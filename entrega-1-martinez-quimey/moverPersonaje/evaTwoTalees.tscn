@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://50odi4j3gjhy"]
+
+[ext_resource type="Texture2D" uid="uid://cpeutjnhtply3" path="res://sprites/evalaKitsune.png" id="1_4ly2x"]
+[ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://eva_two_talees.gd" id="1_u6mwx"]
+
+[node name="evaTwoTales" type="CharacterBody2D"]
+script = ExtResource("1_u6mwx")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(4, 4)
+texture = ExtResource("1_4ly2x")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
