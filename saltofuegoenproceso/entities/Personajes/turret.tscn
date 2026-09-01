@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://cln8aik4u1lng"]
+
+[ext_resource type="Texture2D" uid="uid://boqb4iwkw660" path="res://sprites/turret.png" id="1_odw4x"]
+[ext_resource type="Script" uid="uid://cb21478u4rwwy" path="res://script/turret.gd" id="2_megvq"]
+[ext_resource type="PackedScene" uid="uid://chh051makop3r" path="res://entities/proyectiles/proyectile_malo.tscn" id="3_megvq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wwkb3"]
+size = Vector2(31, 63)
+
+[node name="Turret" type="StaticBody2D" groups=["enemigos"]]
+script = ExtResource("2_megvq")
+projectile_scene = ExtResource("3_megvq")
+
+[node name="FirePosition" type="Marker2D" parent="."]
+position = Vector2(0, -31)
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, -0.5)
+shape = SubResource("RectangleShape2D_wwkb3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_odw4x")
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

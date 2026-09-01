@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://bl0vx3pq705hx"]
+
+[ext_resource type="Script" uid="uid://bv6u3g704e7k4" path="res://script/game.gd" id="1_bmwyx"]
+[ext_resource type="PackedScene" uid="uid://whuuytfa1xog" path="res://entities/Personajes/Player.tscn" id="3_i5be6"]
+[ext_resource type="PackedScene" uid="uid://cln8aik4u1lng" path="res://entities/Personajes/turret.tscn" id="4_f5nmf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
+size = Vector2(1148, 375)
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_bmwyx")
+
+[node name="fondo" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1000.0
+offset_bottom = 1000.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartPosition" type="Marker2D" parent="."]
+position = Vector2(550, 487)
+
+[node name="Player" parent="." instance=ExtResource("3_i5be6")]
+position = Vector2(382, 603)
+
+[node name="Turret" parent="." instance=ExtResource("4_f5nmf")]
+position = Vector2(189, 613)
+
+[node name="Projectiles" type="Node2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(429, 831.5)
+shape = SubResource("RectangleShape2D_0hol4")
+
+[node name="ColorRect" type="ColorRect" parent="StaticBody2D"]
+offset_left = -147.0
+offset_top = 646.0
+offset_right = 1011.0
+offset_bottom = 1028.0
+color = Color(0.189416, 0.424862, 0, 1)
