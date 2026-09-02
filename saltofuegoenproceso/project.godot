@@ -10,10 +10,14 @@ config_version=5
 
 [application]
 
-config/name="kitsune"
+config/name="proyecto final"
 run/main_scene="uid://dnncf2vlm01wn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="uid://bpga5u67s46w4"
+
+[autoload]
+
+Settings="*res://script/Settings.gd"
 
 [dotnet]
 

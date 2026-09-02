@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://chh051makop3r"]
 
-[ext_resource type="PackedScene" uid="uid://boi0i2drj2j55" path="res://entities/proyectiles/abstractproyectile.tscn" id="1_kr4di"]
+[ext_resource type="PackedScene" uid="uid://boi0i2drj2j55" path="res://entities/abstract/abstractproyectile.tscn" id="1_kr4di"]
 [ext_resource type="Texture2D" uid="uid://uwom7lfprpj6" path="res://proyectile_turret.png" id="2_njv3b"]
-[ext_resource type="Script" uid="uid://bucvarytb21db" path="res://entities/proyectiles/proyectile_malo.gd" id="3_fsulx"]
+[ext_resource type="Script" uid="uid://bucvarytb21db" path="res://script/proyectile_malo.gd" id="3_fsulx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_mg0ve"]
 radius = 9.0
