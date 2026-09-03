@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://h2yw1rfppqnk"]
+
+[ext_resource type="Script" uid="uid://b1mbghmqwc743" path="res://script/dialogue_box.gd" id="1_7hyon"]
+
+[node name="DialogueBox" type="CanvasLayer" groups=["dialogue_box"]]
+process_mode = 3
+script = ExtResource("1_7hyon")
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = -3.0
+offset_top = 455.0
+offset_right = 1155.0
+offset_bottom = 654.0
+
+[node name="Portrait" type="TextureRect" parent="Panel"]
+z_index = 10
+layout_mode = 0
+offset_left = 13.0
+offset_top = -87.0
+offset_right = 107.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 2.0
+offset_right = 1142.0
+offset_bottom = 191.0
+
+[node name="Name" type="Label" parent="Panel/TextContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+
+[node name="Text" type="RichTextLabel" parent="Panel/TextContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/bold_italics_font_size = 30
+theme_override_font_sizes/italics_font_size = 30
+theme_override_font_sizes/mono_font_size = 30
+theme_override_font_sizes/normal_font_size = 30
+theme_override_font_sizes/bold_font_size = 30

@@ -1,11 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://dp451odq65s60"]
+[gd_scene load_steps=7 format=3 uid="uid://dp451odq65s60"]
 
 [ext_resource type="Script" uid="uid://bv6u3g704e7k4" path="res://script/game.gd" id="1_l8taw"]
 [ext_resource type="PackedScene" uid="uid://whuuytfa1xog" path="res://entities/Personajes/Player.tscn" id="2_wn5rq"]
 [ext_resource type="PackedScene" uid="uid://cln8aik4u1lng" path="res://entities/Personajes/turret.tscn" id="3_e5dmo"]
+[ext_resource type="PackedScene" uid="uid://cotxbmk3wfw1c" path="res://entities/npc/ciervo_1.tscn" id="4_wn5rq"]
+[ext_resource type="PackedScene" uid="uid://h2yw1rfppqnk" path="res://entities/dialogue_box.tscn" id="5_e5dmo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
-size = Vector2(1148, 375)
+size = Vector2(1549, 375)
 
 [node name="Level1" type="Node2D"]
 script = ExtResource("1_l8taw")
@@ -33,12 +35,19 @@ position = Vector2(189, 613)
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(429, 831.5)
+position = Vector2(629.5, 831.5)
 shape = SubResource("RectangleShape2D_0hol4")
 
 [node name="ColorRect" type="ColorRect" parent="StaticBody2D"]
 offset_left = -147.0
 offset_top = 646.0
-offset_right = 1011.0
+offset_right = 1405.0
 offset_bottom = 1028.0
 color = Color(0.189416, 0.424862, 0, 1)
+
+[node name="Ciervo1" parent="." instance=ExtResource("4_wn5rq")]
+position = Vector2(1285, 603)
+scale = Vector2(4, 4)
+dialogue_scene = null
+
+[node name="DialogueBox" parent="." instance=ExtResource("5_e5dmo")]

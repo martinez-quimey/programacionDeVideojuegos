@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=3 uid="uid://cotxbmk3wfw1c"]
+
+[ext_resource type="PackedScene" uid="uid://m2b170sodkps" path="res://entities/abstract/abstract_npc.tscn" id="1_1qwfr"]
+[ext_resource type="Texture2D" uid="uid://bbtnx50gxvn8a" path="res://sprites/npc/ciervo/ciervo.png" id="2_8s8om"]
+[ext_resource type="Script" uid="uid://c23vbt8qm3ycc" path="res://entities/npc/ciervo_1.gd" id="2_pc4yb"]
+[ext_resource type="Script" uid="uid://bapq5vjdjyixa" path="res://entities/dialogue/ciervo_1_dialogue.gd" id="3_weqfx"]
+
+[node name="Ciervo1" instance=ExtResource("1_1qwfr")]
+script = ExtResource("2_pc4yb")
+dialogue_script = ExtResource("3_weqfx")
+
+[node name="Sprite2D" type="Sprite2D" parent="." index="1"]
+position = Vector2(46, -18)
+texture = ExtResource("2_8s8om")
+
+[connection signal="body_entered" from="InteractionArea" to="." method="_on_interaction_area_body_entered"]
+[connection signal="body_exited" from="InteractionArea" to="." method="_on_interaction_area_body_exited"]

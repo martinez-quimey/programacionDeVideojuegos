@@ -9,6 +9,7 @@ action = &"start"
 events = [SubResource("InputEventAction_64ctp")]
 
 [node name="HUD" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_64ctp")
 
 [node name="MainMenu" type="Control" parent="."]
