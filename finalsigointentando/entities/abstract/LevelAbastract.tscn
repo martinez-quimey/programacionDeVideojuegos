@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://dp451odq65s60"]
+
+[ext_resource type="Script" uid="uid://bv6u3g704e7k4" path="res://script/abstractLevel.gd" id="1_l8taw"]
+[ext_resource type="PackedScene" uid="uid://whuuytfa1xog" path="res://entities/Personajes/Player.tscn" id="2_wn5rq"]
+[ext_resource type="PackedScene" uid="uid://h2yw1rfppqnk" path="res://entities/dialogue_box.tscn" id="5_e5dmo"]
+
+[node name="LevelAbstract" type="Node2D"]
+script = ExtResource("1_l8taw")
+
+[node name="StartPosition" type="Marker2D" parent="."]
+position = Vector2(550, 487)
+
+[node name="Player" parent="." instance=ExtResource("2_wn5rq")]
+position = Vector2(382, 603)
+
+[node name="Projectiles" type="Node2D" parent="."]
+
+[node name="DialogueBox" parent="." instance=ExtResource("5_e5dmo")]
+
+[connection signal="game_paused" from="." to="." method="_on_game_paused"]

@@ -1,3 +1,4 @@
+#main
 extends Node2D
 
 @onready var game_container: Node2D = $GameContainer
@@ -31,6 +32,8 @@ func load_level(level_scene: PackedScene) -> void:
 	game_container.add_child(game)
 
 	game.player_died.connect(_on_player_died)
+	game.game_paused.connect(_on_game_paused)
+
 
 
 func _on_player_died() -> void:
@@ -39,6 +42,9 @@ func _on_player_died() -> void:
 		game = null
 
 	hud.show_game_over()
+
+func _on_game_paused() -> void:
+	hud.show_pause_menu()
 
 
 func _on_main_menu() -> void:

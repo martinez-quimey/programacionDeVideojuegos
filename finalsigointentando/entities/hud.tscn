@@ -128,6 +128,39 @@ layout_mode = 2
 [node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
 layout_mode = 2
 
+[node name="Pause" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Pause"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause/CenterContainer"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "pausa"
+
+[node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "main menu"
+
 [connection signal="main_menu" from="." to="." method="_on_main_menu"]
 [connection signal="retry_game" from="." to="." method="_on_retry_game"]
 [connection signal="start_game" from="." to="." method="_on_start_game"]

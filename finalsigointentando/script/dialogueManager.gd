@@ -10,6 +10,7 @@ var dialogue_box: DialogueBox
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	
 
 
 func _process(_delta: float) -> void:
@@ -37,6 +38,7 @@ func start_dialogue(dialogue: Dialogue) -> void:
 
 	print("Diálogo iniciado")
 	print("Cantidad de líneas: ", current_dialogue.lines.size())
+	Settings.sePuedePausar = false
 
 	show_current_line()
 
@@ -68,3 +70,4 @@ func end_dialogue() -> void:
 	current_dialogue = null
 
 	get_tree().paused = false
+	Settings.sePuedePausar = true
