@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://qkdek6nk8wiu"]
+
+[ext_resource type="Script" uid="uid://csd4bdxl1glrb" path="res://dialogue_line.gd" id="1_d4nly"]
+
+[node name="DialogueLine" type="Node"]
+script = ExtResource("1_d4nly")

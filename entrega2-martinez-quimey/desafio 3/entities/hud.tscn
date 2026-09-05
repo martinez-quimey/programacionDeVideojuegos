@@ -1,0 +1,167 @@
+[gd_scene load_steps=4 format=3 uid="uid://dnhtvjtnlqq8e"]
+
+[ext_resource type="Script" uid="uid://bh8cv8kqckg8x" path="res://script/hud.gd" id="1_64ctp"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_64ctp"]
+action = &"start"
+
+[sub_resource type="Shortcut" id="Shortcut_8sq4i"]
+events = [SubResource("InputEventAction_64ctp")]
+
+[node name="HUD" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_64ctp")
+
+[node name="MainMenu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -145.5
+offset_right = 250.0
+offset_bottom = 145.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu/CenterContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainMenu/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Eva Two Tales Kitsune"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="StartButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_8sq4i")
+text = "Start"
+
+[node name="LanguageButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GameOver" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="GameOver"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOver/CenterContainer"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="GameOver/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Has muerto
+"
+
+[node name="RetryButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MainMenuButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LanguageMenu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="LanguageMenu"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LanguageMenu/CenterContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpanishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EnglishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Pause" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Pause"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause/CenterContainer"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "pausa"
+
+[node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "main menu"
+
+[connection signal="main_menu" from="." to="." method="_on_main_menu"]
+[connection signal="retry_game" from="." to="." method="_on_retry_game"]
+[connection signal="start_game" from="." to="." method="_on_start_game"]
+[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]

@@ -1,0 +1,9 @@
+[gd_scene load_steps=4 format=3 uid="uid://bbpl7jcmt6nrd"]
+
+[ext_resource type="PackedScene" uid="uid://bac4l51qynyd7" path="res://entities/abstract/dialogue.tscn" id="1_qfies"]
+[ext_resource type="Script" uid="uid://bapq5vjdjyixa" path="res://entities/dialogue/ciervo_1_dialogue.gd" id="2_5awq4"]
+[ext_resource type="Texture2D" uid="uid://bpga5u67s46w4" path="res://icon.svg" id="3_8sqcc"]
+
+[node name="Ciervo1Dialogue" instance=ExtResource("1_qfies")]
+script = ExtResource("2_5awq4")
+imagenDEEva = ExtResource("3_8sqcc")

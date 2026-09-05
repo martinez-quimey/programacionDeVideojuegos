@@ -1,0 +1,63 @@
+[gd_scene load_steps=13 format=3 uid="uid://d1vqhl5w3s8st"]
+
+[ext_resource type="PackedScene" uid="uid://boi0i2drj2j55" path="res://entities/abstract/abstractproyectile.tscn" id="1_f4ckb"]
+[ext_resource type="Texture2D" uid="uid://fed8xci1c13n" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_01.png" id="2_t6wwp"]
+[ext_resource type="Script" uid="uid://byw5bpd6v7sse" path="res://script/proyectile_fuego.gd" id="2_yll5o"]
+[ext_resource type="Texture2D" uid="uid://dr5fx6wpc3xcc" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_02.png" id="3_yll5o"]
+[ext_resource type="Texture2D" uid="uid://dxfod8nsofjac" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_03.png" id="4_xaa7q"]
+[ext_resource type="Texture2D" uid="uid://dfmra1cx3qyqy" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_04.png" id="5_t5ltk"]
+[ext_resource type="Texture2D" uid="uid://odvcood5qxm3" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_05.png" id="6_rmxua"]
+[ext_resource type="Texture2D" uid="uid://b6075sc3wmxfx" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_06.png" id="7_r76y0"]
+[ext_resource type="Texture2D" uid="uid://ceagv56503yta" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_07.png" id="8_s3oxd"]
+[ext_resource type="Texture2D" uid="uid://d7x7grvqpf5t" path="res://sprites/Fire Arrow/PNG/Fire Arrow_Frame_08.png" id="9_7eci0"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xygmf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_t6wwp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_yll5o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_xaa7q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_t5ltk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_rmxua")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_r76y0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_s3oxd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_7eci0")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xaa7q"]
+radius = 70.0
+height = 260.0
+
+[node name="ProyectileFuego" instance=ExtResource("1_f4ckb")]
+rotation = 1.5708
+scale = Vector2(0.5, 0.5)
+script = ExtResource("2_yll5o")
+speed = 300.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="1"]
+rotation = 3.14159
+sprite_frames = SubResource("SpriteFrames_xygmf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="2"]
+position = Vector2(130, -5.68248e-06)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_xaa7q")
