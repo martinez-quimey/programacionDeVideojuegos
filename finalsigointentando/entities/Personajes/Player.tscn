@@ -1,22 +1,32 @@
-[gd_scene load_steps=8 format=3 uid="uid://whuuytfa1xog"]
+[gd_scene load_steps=15 format=3 uid="uid://whuuytfa1xog"]
 
 [ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
-[ext_resource type="Texture2D" uid="uid://bd63t7sur10ha" path="res://sprites/eva/eva two tales kitsune_0001.png" id="2_a1f57"]
-[ext_resource type="Texture2D" uid="uid://pvbptpv67ckc" path="res://sprites/eva/eva two tales kitsune_0002.png" id="3_25mxy"]
-[ext_resource type="Texture2D" uid="uid://bihhrb58erdln" path="res://sprites/eva/eva two tales kitsune_0003.png" id="4_dv4ir"]
-[ext_resource type="Texture2D" uid="uid://cd5s2ilo0ut8m" path="res://sprites/eva/eva two tales kitsune_0004.png" id="5_idcse"]
+[ext_resource type="Texture2D" uid="uid://cpo2ylm6clocq" path="res://sprites/eva/correr/eva two tales kitsuneCorrer2.png" id="2_a1f57"]
+[ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="2_bqvfx"]
+[ext_resource type="Texture2D" uid="uid://ctywnma7c8gtt" path="res://sprites/eva/caminar/eva two tales kitsune_0002.png" id="3_25mxy"]
+[ext_resource type="Texture2D" uid="uid://b5ihn2547exqm" path="res://sprites/eva/caminar/eva two tales kitsunecaminar.png" id="3_ar323"]
+[ext_resource type="Texture2D" uid="uid://bofs15gio8lny" path="res://sprites/eva/caminar/eva two tales kitsune_0003.png" id="4_dv4ir"]
+[ext_resource type="Texture2D" uid="uid://47fueng3tmld" path="res://sprites/eva/caminar/eva two tales kitsune_0004.png" id="5_idcse"]
+[ext_resource type="Texture2D" uid="uid://bflvfvfm6fhby" path="res://sprites/eva/correr/eva two tales kitsune4,5.png" id="6_e6e86"]
+[ext_resource type="Texture2D" uid="uid://daw5cio0pbybd" path="res://sprites/eva/correr/eva two tales kitsuneCorrer.png" id="7_tr6hg"]
+[ext_resource type="Texture2D" uid="uid://cdtdtiaf6ipdo" path="res://sprites/eva/correr/eva two tales kitsuneCorrer3.png" id="8_ar323"]
+[ext_resource type="Texture2D" uid="uid://doi2ffw4rwqbc" path="res://sprites/eva/correr/eva two tales kitsuneCorrer4.png" id="9_e6e86"]
+[ext_resource type="Texture2D" uid="uid://bu3go3q454wpk" path="res://sprites/eva/eva two tales kitsuneSalto.png" id="12_5p1bl"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lderi"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_a1f57")
+"texture": ExtResource("3_ar323")
 }, {
 "duration": 1.0,
 "texture": ExtResource("3_25mxy")
 }, {
 "duration": 1.0,
 "texture": ExtResource("4_dv4ir")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_e6e86")
 }, {
 "duration": 1.0,
 "texture": ExtResource("5_idcse")
@@ -27,16 +37,16 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("7_tr6hg")
+}, {
+"duration": 1.0,
 "texture": ExtResource("2_a1f57")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_25mxy")
+"texture": ExtResource("8_ar323")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_dv4ir")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_idcse")
+"texture": ExtResource("9_e6e86")
 }],
 "loop": true,
 "name": &"correr",
@@ -49,21 +59,30 @@ animations = [{
 "loop": true,
 "name": &"quieta",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_5p1bl")
+}],
+"loop": true,
+"name": &"salto",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
-size = Vector2(160, 85)
+size = Vector2(134, 85)
 
 [node name="Player" type="CharacterBody2D" groups=["jugador"]]
 script = ExtResource("1_l1ths")
+projectile_scene = ExtResource("2_bqvfx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"correr"
+animation = &"salto"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(19, -1.5)
+position = Vector2(21, -1.5)
 shape = SubResource("RectangleShape2D_l1ths")
 
 [node name="PlayerStart" type="Marker2D" parent="."]
@@ -73,5 +92,9 @@ position = Vector2(27, 39)
 
 [node name="FirePosition" type="Marker2D" parent="."]
 position = Vector2(27, 39)
+
+[node name="TiempoFuego" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
 
 [connection signal="died" from="." to="." method="_on_died"]

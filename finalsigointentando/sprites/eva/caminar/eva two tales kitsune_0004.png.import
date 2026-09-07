@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cd5s2ilo0ut8m"
-path="res://.godot/imported/eva two tales kitsune_0004.png-4b4e82060f9b285b794adf7a32b4bf3e.ctex"
+uid="uid://47fueng3tmld"
+path="res://.godot/imported/eva two tales kitsune_0004.png-9a96353aa47ccaafb4cbe6941087d263.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/eva/eva two tales kitsune_0004.png"
-dest_files=["res://.godot/imported/eva two tales kitsune_0004.png-4b4e82060f9b285b794adf7a32b4bf3e.ctex"]
+source_file="res://sprites/eva/caminar/eva two tales kitsune_0004.png"
+dest_files=["res://.godot/imported/eva two tales kitsune_0004.png-9a96353aa47ccaafb4cbe6941087d263.ctex"]
 
 [params]
 

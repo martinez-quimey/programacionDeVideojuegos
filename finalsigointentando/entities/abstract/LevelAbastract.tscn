@@ -1,8 +1,14 @@
-[gd_scene load_steps=4 format=3 uid="uid://dp451odq65s60"]
+[gd_scene load_steps=6 format=3 uid="uid://dp451odq65s60"]
 
 [ext_resource type="Script" uid="uid://bv6u3g704e7k4" path="res://script/abstractLevel.gd" id="1_l8taw"]
 [ext_resource type="PackedScene" uid="uid://whuuytfa1xog" path="res://entities/Personajes/Player.tscn" id="2_wn5rq"]
 [ext_resource type="PackedScene" uid="uid://h2yw1rfppqnk" path="res://entities/dialogue_box.tscn" id="5_e5dmo"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvnwp"]
+bg_color = Color(0.755235, 0.566486, 0.092648, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x8ioc"]
+bg_color = Color(0.921644, 0.430204, 0.338873, 1)
 
 [node name="LevelAbstract" type="Node2D"]
 script = ExtResource("1_l8taw")
@@ -14,8 +20,27 @@ position = Vector2(550, 487)
 
 [node name="Player" parent="." instance=ExtResource("2_wn5rq")]
 position = Vector2(382, 603)
-projectile_scene = null
 
 [node name="DialogueBox" parent="." instance=ExtResource("5_e5dmo")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="barraDeFuego" type="ProgressBar" parent="CanvasLayer"]
+offset_left = 8.0
+offset_top = 265.0
+offset_right = 362.0
+offset_bottom = 339.0
+theme_override_colors/font_outline_color = Color(0.634865, 0.559779, 0.0531301, 1)
+theme_override_styles/fill = SubResource("StyleBoxFlat_qvnwp")
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
+
+[node name="barraDeVida" type="ProgressBar" parent="CanvasLayer2"]
+offset_left = 11.0
+offset_top = 348.0
+offset_right = 365.0
+offset_bottom = 422.0
+theme_override_colors/font_outline_color = Color(0.688424, 0.233111, 0.197215, 1)
+theme_override_styles/fill = SubResource("StyleBoxFlat_x8ioc")
 
 [connection signal="game_paused" from="." to="." method="_on_game_paused"]

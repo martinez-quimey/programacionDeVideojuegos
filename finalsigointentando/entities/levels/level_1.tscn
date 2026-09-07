@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://b0j7kamy10wcn"]
+[gd_scene load_steps=6 format=3 uid="uid://b0j7kamy10wcn"]
 
 [ext_resource type="PackedScene" uid="uid://dp451odq65s60" path="res://entities/abstract/LevelAbastract.tscn" id="1_m7xcs"]
 [ext_resource type="PackedScene" uid="uid://cotxbmk3wfw1c" path="res://entities/npc/ciervo_1.tscn" id="2_t1qc2"]
@@ -6,6 +6,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
 size = Vector2(2694, 375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f45qw"]
+size = Vector2(215.5, 360)
 
 [node name="Level1" instance=ExtResource("1_m7xcs")]
 
@@ -27,22 +30,57 @@ scale = Vector2(4, 4)
 [node name="Turret" parent="." index="2" instance=ExtResource("3_f45qw")]
 position = Vector2(60, 615)
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." index="4"]
+[node name="paredes" type="Node2D" parent="." index="4"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" index="0"]
+[node name="Suelo" type="Node2D" parent="paredes" index="0"]
+
+[node name="suelo" type="StaticBody2D" parent="paredes/Suelo" index="0"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/Suelo/suelo" index="0"]
 position = Vector2(1202, 831.5)
 shape = SubResource("RectangleShape2D_0hol4")
 
-[node name="ColorRect" type="ColorRect" parent="StaticBody2D/CollisionShape2D" index="0"]
+[node name="ColorRect" type="ColorRect" parent="paredes/Suelo/suelo/CollisionShape2D" index="0"]
 offset_left = -1348.0
 offset_top = -184.0
 offset_right = 1347.0
 offset_bottom = 197.0
 color = Color(0.189416, 0.424862, 0, 1)
 
+[node name="paredSalto2" type="Node2D" parent="paredes" index="1"]
+
+[node name="paredSalto2" type="StaticBody2D" parent="paredes/paredSalto2" index="0"]
+collision_layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="paredes/paredSalto2/paredSalto2" index="0"]
+offset_left = 2019.0
+offset_top = -86.0
+offset_right = 2243.0
+offset_bottom = 278.0
+color = Color(0.456449, 0.217861, 0.13735, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/paredSalto2/paredSalto2" index="1"]
+position = Vector2(2131.75, 95)
+shape = SubResource("RectangleShape2D_f45qw")
+
+[node name="paredSalto1" type="Node2D" parent="paredes" index="2"]
+
+[node name="paredSalto1" type="StaticBody2D" parent="paredes/paredSalto1" index="0"]
+collision_layer = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/paredSalto1/paredSalto1" index="0"]
+position = Vector2(2602, 324)
+shape = SubResource("RectangleShape2D_f45qw")
+
+[node name="ColorRect" type="ColorRect" parent="paredes/paredSalto1/paredSalto1" index="1"]
+offset_left = 2494.0
+offset_top = 143.0
+offset_right = 2718.0
+offset_bottom = 507.0
+color = Color(0.456449, 0.217861, 0.13735, 1)
+
 [node name="StartPosition" parent="." index="5"]
 position = Vector2(539, 603)
 
 [node name="Player" parent="." index="6"]
 position = Vector2(518, 602)
-projectile_scene = null

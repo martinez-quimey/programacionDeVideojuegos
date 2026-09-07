@@ -11,5 +11,5 @@ func _on_body_entered(body):
 
 		explotar()
 	elif body.is_in_group("jugador"):
-		body.morir()
+		body.herir()
 		explotar()
