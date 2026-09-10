@@ -8,9 +8,9 @@ script = ExtResource("1_7hyon")
 
 [node name="Panel" type="Panel" parent="."]
 offset_left = -3.0
-offset_top = 455.0
+offset_top = 550.0
 offset_right = 1155.0
-offset_bottom = 654.0
+offset_bottom = 749.0
 
 [node name="Portrait" type="TextureRect" parent="Panel"]
 z_index = 10

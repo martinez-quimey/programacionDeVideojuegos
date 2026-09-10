@@ -10,6 +10,7 @@ func _ready() -> void:
 	# Conectar botones
 	$MainMenu/CenterContainer/VBoxContainer/StartButton.pressed.connect(_on_start_button_pressed)
 	$MainMenu/CenterContainer/VBoxContainer/LanguageButton.pressed.connect(_on_language_button_pressed)
+	$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.pressed.connect(_on_quit_game_button_pressed)
 
 	$GameOver/CenterContainer/VBoxContainer/RetryButton.pressed.connect(_on_retry_button_pressed)
 	$GameOver/CenterContainer/VBoxContainer/MainMenuButton.pressed.connect(_on_main_menu_button_pressed)
@@ -67,6 +68,7 @@ func update_language() -> void:
 		$MainMenu/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
 		$MainMenu/CenterContainer/VBoxContainer/StartButton.text = "Jugar"
 		$MainMenu/CenterContainer/VBoxContainer/LanguageButton.text = "Idioma"
+		$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.text = "Cerrar juego"
 
 		$GameOver/CenterContainer/VBoxContainer/Message.text = "Game Over"
 		$GameOver/CenterContainer/VBoxContainer/RetryButton.text = "Reintentar"
@@ -85,6 +87,7 @@ func update_language() -> void:
 		$MainMenu/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
 		$MainMenu/CenterContainer/VBoxContainer/StartButton.text = "Play"
 		$MainMenu/CenterContainer/VBoxContainer/LanguageButton.text = "Language"
+		$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.text = "Quit game"
 
 		$GameOver/CenterContainer/VBoxContainer/Message.text = "Game Over"
 		$GameOver/CenterContainer/VBoxContainer/RetryButton.text = "Retry"
@@ -107,12 +110,16 @@ func update_language() -> void:
 func _on_start_button_pressed() -> void:
 	print("JUGAR")
 	$MainMenu.hide()
-	start_game.emit()
+	retry_game.emit()
 
 
 func _on_language_button_pressed() -> void:
 	print("IDIOMA")
 	show_language_menu()
+	
+func _on_quit_game_button_pressed() -> void:
+	get_tree().quit()
+
 
 
 # =========================
@@ -161,4 +168,7 @@ func _on_continuar_button_pressed() -> void:
 	
 func _on_main_menu_button2_pressed() -> void:
 	print("VOLVER AL MENU")
+	get_tree().paused = false
+	Settings.sePuedePausar = true
+	$Pause.hide()
 	main_menu.emit()

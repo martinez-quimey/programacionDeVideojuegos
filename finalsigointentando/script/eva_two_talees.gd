@@ -23,13 +23,39 @@ const FRICTION = 1000.0
 const WALL_JUMP_FORCE = 650.0
 const WALL_SLIDE_SPEED = 150.0
 
-# Paredes especiales = Collision Layer 3
 const WALL_LAYER = 3
 
+# ==========================================
+# TURBO FUEGO
+# ==========================================
+
+const ENERGIA_TURBO = 3
+const FUERZA_TURBO = 3500.0
+const DURACION_TURBO = 0.15
+
+# Los enemigos estarán en Collision Layer 4
+const ENEMIGO_LAYER = 4
+
+var turbo_activo: bool = false
+
+# Guarda cómo estaba la máscara antes del turbo.
+var colision_enemigos_original: bool
+
+
+# ==========================================
+# REFERENCIAS
+# ==========================================
 
 @onready var fire_position: Marker2D = $FirePosition
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+
+@onready var tiempo_recarga_fuego = $TiempoRecargaFuego
+
+@onready var barra = $"../CanvasLayer/barraDeFuego"
+@onready var barraVida = $"../CanvasLayer2/barraDeVida"
+
+@onready var hitbox_turbo: Area2D = $HitboxTurbo
 
 signal hit
 signal died
@@ -39,11 +65,12 @@ signal died
 var screen_size: Vector2
 
 var seSalto: bool = false
-
+var saltoFuego: bool = false
 
 var activo: bool = false
 
 var projectile_container: Node
+
 
 # ==========================================
 # ESTADO DE PARED
@@ -52,36 +79,81 @@ var projectile_container: Node
 var agarrado_pared: bool = false
 var pared_normal: Vector2 = Vector2.ZERO
 
-# Evita volver a agarrarse inmediatamente
-# después de hacer un wall jump.
 var puede_agarrarse_pared: bool = true
+
+
+# ==========================================
+# VIDA
+# ==========================================
+
 var vida: int = 5
 
-@onready var timer = $TiempoFuego
-@onready var barra = $"../CanvasLayer/barraDeFuego" #barra del timer del salto fuego
-@onready var barraVida = $"../CanvasLayer2/barraDeVida" 
 
-	
+# ==========================================
+# ENERGÍA DE FUEGO
+# ==========================================
+
+const ENERGIA_MAXIMA = 5
+
+var energia_fuego: int = 5
+
+
 func _ready() -> void:
+
 	screen_size = get_viewport_rect().size
+
+
+	# ==========================================
+	# BARRA DE VIDA
+	# ==========================================
 
 	barraVida.max_value = vida
 	barraVida.value = vida
 
-	hide()
 
+	# ==========================================
+	# BARRA DE FUEGO
+	# ==========================================
+
+	barra.min_value = 0
+	barra.max_value = ENERGIA_MAXIMA
+	barra.value = energia_fuego
+
+
+	# ==========================================
+	# HITBOX TURBO
+	# ==========================================
+
+	hitbox_turbo.monitoring = false
+
+
+	# ==========================================
+	# GUARDAR ESTADO DE COLISIÓN
+	# ==========================================
+
+	colision_enemigos_original = get_collision_mask_value(ENEMIGO_LAYER)
+
+
+	hide()
 
 
 func _physics_process(delta: float) -> void:
 
-	if timer.is_stopped():
-		barra.value = 0
-	else:
-		barra.value = (timer.time_left / timer.wait_time) * 100
-
 	if not activo:
 		return
 
+
+	# ==========================================
+	# TURBO FUEGO
+	# ==========================================
+
+	if Input.is_action_just_pressed("turboFuego"):
+
+		if energia_fuego >= ENERGIA_TURBO \
+		and not turbo_activo \
+		and not agarrado_pared:
+
+			activar_turbo()
 
 
 	# ==========================================
@@ -92,31 +164,33 @@ func _physics_process(delta: float) -> void:
 	var caminando := Input.is_action_pressed("caminar")
 
 
-	if direccion != 0:
+	if not turbo_activo:
 
-		if caminando:
+		if direccion != 0:
 
-			velocity.x = move_toward(
-				velocity.x,
-				direccion * SPEEDCAMINANDO,
-				ACCELERATION * delta
-			)
+			if caminando:
+
+				velocity.x = move_toward(
+					velocity.x,
+					direccion * SPEEDCAMINANDO,
+					ACCELERATION * delta
+				)
+
+			else:
+
+				velocity.x = move_toward(
+					velocity.x,
+					direccion * MAX_SPEED,
+					ACCELERATION * delta
+				)
 
 		else:
 
 			velocity.x = move_toward(
 				velocity.x,
-				direccion * MAX_SPEED,
-				ACCELERATION * delta
+				0.0,
+				FRICTION * delta
 			)
-
-	else:
-
-		velocity.x = move_toward(
-			velocity.x,
-			0.0,
-			FRICTION * delta
-		)
 
 
 	# ==========================================
@@ -132,7 +206,7 @@ func _physics_process(delta: float) -> void:
 				WALL_SLIDE_SPEED
 			)
 
-		else:
+		elif not turbo_activo:
 
 			velocity.y += GRAVITY * delta
 
@@ -141,7 +215,7 @@ func _physics_process(delta: float) -> void:
 	# SALTO
 	# ==========================================
 
-	if Input.is_action_just_pressed("salto"):
+	if Input.is_action_just_pressed("salto") and not turbo_activo:
 
 		# ==========================================
 		# WALL JUMP
@@ -149,39 +223,18 @@ func _physics_process(delta: float) -> void:
 
 		if agarrado_pared:
 
-			# Guardamos la dirección antes de salir.
 			var direccion_salto := pared_normal.x
-
-			# --------------------------------------
-			# IMPULSO
-			# --------------------------------------
 
 			velocity.x = direccion_salto * WALL_JUMP_FORCE
 			velocity.y = JUMP_FORCE
 
-			# --------------------------------------
-			# RECUPERAR HABILIDADES
-			# --------------------------------------
-
 			seSalto = false
-
-
-			# --------------------------------------
-			# SALIR DE LA PARED
-			# --------------------------------------
+			saltoFuego = false
 
 			agarrado_pared = false
 			pared_normal = Vector2.ZERO
 
-			# --------------------------------------
-			# BLOQUEAR AGARRE INMEDIATO
-			# --------------------------------------
-
 			puede_agarrarse_pared = false
-
-			# --------------------------------------
-			# VOLVER A ORIENTACIÓN NORMAL
-			# --------------------------------------
 
 			rotation = 0.0
 
@@ -212,22 +265,28 @@ func _physics_process(delta: float) -> void:
 	# SALTO CON FUEGO
 	# ==========================================
 
-	if Input.is_action_just_pressed("saltoFuego")  :
-		if ($TiempoFuego.is_stopped()) :
+	if Input.is_action_just_pressed("saltoFuego") and not turbo_activo:
+
+		if energia_fuego >= 2 and saltoFuego == false:
+
+			energia_fuego -= 2
+
+			barra.value = energia_fuego
+
 			velocity.y = JUMP_FIRE_FORCE
 
 			fire()
-			$TiempoFuego.start()
 
+			saltoFuego = true
 
-			# Salimos de la pared.
+			if tiempo_recarga_fuego.is_stopped():
+
+				tiempo_recarga_fuego.start()
+
 			agarrado_pared = false
 			pared_normal = Vector2.ZERO
 
-			# Volver a la orientación normal.
 			rotation = 0.0
-		else:
-			pass
 
 
 	# ==========================================
@@ -241,8 +300,6 @@ func _physics_process(delta: float) -> void:
 	# PERMITIR VOLVER A AGARRARSE
 	# ==========================================
 
-	# Cuando ya nos alejamos de la pared,
-	# volvemos a permitir el wall grab.
 	if not is_on_wall():
 
 		puede_agarrarse_pared = true
@@ -252,23 +309,25 @@ func _physics_process(delta: float) -> void:
 	# DETECTAR PARED
 	# ==========================================
 
-	detectar_pared()
+	if not turbo_activo:
+
+		detectar_pared()
 
 
 	# ==========================================
 	# RESETEAR AL TOCAR EL SUELO
 	# ==========================================
 
-	if is_on_floor():
+	if is_on_floor() and not turbo_activo:
 
 		seSalto = false
+		saltoFuego = false
 
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
 
 		puede_agarrarse_pared = true
 
-		# Personaje vuelve a posición normal.
 		rotation = 0.0
 
 
@@ -276,7 +335,166 @@ func _physics_process(delta: float) -> void:
 	# ANIMACIONES
 	# ==========================================
 
-	actualizar_animacion(direccion, caminando)
+	if not turbo_activo:
+
+		actualizar_animacion(direccion, caminando)
+
+
+# ==========================================
+# ACTIVAR TURBO FUEGO
+# ==========================================
+
+func activar_turbo() -> void:
+
+	turbo_activo = true
+
+
+	# ==========================================
+	# GASTAR ENERGÍA
+	# ==========================================
+
+	energia_fuego -= ENERGIA_TURBO
+
+	barra.value = energia_fuego
+
+
+	# ==========================================
+	# INICIAR RECARGA
+	# ==========================================
+
+	if tiempo_recarga_fuego.is_stopped():
+
+		tiempo_recarga_fuego.start()
+
+
+	# ==========================================
+	# SALIR DE LA PARED
+	# ==========================================
+
+	agarrado_pared = false
+	pared_normal = Vector2.ZERO
+
+	rotation = 0.0
+
+
+	# ==========================================
+	# HACERSE INVULNERABLE
+	# ==========================================
+
+	$invulnerabilidad.stop()
+
+
+	# ==========================================
+	# QUITAR COLISIÓN CON ENEMIGOS
+	# ==========================================
+
+	colision_enemigos_original = get_collision_mask_value(ENEMIGO_LAYER)
+
+	set_collision_mask_value(ENEMIGO_LAYER, false)
+
+
+	# ==========================================
+	# ACTIVAR HITBOX
+	# ==========================================
+
+	hitbox_turbo.monitoring = true
+
+
+	# ==========================================
+	# ANIMACIÓN
+	# ==========================================
+
+	animated_sprite.animation = "turboFuego"
+	animated_sprite.play()
+
+
+	# ==========================================
+	# PROPULSIÓN
+	# ==========================================
+
+	if animated_sprite.flip_h:
+
+		velocity.x = -FUERZA_TURBO
+
+	else:
+
+		velocity.x = FUERZA_TURBO
+
+
+	# ==========================================
+	# DURACIÓN
+	# ==========================================
+
+	await get_tree().create_timer(DURACION_TURBO).timeout
+
+	desactivar_turbo()
+
+
+# ==========================================
+# DESACTIVAR TURBO
+# ==========================================
+
+func desactivar_turbo() -> void:
+
+	turbo_activo = false
+
+
+	# ==========================================
+	# DESACTIVAR HITBOX
+	# ==========================================
+
+	hitbox_turbo.monitoring = false
+
+
+	# ==========================================
+	# RESTAURAR COLISIÓN CON ENEMIGOS
+	# ==========================================
+
+	set_collision_mask_value(
+		ENEMIGO_LAYER,
+		colision_enemigos_original
+	)
+
+
+	# ==========================================
+	# VELOCIDAD NORMAL MÁXIMA
+	# ==========================================
+
+	velocity.x = sign(velocity.x) * MAX_SPEED
+
+
+	animated_sprite.visible = true
+
+
+# ==========================================
+# HITBOX DEL TURBO
+# ==========================================
+
+func _on_hitbox_turbo_body_entered(body: Node2D) -> void:
+
+	if body.is_in_group("enemigos"):
+
+		if body.has_method("herir"):
+
+			body.herir()
+
+
+# ==========================================
+# RECARGAR ENERGÍA DE FUEGO
+# ==========================================
+
+func recargar_energia_fuego() -> void:
+
+	if energia_fuego < ENERGIA_MAXIMA:
+
+		energia_fuego += 1
+
+		barra.value = energia_fuego
+
+
+	if energia_fuego < ENERGIA_MAXIMA:
+
+		tiempo_recarga_fuego.start()
 
 
 # ==========================================
@@ -284,10 +502,6 @@ func _physics_process(delta: float) -> void:
 # ==========================================
 
 func detectar_pared() -> void:
-
-	# ==========================================
-	# BLOQUEO DESPUÉS DE WALL JUMP
-	# ==========================================
 
 	if not puede_agarrarse_pared:
 
@@ -298,10 +512,6 @@ func detectar_pared() -> void:
 		return
 
 
-	# ==========================================
-	# SUELO
-	# ==========================================
-
 	if is_on_floor():
 
 		agarrado_pared = false
@@ -309,10 +519,6 @@ func detectar_pared() -> void:
 
 		return
 
-
-	# ==========================================
-	# NO ESTÁ EN UNA PARED
-	# ==========================================
 
 	if not is_on_wall():
 
@@ -322,28 +528,22 @@ func detectar_pared() -> void:
 		return
 
 
-	# ==========================================
-	# BUSCAR COLISIÓN CON PARED ESPECIAL
-	# ==========================================
-
 	for i in get_slide_collision_count():
 
 		var collision := get_slide_collision(i)
 
 		var collider := collision.get_collider()
 
-		# Solo paredes verticales.
+
 		if abs(collision.get_normal().x) < 0.8:
+
 			continue
 
 
 		if not collider is CollisionObject2D:
+
 			continue
 
-
-		# ==========================================
-		# COMPROBAR COLLISION LAYER 3
-		# ==========================================
 
 		if collider.collision_layer & (1 << (WALL_LAYER - 1)):
 
@@ -354,33 +554,17 @@ func detectar_pared() -> void:
 			velocity.x = 0.0
 
 
-			# ======================================
-			# ROTAR EL PERSONAJE
-			# ======================================
-
 			if pared_normal.x < 0:
-
-				# Pared a la derecha.
-				#
-				# Los pies quedan hacia la derecha.
 
 				rotation = deg_to_rad(-90.0)
 
 			else:
-
-				# Pared a la izquierda.
-				#
-				# Los pies quedan hacia la izquierda.
 
 				rotation = deg_to_rad(90.0)
 
 
 			return
 
-
-	# ==========================================
-	# NO ES UNA PARED ESPECIAL
-	# ==========================================
 
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
@@ -394,13 +578,8 @@ func detectar_pared() -> void:
 
 func actualizar_animacion(direccion: float, caminando: bool) -> void:
 
-	# ==========================================
-	# PARED
-	# ==========================================
-
 	if agarrado_pared:
 
-		# La animación sigue siendo quieta.
 		animated_sprite.animation = "quieta"
 
 		animated_sprite.flip_h = false
@@ -410,10 +589,6 @@ func actualizar_animacion(direccion: float, caminando: bool) -> void:
 
 		return
 
-
-	# ==========================================
-	# AIRE
-	# ==========================================
 
 	if not is_on_floor():
 
@@ -426,10 +601,6 @@ func actualizar_animacion(direccion: float, caminando: bool) -> void:
 
 		return
 
-
-	# ==========================================
-	# SUELO
-	# ==========================================
 
 	animated_sprite.flip_v = false
 
@@ -516,7 +687,6 @@ func start(pos: Vector2, projectile_container) -> void:
 
 	rotation = 0.0
 
-	# Restablecer estado de pared.
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 	puede_agarrarse_pared = true
@@ -525,17 +695,51 @@ func start(pos: Vector2, projectile_container) -> void:
 	set_process(true)
 
 
-
 # ==========================================
-# herido
+# HERIDO
 # ==========================================
 
 func herir():
-	vida -= 1
-	barraVida.value = vida
 
-	if vida <= 0:
-		morir()
+	# Durante el turbo no puede recibir daño.
+	if turbo_activo:
+
+		return
+
+
+	if $invulnerabilidad.is_stopped():
+
+		vida -= 1
+
+		barraVida.value = vida
+
+		$invulnerabilidad.start()
+
+		animacionHerida()
+
+		if vida <= 0:
+
+			morir()
+
+
+# ==========================================
+# ANIMACIÓN DE HERIDA
+# ==========================================
+
+func animacionHerida():
+
+	while not $invulnerabilidad.is_stopped():
+
+		$AnimatedSprite2D.visible = false
+
+		await get_tree().create_timer(0.1).timeout
+
+		$AnimatedSprite2D.visible = true
+
+		await get_tree().create_timer(0.1).timeout
+
+
+	$AnimatedSprite2D.visible = true
 
 
 # ==========================================
@@ -547,6 +751,16 @@ func morir():
 	died.emit()
 
 	set_physics_process(false)
+
 	set_process(false)
 
 	hide()
+
+
+# ==========================================
+# TIMEOUT DEL TIMER DE RECARGA
+# ==========================================
+
+func _on_tiempo_recarga_fuego_timeout() -> void:
+
+	recargar_energia_fuego()

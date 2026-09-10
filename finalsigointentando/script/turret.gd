@@ -60,5 +60,5 @@ func _on_projectile_delete_requested(projectile):
 	projectile.queue_free()
 
 
-func morir():
+func herir():
 	queue_free()

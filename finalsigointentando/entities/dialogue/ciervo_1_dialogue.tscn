@@ -6,4 +6,5 @@
 
 [node name="Ciervo1Dialogue" instance=ExtResource("1_qfies")]
 script = ExtResource("2_5awq4")
-imagenDEEva = ExtResource("3_8sqcc")
+imagenDEEvaAlegre = ExtResource("3_8sqcc")
+imagenDeEvaFastidiada = ExtResource("3_8sqcc")

@@ -26,20 +26,23 @@ position = Vector2(382, 603)
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="barraDeFuego" type="ProgressBar" parent="CanvasLayer"]
-offset_left = 8.0
-offset_top = 265.0
-offset_right = 362.0
-offset_bottom = 339.0
+offset_left = 6.0
+offset_top = 173.0
+offset_right = 360.0
+offset_bottom = 247.0
 theme_override_colors/font_outline_color = Color(0.634865, 0.559779, 0.0531301, 1)
 theme_override_styles/fill = SubResource("StyleBoxFlat_qvnwp")
+max_value = 5.0
+step = 1.0
+show_percentage = false
 
 [node name="CanvasLayer2" type="CanvasLayer" parent="."]
 
 [node name="barraDeVida" type="ProgressBar" parent="CanvasLayer2"]
-offset_left = 11.0
-offset_top = 348.0
-offset_right = 365.0
-offset_bottom = 422.0
+offset_left = 5.0
+offset_top = 268.0
+offset_right = 359.0
+offset_bottom = 342.0
 theme_override_colors/font_outline_color = Color(0.688424, 0.233111, 0.197215, 1)
 theme_override_styles/fill = SubResource("StyleBoxFlat_x8ioc")
 
