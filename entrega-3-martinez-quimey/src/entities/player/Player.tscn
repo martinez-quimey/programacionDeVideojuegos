@@ -1,0 +1,126 @@
+[gd_scene load_steps=12 format=3 uid="uid://bg6s38wn8ss5x"]
+
+[ext_resource type="Script" uid="uid://tp4fxm4jsgcy" path="res://src/entities/player/Player.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://de1m14eyfnc8c" path="res://assets/textures/player/player_sheet.png" id="2_lvau8"]
+[ext_resource type="Texture2D" uid="uid://cxvdy8nrhcryn" path="res://assets/textures/cannon.png" id="3"]
+[ext_resource type="Script" uid="uid://bxm1bqpwq3bk5" path="res://src/entities/player/Cannon.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://dnl107pupmqic" path="res://src/entities/player/PlayerProjectile.tscn" id="5"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(13, 16)
+
+[sub_resource type="Animation" id="Animation_lvau8"]
+resource_name = "idle"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("bodyPivot/Body:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [1, 2, 3, 4, 5]
+}
+
+[sub_resource type="Animation" id="Animation_gc66i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("bodyPivot/Body:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="Animation" id="Animation_j0f6w"]
+resource_name = "walk"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("bodyPivot/Body:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2, 0.233333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [9, 10, 11, 12, 13, 14, 15, 16]
+}
+
+[sub_resource type="Animation" id="Animation_3g2ip"]
+resource_name = "jump"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("bodyPivot/Body:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [18, 19, 20]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4niw5"]
+_data = {
+&"RESET": SubResource("Animation_gc66i"),
+&"idle": SubResource("Animation_lvau8"),
+&"jump": SubResource("Animation_3g2ip"),
+&"walk": SubResource("Animation_j0f6w")
+}
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 7
+floor_max_angle = 0.802851
+floor_snap_length = 16.0
+platform_floor_layers = 4294901761
+script = ExtResource("1")
+ACCELERATION = 600.0
+H_SPEED_LIMIT = 2000.0
+jump_speed = 300
+FRICTION_WEIGHT = 100.0
+gravity = 300.0
+push_force = 160.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, -9)
+shape = SubResource("1")
+
+[node name="BodyAnimations" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_4niw5")
+}
+
+[node name="bodyPivot" type="Node2D" parent="."]
+
+[node name="Body" type="Sprite2D" parent="bodyPivot"]
+position = Vector2(-2, -10)
+texture = ExtResource("2_lvau8")
+hframes = 9
+vframes = 5
+frame = 1
+
+[node name="WeaponContainer" type="Node2D" parent="."]
+visible = false
+
+[node name="Weapon" type="Sprite2D" parent="WeaponContainer"]
+unique_name_in_owner = true
+position = Vector2(-0.0635071, 0.165405)
+texture = ExtResource("3")
+script = ExtResource("4")
+projectile_scene = ExtResource("5")
+
+[node name="WeaponTip" type="Marker2D" parent="WeaponContainer/Weapon"]
+position = Vector2(15, 0)

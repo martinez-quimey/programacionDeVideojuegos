@@ -1,18 +1,17 @@
-# turret.gd
 extends StaticBody2D
 
 @export var projectile_scene: PackedScene
-
+@onready var Invulnerabilidad: Timer = $Invulnerabilidad
 @onready var fire_position: Marker2D = $FirePosition
 @onready var detection_area: Area2D = $DetectionArea
+const isBoss = false
+var vida: int = 1
 
 var projectile_container: Node
-
 var player_in_range: bool = false
 
 
 func setValues(projectile_container):
-	
 	self.projectile_container = projectile_container
 
 
@@ -60,5 +59,28 @@ func _on_projectile_delete_requested(projectile):
 	projectile.queue_free()
 
 
-func herir():
+func animacionHerida():
+	while not Invulnerabilidad.is_stopped():
+		$AnimatedSprite2D.visible = false
+		await get_tree().create_timer(0.1).timeout
+		$AnimatedSprite2D.visible = true
+		await get_tree().create_timer(0.1).timeout
+
+
+func morir():
 	queue_free()
+
+
+func herir(num: int):
+	if Invulnerabilidad.is_stopped():
+		vida -= num
+
+		if isBoss:
+			pass
+
+		if vida <= 0:
+			morir()
+			return
+
+		Invulnerabilidad.start()
+		animacionHerida()

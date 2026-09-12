@@ -2,19 +2,24 @@
 extends CharacterBody2D
 
 @export var projectile_scene: PackedScene
+@onready var Invulnerabilidad: Timer = $Invulnerabilidad
 
-const GRAVITY = 980.0
-const JUMP_FORCE = -600.0
-const JUMP_FIRE_FORCE = -880.0
+
+@export var GRAVITY: float = 600.0
+
+@export var JUMP_FORCE: float = -600.0
+@export var JUMP_FIRE_FORCE: float = -880.0
+
 
 # ==========================================
 # VELOCIDAD
 # ==========================================
 
-const MAX_SPEED = 600.0
-const SPEEDCAMINANDO = 100.0
-const ACCELERATION = 1500.0
-const FRICTION = 1000.0
+@export var MAX_SPEED: float = 600.0
+@export var SPEEDCAMINANDO: float = 100.0
+@export var ACCELERATION: float = 1500.0
+@export var FRICTION: float = 1000.0
+
 
 # ==========================================
 # PARED
@@ -30,8 +35,9 @@ const WALL_LAYER = 3
 # ==========================================
 
 const ENERGIA_TURBO = 3
-const FUERZA_TURBO = 3500.0
-const DURACION_TURBO = 0.15
+@export var FUERZA_TURBO: float = 3500
+@export var DURACION_TURBO: float = 0.15
+
 
 # Los enemigos estarán en Collision Layer 4
 const ENEMIGO_LAYER = 4
@@ -381,7 +387,7 @@ func activar_turbo() -> void:
 	# HACERSE INVULNERABLE
 	# ==========================================
 
-	$invulnerabilidad.stop()
+	Invulnerabilidad.stop()
 
 
 	# ==========================================
@@ -476,7 +482,7 @@ func _on_hitbox_turbo_body_entered(body: Node2D) -> void:
 
 		if body.has_method("herir"):
 
-			body.herir()
+			body.herir(3)
 
 
 # ==========================================
@@ -560,7 +566,8 @@ func detectar_pared() -> void:
 
 			else:
 
-				rotation = deg_to_rad(90.0)
+				rotation = deg_to_rad(-90.0)
+				animated_sprite.flip_v = true
 
 
 			return
@@ -583,7 +590,6 @@ func actualizar_animacion(direccion: float, caminando: bool) -> void:
 		animated_sprite.animation = "quieta"
 
 		animated_sprite.flip_h = false
-		animated_sprite.flip_v = false
 
 		animated_sprite.play()
 
@@ -699,7 +705,7 @@ func start(pos: Vector2, projectile_container) -> void:
 # HERIDO
 # ==========================================
 
-func herir():
+func herir(num:int):
 
 	# Durante el turbo no puede recibir daño.
 	if turbo_activo:
@@ -707,13 +713,13 @@ func herir():
 		return
 
 
-	if $invulnerabilidad.is_stopped():
+	if Invulnerabilidad.is_stopped():
 
-		vida -= 1
+		vida -= num
 
 		barraVida.value = vida
 
-		$invulnerabilidad.start()
+		Invulnerabilidad.start()
 
 		animacionHerida()
 
@@ -728,7 +734,7 @@ func herir():
 
 func animacionHerida():
 
-	while not $invulnerabilidad.is_stopped():
+	while not Invulnerabilidad.is_stopped():
 
 		$AnimatedSprite2D.visible = false
 

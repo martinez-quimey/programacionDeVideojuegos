@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dp451odq65s60" path="res://entities/abstract/LevelAbastract.tscn" id="1_m7xcs"]
 [ext_resource type="PackedScene" uid="uid://cotxbmk3wfw1c" path="res://entities/npc/ciervo_1.tscn" id="2_t1qc2"]
-[ext_resource type="PackedScene" uid="uid://cln8aik4u1lng" path="res://entities/Personajes/turret.tscn" id="3_f45qw"]
+[ext_resource type="PackedScene" uid="uid://cln8aik4u1lng" path="res://entities/enemies/turret.tscn" id="3_f45qw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
 size = Vector2(2694, 375)
@@ -29,6 +29,7 @@ scale = Vector2(4, 4)
 
 [node name="Turret" parent="." index="2" instance=ExtResource("3_f45qw")]
 position = Vector2(60, 615)
+projectile_scene = null
 
 [node name="paredes" type="Node2D" parent="." index="4"]
 

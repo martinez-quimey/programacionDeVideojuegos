@@ -10,6 +10,7 @@ script = ExtResource("2_pc4yb")
 dialogue_scene = ExtResource("3_weqfx")
 
 [node name="Sprite2D" type="Sprite2D" parent="." index="1"]
+texture_filter = 3
 position = Vector2(46, -18)
 texture = ExtResource("2_8s8om")
 

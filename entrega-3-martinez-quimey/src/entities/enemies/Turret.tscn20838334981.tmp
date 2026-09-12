@@ -1,0 +1,97 @@
+[gd_scene load_steps=14 format=3 uid="uid://bd5hj26cc16d2"]
+
+[ext_resource type="Texture2D" uid="uid://cl6weutp8sgpe" path="res://assets/textures/turret.png" id="1"]
+[ext_resource type="Script" uid="uid://mvifnud8nrv3" path="res://src/entities/enemies/Turret.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://22mlxu8p1pyp" path="res://src/entities/enemies/TurretProjectile.tscn" id="3"]
+[ext_resource type="Script" uid="uid://biif72o373js7" path="res://src/entities/enemies/DetectionArea.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://bctnrl3hx26n" path="res://assets/textures/green_circle.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://cvy38xjo8lmsg" path="res://assets/textures/enemies/golem/Golem_IdleA.png" id="6_aag6v"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(32, 64)
+
+[sub_resource type="CircleShape2D" id="2"]
+radius = 328.39
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tcn5k"]
+atlas = ExtResource("6_aag6v")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jnkdk"]
+atlas = ExtResource("6_aag6v")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_njpiu"]
+atlas = ExtResource("6_aag6v")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6wtxx"]
+atlas = ExtResource("6_aag6v")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mf6ap"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tcn5k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jnkdk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_njpiu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6wtxx")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="Turret" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 5
+script = ExtResource("2")
+projectile_scene = ExtResource("3")
+
+[node name="FireTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="FirePosition" type="Marker2D" parent="."]
+position = Vector2(0, -30.0339)
+
+[node name="Body" type="Sprite2D" parent="."]
+visible = false
+texture = ExtResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("1")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+position = Vector2(0.0428963, -30.0659)
+target_position = Vector2(0, 0)
+collision_mask = 3
+
+[node name="DetectionArea" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("4")
+
+[node name="GreenCircle" type="Sprite2D" parent="DetectionArea"]
+modulate = Color(1, 1, 1, 0.301961)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_mf6ap")
+animation = &"idle"
+frame_progress = 0.862633
+
+[connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
+[connection signal="body_exited" from="DetectionArea" to="." method="_on_detection_area_body_exited"]

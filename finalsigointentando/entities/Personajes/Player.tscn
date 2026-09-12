@@ -96,11 +96,13 @@ height = 187.914
 [node name="Player" type="CharacterBody2D" groups=["jugador"]]
 script = ExtResource("1_l1ths")
 projectile_scene = ExtResource("2_bqvfx")
+GRAVITY = 700.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 3
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"turboFuego"
+animation = &"quieta"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(21, -1.5)
