@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://cln8aik4u1lng"]
+
+[ext_resource type="Texture2D" uid="uid://boqb4iwkw660" path="res://sprites/turret.png" id="1_odw4x"]
+[ext_resource type="PackedScene" uid="uid://chh051makop3r" path="res://entities/proyectiles/proyectile_malo.tscn" id="2_aiw5j"]
+[ext_resource type="Script" uid="uid://cb21478u4rwwy" path="res://script/turret.gd" id="2_megvq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wwkb3"]
+size = Vector2(31, 63)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wwkb3"]
+radius = 369.168
+
+[node name="Turret" type="StaticBody2D" unique_id=1573950017 groups=["enemigos"]]
+script = ExtResource("2_megvq")
+projectile_scene = ExtResource("2_aiw5j")
+
+[node name="FirePosition" type="Marker2D" parent="." unique_id=1906950779]
+position = Vector2(0, -31)
+
+[node name="Timer" type="Timer" parent="." unique_id=481508444]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1768235801]
+visibility_layer = 8
+position = Vector2(-0.5, -0.5)
+shape = SubResource("RectangleShape2D_wwkb3")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=274884429]
+texture = ExtResource("1_odw4x")
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=85089812]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=634361475]
+shape = SubResource("CircleShape2D_wwkb3")
+
+[node name="Invulnerabilidad" type="Timer" parent="." unique_id=2061328177]
+wait_time = 2.0
+one_shot = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

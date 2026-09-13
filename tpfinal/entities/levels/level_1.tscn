@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://b0j7kamy10wcn"]
+
+[ext_resource type="PackedScene" uid="uid://dp451odq65s60" path="res://entities/abstract/LevelAbastract.tscn" id="1_m7xcs"]
+[ext_resource type="PackedScene" uid="uid://cotxbmk3wfw1c" path="res://entities/npc/ciervo_1.tscn" id="2_t1qc2"]
+[ext_resource type="PackedScene" uid="uid://cln8aik4u1lng" path="res://entities/enemies/turret.tscn" id="3_f45qw"]
+[ext_resource type="PackedScene" uid="uid://budcy72xkwkse" path="res://entities/enemies/jabali.tscn" id="4_ye8cx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
+size = Vector2(2694, 375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f45qw"]
+size = Vector2(215.5, 360)
+
+[node name="Level1" unique_id=1991619548 instance=ExtResource("1_m7xcs")]
+
+[node name="fondo" type="ColorRect" parent="." index="0" unique_id=1998545348]
+light_mask = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_right = 2691.0
+offset_bottom = 1000.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Ciervo1" parent="." index="1" unique_id=382577582 instance=ExtResource("2_t1qc2")]
+position = Vector2(1285, 603)
+scale = Vector2(4, 4)
+
+[node name="Turret" parent="." index="2" unique_id=387884464 instance=ExtResource("3_f45qw")]
+position = Vector2(60, 615)
+
+[node name="paredes" type="Node2D" parent="." index="4" unique_id=1398495205]
+
+[node name="suelo" type="Node" parent="paredes" index="0" unique_id=485997172]
+
+[node name="Suelo1" type="Node2D" parent="paredes/suelo" index="0" unique_id=1470695186]
+
+[node name="suelo" type="StaticBody2D" parent="paredes/suelo/Suelo1" index="0" unique_id=229286079]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo1/suelo" index="0" unique_id=168092927]
+position = Vector2(1202, 831.5)
+shape = SubResource("RectangleShape2D_0hol4")
+
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo1/suelo/CollisionShape2D" index="0" unique_id=2037248799]
+offset_left = -1348.0
+offset_top = -184.0
+offset_right = 1347.0
+offset_bottom = 197.0
+color = Color(0.189416, 0.424862, 0, 1)
+
+[node name="Suelo2" type="Node2D" parent="paredes/suelo" index="1" unique_id=17114674]
+
+[node name="suelo" type="StaticBody2D" parent="paredes/suelo/Suelo2" index="0" unique_id=1994016237]
+
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo2/suelo" index="0" unique_id=1368136766]
+offset_left = 5226.0
+offset_top = 599.0
+offset_right = 7921.0
+offset_bottom = 980.0
+color = Color(0.189416, 0.424862, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo2/suelo" index="1" unique_id=321655850]
+position = Vector2(6574, 792)
+shape = SubResource("RectangleShape2D_0hol4")
+
+[node name="Suelo3" type="Node2D" parent="paredes/suelo" index="2" unique_id=1207636072]
+
+[node name="suelo" type="StaticBody2D" parent="paredes/suelo/Suelo3" index="0" unique_id=1094936427]
+
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo3/suelo" index="0" unique_id=1304984053]
+offset_left = 2557.0
+offset_top = 957.0
+offset_right = 5252.0
+offset_bottom = 1338.0
+color = Color(0.189416, 0.424862, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo3/suelo" index="1" unique_id=185209913]
+position = Vector2(3905, 1146)
+shape = SubResource("RectangleShape2D_0hol4")
+
+[node name="pared salto" type="Node2D" parent="paredes" index="1" unique_id=519044037]
+
+[node name="paredSalto1" type="Node2D" parent="paredes/pared salto" index="0" unique_id=1214155256]
+
+[node name="paredSalto1" type="StaticBody2D" parent="paredes/pared salto/paredSalto1" index="0" unique_id=1323575589]
+collision_layer = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/pared salto/paredSalto1/paredSalto1" index="0" unique_id=1032739057]
+position = Vector2(2602, 324)
+shape = SubResource("RectangleShape2D_f45qw")
+
+[node name="ColorRect" type="ColorRect" parent="paredes/pared salto/paredSalto1/paredSalto1" index="1" unique_id=2144507085]
+offset_left = 2494.0
+offset_top = 143.0
+offset_right = 2718.0
+offset_bottom = 507.0
+color = Color(0.456449, 0.217861, 0.13735, 1)
+
+[node name="paredSalto2" type="Node2D" parent="paredes/pared salto" index="1" unique_id=1876766148]
+
+[node name="paredSalto2" type="StaticBody2D" parent="paredes/pared salto/paredSalto2" index="0" unique_id=1079769462]
+collision_layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="paredes/pared salto/paredSalto2/paredSalto2" index="0" unique_id=1375189603]
+offset_left = 2019.0
+offset_top = -86.0
+offset_right = 2243.0
+offset_bottom = 278.0
+color = Color(0.456449, 0.217861, 0.13735, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/pared salto/paredSalto2/paredSalto2" index="1" unique_id=1136693613]
+position = Vector2(2131.75, 95)
+shape = SubResource("RectangleShape2D_f45qw")
+
+[node name="StartPosition" parent="." index="5"]
+position = Vector2(539, 603)
+
+[node name="Player" parent="." index="6"]
+position = Vector2(518, 602)
+
+[node name="Jabali" parent="." index="10" unique_id=2131858162 instance=ExtResource("4_ye8cx")]
+position = Vector2(4207.0005, 742.00006)
+scale = Vector2(10, 10)

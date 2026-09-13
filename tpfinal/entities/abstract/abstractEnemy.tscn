@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://d1rwpr237uskv"]
+
+[ext_resource type="Script" uid="uid://d0u2kym344dlc" path="res://entities/abstract/abstract_enemy.gd" id="1_to83a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cjvmg"]
+radius = 369.168
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_to83a"]
+size = Vector2(134, 85)
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=86738375 groups=["enemigos"]]
+script = ExtResource("1_to83a")
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=1040540624]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1132004423]
+shape = SubResource("CircleShape2D_cjvmg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1444408395]
+shape = SubResource("RectangleShape2D_to83a")
+
+[node name="Invulnerabilidad" type="Timer" parent="." unique_id=14355771]
+wait_time = 2.0
+one_shot = true
+
+[node name="OrientacionJabali" type="Node2D" parent="." unique_id=187453929]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="OrientacionJabali" unique_id=118100971]

@@ -1,0 +1,134 @@
+[gd_scene format=3 uid="uid://whuuytfa1xog"]
+
+[ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
+[ext_resource type="Texture2D" uid="uid://cpo2ylm6clocq" path="res://sprites/eva/correr/eva two tales kitsuneCorrer2.png" id="2_a1f57"]
+[ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="2_bqvfx"]
+[ext_resource type="Texture2D" uid="uid://ctywnma7c8gtt" path="res://sprites/eva/caminar/eva two tales kitsune_0002.png" id="3_25mxy"]
+[ext_resource type="Texture2D" uid="uid://b5ihn2547exqm" path="res://sprites/eva/caminar/eva two tales kitsunecaminar.png" id="3_ar323"]
+[ext_resource type="Texture2D" uid="uid://bofs15gio8lny" path="res://sprites/eva/caminar/eva two tales kitsune_0003.png" id="4_dv4ir"]
+[ext_resource type="Texture2D" uid="uid://47fueng3tmld" path="res://sprites/eva/caminar/eva two tales kitsune_0004.png" id="5_idcse"]
+[ext_resource type="Texture2D" uid="uid://bflvfvfm6fhby" path="res://sprites/eva/correr/eva two tales kitsune4,5.png" id="6_e6e86"]
+[ext_resource type="Texture2D" uid="uid://daw5cio0pbybd" path="res://sprites/eva/correr/eva two tales kitsuneCorrer.png" id="7_tr6hg"]
+[ext_resource type="Texture2D" uid="uid://cdtdtiaf6ipdo" path="res://sprites/eva/correr/eva two tales kitsuneCorrer3.png" id="8_ar323"]
+[ext_resource type="Texture2D" uid="uid://doi2ffw4rwqbc" path="res://sprites/eva/correr/eva two tales kitsuneCorrer4.png" id="9_e6e86"]
+[ext_resource type="Texture2D" uid="uid://bu3go3q454wpk" path="res://sprites/eva/eva two tales kitsuneSalto.png" id="12_5p1bl"]
+[ext_resource type="Texture2D" uid="uid://bng1g4uxk2b1m" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo.png" id="13_uq2ph"]
+[ext_resource type="Texture2D" uid="uid://dysrk804eu5xd" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo2.png" id="14_3c5qw"]
+[ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lderi"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_ar323")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_25mxy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_dv4ir")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_e6e86")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_idcse")
+}],
+"loop": 1,
+"name": &"caminar",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_tr6hg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_a1f57")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_ar323")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_e6e86")
+}],
+"loop": 1,
+"name": &"correr",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_a1f57")
+}],
+"loop": 1,
+"name": &"quieta",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_5p1bl")
+}],
+"loop": 1,
+"name": &"salto",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_uq2ph")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_3c5qw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_jkysx")
+}],
+"loop": 1,
+"name": &"turboFuego",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
+size = Vector2(129, 90)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
+radius = 73.0695
+height = 187.914
+
+[node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
+script = ExtResource("1_l1ths")
+projectile_scene = ExtResource("2_bqvfx")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1194749253]
+texture_filter = 3
+scale = Vector2(4, 4)
+sprite_frames = SubResource("SpriteFrames_lderi")
+animation = &"quieta"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
+position = Vector2(29.5, -4)
+shape = SubResource("RectangleShape2D_l1ths")
+
+[node name="PlayerStart" type="Marker2D" parent="." unique_id=331214768]
+position = Vector2(27, 39)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1120706322]
+
+[node name="FirePosition" type="Marker2D" parent="." unique_id=225568629]
+position = Vector2(27, 39)
+
+[node name="TiempoRecargaFuego" type="Timer" parent="." unique_id=1043286744]
+wait_time = 2.0
+
+[node name="Invulnerabilidad" type="Timer" parent="." unique_id=1890532257]
+wait_time = 2.0
+one_shot = true
+
+[node name="HitboxTurbo" type="Area2D" parent="." unique_id=1704353825]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTurbo" unique_id=1166951105]
+position = Vector2(22, -10)
+rotation = -1.55509
+shape = SubResource("CapsuleShape2D_5p1bl")
+
+[connection signal="died" from="." to="." method="_on_died"]
+[connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
+[connection signal="body_entered" from="HitboxTurbo" to="." method="_on_hitbox_turbo_body_entered"]
