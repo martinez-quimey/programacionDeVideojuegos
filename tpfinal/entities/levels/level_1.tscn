@@ -1,15 +1,17 @@
 [gd_scene format=3 uid="uid://b0j7kamy10wcn"]
 
 [ext_resource type="PackedScene" uid="uid://dp451odq65s60" path="res://entities/abstract/LevelAbastract.tscn" id="1_m7xcs"]
+[ext_resource type="PackedScene" uid="uid://d1jm8c0k1qut1" path="res://entities/impulso.tscn" id="2_q7tr2"]
 [ext_resource type="PackedScene" uid="uid://cotxbmk3wfw1c" path="res://entities/npc/ciervo_1.tscn" id="2_t1qc2"]
 [ext_resource type="PackedScene" uid="uid://cln8aik4u1lng" path="res://entities/enemies/turret.tscn" id="3_f45qw"]
 [ext_resource type="PackedScene" uid="uid://budcy72xkwkse" path="res://entities/enemies/jabali.tscn" id="4_ye8cx"]
+[ext_resource type="PackedScene" uid="uid://4s4o0gfrimwv" path="res://entities/madriguera.tscn" id="6_2lqro"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
-size = Vector2(2694, 375)
+size = Vector2(2847, 371)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f45qw"]
-size = Vector2(215.5, 360)
+size = Vector2(553, 357)
 
 [node name="Level1" unique_id=1991619548 instance=ExtResource("1_m7xcs")]
 
@@ -24,60 +26,86 @@ offset_bottom = 1000.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Ciervo1" parent="." index="1" unique_id=382577582 instance=ExtResource("2_t1qc2")]
+[node name="madriguera 1" type="Node2D" parent="." index="1" unique_id=527930563]
+
+[node name="MadrigueraEntrada" parent="madriguera 1" index="0" unique_id=1249858680 instance=ExtResource("6_2lqro")]
+position = Vector2(-464, 626)
+scale = Vector2(5, 5)
+
+[node name="MadrigueraSalida" parent="madriguera 1" index="1" unique_id=2047692436 instance=ExtResource("6_2lqro")]
+position = Vector2(-409, 1051)
+rotation = -3.1415925
+scale = Vector2(5, 5)
+
+[node name="Ciervo1" parent="." index="2" unique_id=382577582 instance=ExtResource("2_t1qc2")]
 position = Vector2(1285, 603)
 scale = Vector2(4, 4)
 
-[node name="Turret" parent="." index="2" unique_id=387884464 instance=ExtResource("3_f45qw")]
+[node name="Turret" parent="." index="3" unique_id=387884464 instance=ExtResource("3_f45qw")]
 position = Vector2(60, 615)
 
-[node name="paredes" type="Node2D" parent="." index="4" unique_id=1398495205]
+[node name="paredes" type="Node2D" parent="." index="5" unique_id=1398495205]
 
 [node name="suelo" type="Node" parent="paredes" index="0" unique_id=485997172]
 
 [node name="Suelo1" type="Node2D" parent="paredes/suelo" index="0" unique_id=1470695186]
 
-[node name="suelo" type="StaticBody2D" parent="paredes/suelo/Suelo1" index="0" unique_id=229286079]
+[node name="suelo1" type="StaticBody2D" parent="paredes/suelo/Suelo1" index="0" unique_id=229286079]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo1/suelo" index="0" unique_id=168092927]
-position = Vector2(1202, 831.5)
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo1/suelo1" index="0" unique_id=2037248799]
+offset_left = -350.0
+offset_top = 647.5
+offset_right = 2445.5
+offset_bottom = 1028.5
+color = Color(0.1882353, 0.42352942, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo1/suelo1" index="1" unique_id=168092927]
+position = Vector2(1125.5, 833.5)
 shape = SubResource("RectangleShape2D_0hol4")
-
-[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo1/suelo/CollisionShape2D" index="0" unique_id=2037248799]
-offset_left = -1348.0
-offset_top = -184.0
-offset_right = 1347.0
-offset_bottom = 197.0
-color = Color(0.189416, 0.424862, 0, 1)
 
 [node name="Suelo2" type="Node2D" parent="paredes/suelo" index="1" unique_id=17114674]
 
-[node name="suelo" type="StaticBody2D" parent="paredes/suelo/Suelo2" index="0" unique_id=1994016237]
+[node name="suelo2" type="StaticBody2D" parent="paredes/suelo/Suelo2" index="0" unique_id=1994016237]
 
-[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo2/suelo" index="0" unique_id=1368136766]
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo2/suelo2" index="0" unique_id=1368136766]
 offset_left = 5226.0
 offset_top = 599.0
 offset_right = 7921.0
 offset_bottom = 980.0
 color = Color(0.189416, 0.424862, 0, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo2/suelo" index="1" unique_id=321655850]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo2/suelo2" index="1" unique_id=321655850]
 position = Vector2(6574, 792)
 shape = SubResource("RectangleShape2D_0hol4")
 
 [node name="Suelo3" type="Node2D" parent="paredes/suelo" index="2" unique_id=1207636072]
 
-[node name="suelo" type="StaticBody2D" parent="paredes/suelo/Suelo3" index="0" unique_id=1094936427]
+[node name="suelo3" type="StaticBody2D" parent="paredes/suelo/Suelo3" index="0" unique_id=1094936427]
 
-[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo3/suelo" index="0" unique_id=1304984053]
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo3/suelo3" index="0" unique_id=1304984053]
 offset_left = 2557.0
 offset_top = 957.0
 offset_right = 5252.0
 offset_bottom = 1338.0
 color = Color(0.189416, 0.424862, 0, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo3/suelo" index="1" unique_id=185209913]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo3/suelo3" index="1" unique_id=185209913]
 position = Vector2(3905, 1146)
+shape = SubResource("RectangleShape2D_0hol4")
+
+[node name="Suelo4" type="Node2D" parent="paredes/suelo" index="3" unique_id=1729781280]
+
+[node name="suelo4" type="StaticBody2D" parent="paredes/suelo/Suelo4" index="0" unique_id=1941837629]
+
+[node name="ColorRect" type="ColorRect" parent="paredes/suelo/Suelo4/suelo4" index="0" unique_id=144435632]
+offset_left = -459.0
+offset_top = 2737.0
+offset_right = 2408.0
+offset_bottom = 3133.0
+color = Color(0.189416, 0.424862, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/suelo/Suelo4/suelo4" index="1" unique_id=1672818756]
+position = Vector2(973, 2926)
 shape = SubResource("RectangleShape2D_0hol4")
 
 [node name="pared salto" type="Node2D" parent="paredes" index="1" unique_id=519044037]
@@ -114,12 +142,43 @@ color = Color(0.456449, 0.217861, 0.13735, 1)
 position = Vector2(2131.75, 95)
 shape = SubResource("RectangleShape2D_f45qw")
 
-[node name="StartPosition" parent="." index="5"]
+[node name="StartPosition" parent="." index="6"]
 position = Vector2(539, 603)
 
-[node name="Player" parent="." index="6"]
+[node name="Player" parent="." index="7"]
 position = Vector2(518, 602)
 
-[node name="Jabali" parent="." index="10" unique_id=2131858162 instance=ExtResource("4_ye8cx")]
+[node name="Jabali" parent="." index="11" unique_id=2131858162 instance=ExtResource("4_ye8cx")]
 position = Vector2(4207.0005, 742.00006)
 scale = Vector2(10, 10)
+
+[node name="madriguera1" type="Node2D" parent="." index="12" unique_id=270613203]
+
+[node name="cubiertaDeMadriguera" type="Node2D" parent="madriguera1" index="0" unique_id=889209078]
+
+[node name="cubierta1" type="StaticBody2D" parent="madriguera1/cubiertaDeMadriguera" index="0" unique_id=679993760]
+position = Vector2(-1, -2)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="madriguera1/cubiertaDeMadriguera/cubierta1" index="0" unique_id=1011022870]
+position = Vector2(-265.5, 828.5)
+shape = SubResource("RectangleShape2D_f45qw")
+
+[node name="ColorRect" type="ColorRect" parent="madriguera1/cubiertaDeMadriguera/cubierta1" index="1" unique_id=26494249]
+offset_left = -542.0
+offset_top = 650.0
+offset_right = -309.0
+offset_bottom = 1031.0
+color = Color(0.189416, 0.424862, 0, 1)
+
+[node name="Propulsiones" type="Node2D" parent="madriguera1" index="1" unique_id=1871765137]
+position = Vector2(-135, 0)
+
+[node name="Impulso" parent="madriguera1/Propulsiones" index="0" unique_id=695283037 instance=ExtResource("2_q7tr2")]
+position = Vector2(-157, 661)
+direccion = Vector2(0, 1)
+
+[node name="Impulso2" parent="madriguera1/Propulsiones" index="1" unique_id=995403719 instance=ExtResource("2_q7tr2")]
+position = Vector2(-157, 848)
+direccion = Vector2(0, 1)

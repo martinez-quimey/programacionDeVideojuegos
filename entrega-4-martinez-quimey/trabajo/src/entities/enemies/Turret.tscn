@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://1c4vf4hpp4y0"]
+
+[ext_resource type="Script" uid="uid://bkj5hhu2oxiwc" path="res://src/entities/enemies/Turret.gd" id="2"]
+[ext_resource type="PackedScene" path="res://src/entities/enemies/TurretProjectile.tscn" id="3"]
+[ext_resource type="SpriteFrames" uid="uid://bjfctxf8wdo5i" path="res://src/entities/enemies/TurretAnimations.tres" id="3_chgy7"]
+[ext_resource type="Script" uid="uid://c608dvbkjj7fs" path="res://src/entities/enemies/DetectionArea.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://b1m4ub6md6had" path="res://assets/textures/green_circle.png" id="5"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(19, 25)
+
+[sub_resource type="CircleShape2D" id="2"]
+radius = 192.0
+
+[node name="Turret" type="CharacterBody2D" unique_id=73811290]
+texture_filter = 1
+collision_layer = 4
+collision_mask = 5
+script = ExtResource("2")
+projectile_scene = ExtResource("3")
+
+[node name="FireTimer" type="Timer" parent="." unique_id=2073730761]
+wait_time = 2.0
+one_shot = true
+
+[node name="FirePosition" type="Marker2D" parent="." unique_id=1095652496]
+position = Vector2(0, -18.0339)
+
+[node name="Body" type="AnimatedSprite2D" parent="." unique_id=196918094]
+position = Vector2(0, -16)
+sprite_frames = ExtResource("3_chgy7")
+animation = &"go_normal"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1600159840]
+position = Vector2(0.5, -12.5)
+shape = SubResource("1")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=1334388457]
+position = Vector2(0.0428963, -18.0659)
+target_position = Vector2(0, 0)
+collision_mask = 3
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=798951621]
+position = Vector2(0, -12)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("4")
+
+[node name="GreenCircle" type="Sprite2D" parent="DetectionArea" unique_id=2028263854]
+visible = false
+modulate = Color(1, 1, 1, 0.301961)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=134833858]
+shape = SubResource("2")
+
+[node name="TimerIdle" type="Timer" parent="." unique_id=2046959472]
+
+[connection signal="animation_finished" from="Body" to="." method="_on_animation_finished"]
+[connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
+[connection signal="body_exited" from="DetectionArea" to="." method="_on_detection_area_body_exited"]

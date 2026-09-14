@@ -14,7 +14,7 @@ var player_in_range: bool = false
 func setValues(projectile_container):
 	self.projectile_container = projectile_container
 
-func retroceso (direccion: Vector2):
+func retroceso (direccion: Vector2, fuerza:int):
 	pass
 func _ready():
 	detection_area.body_entered.connect(_on_body_entered)

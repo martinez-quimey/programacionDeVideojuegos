@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://d1jm8c0k1qut1"]
+
+[ext_resource type="Script" uid="uid://bpqyg3x5nifj6" path="res://script/impulso.gd" id="1_trkdc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
+size = Vector2(195, 185)
+
+[node name="Impulso" type="Area2D" unique_id=695283037]
+script = ExtResource("1_trkdc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1606608908]
+light_mask = 31
+visibility_layer = 31
+position = Vector2(-87.5, 82.5)
+shape = SubResource("RectangleShape2D_4jn62")

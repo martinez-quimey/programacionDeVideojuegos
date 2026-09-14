@@ -1,0 +1,186 @@
+[gd_scene load_steps=13 format=3 uid="uid://bqyr8idg6ryul"]
+
+[ext_resource type="Texture2D" uid="uid://ctbw2hewfmv5n" path="res://assets/textures/tileset/ruins/Dungeon Ruins Tileset Day.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://d0q5usfd4wh38" path="res://assets/textures/background/Space Background.png" id="2"]
+
+[sub_resource type="Animation" id="8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0.027451)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../SkyColor:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.862745, 1, 0.956863, 1)]
+}
+
+[sub_resource type="Animation" id="9"]
+resource_name = "loop"
+length = 60.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 30),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0.027451), Color(1, 1, 1, 0.156863)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../SkyColor:color")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 30),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.921569, 0.764706, 1), Color(0.862745, 1, 0.956863, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_g8mj7"]
+_data = {
+&"RESET": SubResource("8"),
+&"loop": SubResource("9")
+}
+
+[sub_resource type="CanvasItemMaterial" id="7"]
+blend_mode = 2
+
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("1")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="4"]
+atlas = ExtResource("1")
+region = Rect2(401, 208, 111, 32)
+
+[sub_resource type="AtlasTexture" id="5"]
+atlas = ExtResource("1")
+region = Rect2(264, 229, 132, 10)
+
+[sub_resource type="AtlasTexture" id="6"]
+atlas = ExtResource("1")
+region = Rect2(264, 213, 113, 10)
+
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("1")
+region = Rect2(288, 173, 127, 35)
+
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("1")
+region = Rect2(320, 144, 192, 16)
+
+[node name="DefaultBackground" type="ParallaxBackground"]
+scroll_ignore_camera_zoom = true
+
+[node name="BackgroundAnim" type="AnimationPlayer" parent="."]
+root_node = NodePath("../StarsLayer")
+libraries = {
+&"": SubResource("AnimationLibrary_g8mj7")
+}
+autoplay = "loop"
+
+[node name="SkyColor" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.862745, 1, 0.956863, 1)
+
+[node name="StarsLayer" type="ParallaxLayer" parent="."]
+texture_filter = 1
+motion_scale = Vector2(0.005, 0)
+motion_mirroring = Vector2(288, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="StarsLayer"]
+modulate = Color(1, 1, 1, 0.027451)
+material = SubResource("7")
+position = Vector2(144, 82)
+texture = ExtResource("2")
+
+[node name="MoonLayer" type="ParallaxLayer" parent="."]
+texture_filter = 1
+motion_scale = Vector2(0.005, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="MoonLayer"]
+position = Vector2(102, 33)
+texture = SubResource("1")
+
+[node name="CloudsLayer1" type="ParallaxLayer" parent="."]
+texture_filter = 1
+motion_scale = Vector2(0.01, 0)
+motion_mirroring = Vector2(576, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="CloudsLayer1"]
+position = Vector2(473, 27)
+texture = SubResource("4")
+
+[node name="Sprite2" type="Sprite2D" parent="CloudsLayer1"]
+position = Vector2(69, 49)
+texture = SubResource("5")
+
+[node name="Sprite3" type="Sprite2D" parent="CloudsLayer1"]
+position = Vector2(276, 22)
+texture = SubResource("6")
+
+[node name="MountainsLayer" type="ParallaxLayer" parent="."]
+texture_filter = 1
+motion_scale = Vector2(0.05, 0)
+motion_mirroring = Vector2(288, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="MountainsLayer"]
+position = Vector2(63, 105)
+texture = SubResource("3")
+
+[node name="Sprite2" type="Sprite2D" parent="MountainsLayer"]
+position = Vector2(147, 106)
+scale = Vector2(-1, 1)
+texture = SubResource("3")
+
+[node name="Sprite3" type="Sprite2D" parent="MountainsLayer"]
+position = Vector2(245, 108)
+scale = Vector2(-1, 1)
+texture = SubResource("3")
+
+[node name="DunesLayer" type="ParallaxLayer" parent="."]
+texture_filter = 1
+motion_scale = Vector2(0.1, 0)
+motion_mirroring = Vector2(288, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="DunesLayer"]
+position = Vector2(96, 118)
+texture = SubResource("2")
+
+[node name="Sprite2" type="Sprite2D" parent="DunesLayer"]
+position = Vector2(195, 118)
+scale = Vector2(-1, 1)
+texture = SubResource("2")
+
+[node name="ColorRect" type="ColorRect" parent="DunesLayer"]
+anchors_preset = -1
+anchor_bottom = 0.817
+offset_top = 121.0
+offset_right = 288.0
+offset_bottom = 213.0
+color = Color(0.964706, 0.815686, 0.615686, 1)

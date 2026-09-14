@@ -1,0 +1,263 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://src/entities/Projectile.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/textures/enemies/golem/Golem_AttackA.png" type="Texture2D" id=2]
+[ext_resource path="res://assets/textures/enemies/golem/Golem_AttackB_FX.png" type="Texture2D" id=3]
+
+[sub_resource type="Animation" id=8]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Sprite2:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 0,
+"values": [ Vector2( -3, 4 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Sprite2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 0,
+"values": [ Vector2( -1, -5 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Body/Sprite3:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 0,
+"values": [ Vector2( 5, 1 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Fx:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 1,
+"values": [ false ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "fire_loop"
+length = 0.5
+loop = true
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body/Sprite2D:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array( 0, 0.2, 0.35 ),
+"transitions": PackedFloat32Array( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( -2, -4 ), Vector2( -1, -5 ), Vector2( -3, -4 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Sprite2:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PackedFloat32Array( 0, 0.2, 0.35 ),
+"transitions": PackedFloat32Array( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( -3, 3 ), Vector2( -3, 4 ), Vector2( -2, 4 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Sprite3:position")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PackedFloat32Array( 0, 0.2, 0.35 ),
+"transitions": PackedFloat32Array( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 4, 1 ), Vector2( 5, 1 ), Vector2( 3, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "fire_start"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body/Sprite2D:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array( 0, 0.2, 0.35, 0.5 ),
+"transitions": PackedFloat32Array( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( -2, -4 ), Vector2( -1, -5 ), Vector2( -3, -4 ), Vector2( -2, -4 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Sprite2:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PackedFloat32Array( 0, 0.2, 0.35, 0.5 ),
+"transitions": PackedFloat32Array( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( -3, 3 ), Vector2( -3, 4 ), Vector2( -2, 4 ), Vector2( -3, 3 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Sprite3:position")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PackedFloat32Array( 0, 0.2, 0.35, 0.5 ),
+"transitions": PackedFloat32Array( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 4, 1 ), Vector2( 5, 1 ), Vector2( 3, 1 ), Vector2( 4, 1 ) ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "hit"
+length = 0.5
+tracks/0/type = "method"
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array( 0.5 ),
+"transitions": PackedFloat32Array( 1 ),
+"values": [ {
+"args": [  ],
+"method": "_remove"
+} ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Fx:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PackedFloat32Array( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
+"transitions": PackedFloat32Array( 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4, 5 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PackedFloat32Array( 0, 0.1 ),
+"transitions": PackedFloat32Array( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Fx:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 8.0
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 2 )
+region = Rect2( 38, 21, 6, 8 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 2 )
+region = Rect2( 18, 22, 6, 9 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 2 )
+region = Rect2( 17, 37, 5, 8 )
+
+[node name="TurretProjectile" instance=ExtResource( 1 )]
+VELOCITY = 150.0
+
+[node name="LifetimeTimer" parent="." index="0"]
+wait_time = 3.0
+
+[node name="ProjectileAnimations" parent="." index="1"]
+anims/RESET = SubResource( 8 )
+anims/fire_loop = SubResource( 2 )
+anims/fire_start = SubResource( 3 )
+anims/hit = SubResource( 4 )
+
+[node name="Hitbox" parent="." index="2"]
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" index="0"]
+shape = SubResource( 1 )
+
+[node name="Body" type="Node2D" parent="." index="3"]
+
+[node name="Sprite2D" type="Sprite2D" parent="Body" index="0"]
+position = Vector2( -1, -5 )
+rotation = -1.2802
+texture = SubResource( 5 )
+
+[node name="Sprite2" type="Sprite2D" parent="Body" index="1"]
+position = Vector2( -3, 4 )
+rotation = 1.45111
+texture = SubResource( 6 )
+
+[node name="Sprite3" type="Sprite2D" parent="Body" index="2"]
+position = Vector2( 5, 1 )
+rotation = -1.49609
+texture = SubResource( 7 )
+
+[node name="Fx" type="Sprite2D" parent="." index="4"]
+visible = false
+self_modulate = Color( 1, 0.968627, 0.619608, 1 )
+position = Vector2( -2, -5 )
+scale = Vector2( 0.75, 0.75 )
+texture = ExtResource( 3 )
+hframes = 3
+vframes = 2

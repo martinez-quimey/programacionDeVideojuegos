@@ -1,6 +1,9 @@
 # Player.gd
 extends CharacterBody2D
 
+var esta_forzado := false
+var direccion_forzada := Vector2.ZERO
+var velocidad_forzada := 0.0
 
 @export var projectile_scene: PackedScene
 @onready var Invulnerabilidad: Timer = $Invulnerabilidad
@@ -30,6 +33,19 @@ const WALL_JUMP_FORCE = 650.0
 const WALL_SLIDE_SPEED = 150.0
 
 const WALL_LAYER = 3
+
+
+# ==========================================
+# MADRIGUERA
+# ==========================================
+
+# Las paredes/terrenos que se pueden atravesar
+# al entrar a una madriguera estarán en Layer 2.
+const MADRIGUERA_LAYER = 2
+
+# Indica si el jugador está actualmente
+# dentro de una madriguera.
+var esta_en_madriguera: bool = false
 
 
 # ==========================================
@@ -142,12 +158,78 @@ func _ready() -> void:
 
 	colision_enemigos_original = get_collision_mask_value(ENEMIGO_LAYER)
 
+	# Al comenzar, el jugador SÍ puede chocar
+	# con las paredes de madriguera.
+	set_collision_mask_value(MADRIGUERA_LAYER, true)
+
 	hide()
 
 
-func _physics_process(delta: float) -> void:
+# ==========================================
+# MOVIMIENTO FORZADO
+# ==========================================
+
+func movimiento_forzado(direccion: Vector2, velocidad: float):
+
+	esta_forzado = true
+	direccion_forzada = direccion.normalized()
+	velocidad_forzada = velocidad
+
+
+func detener_movimiento_forzado():
+
+	esta_forzado = false
+	direccion_forzada = Vector2.ZERO
+	velocidad_forzada = 0.0
+
+
+# ==========================================
+# MADRIGUERA
+# ==========================================
+
+func entrar_madriguera():
+	print("el personaje intenta entrar")
+
+	esta_en_madriguera = true
+
+	print("antes de cambiar mask: ", get_collision_mask())
+
+	set_collision_mask_value(MADRIGUERA_LAYER, false)
+
+	print("despues de cambiar mask: ", get_collision_mask())
+	print("esta en madriguera: ", esta_en_madriguera)
+
+
+func salir_madriguera():
+
+	esta_en_madriguera = false
+
+	# Volvemos a detectar la Collision Layer 2.
+	# El jugador vuelve a chocar con ese terreno.
+	set_collision_mask_value(MADRIGUERA_LAYER, true)
+func estaEnMadriguera():
+	return esta_en_madriguera
+
+
+# ==========================================
+# MOVIMIENTO
+# ==========================================
+
+func _physics_process(delta: float):
 
 	if not activo:
+		return
+
+	# ==========================================
+	# MOVIMIENTO FORZADO
+	# ==========================================
+
+	if esta_forzado:
+
+		velocity = direccion_forzada * velocidad_forzada
+
+		move_and_slide()
+
 		return
 
 
@@ -289,8 +371,7 @@ func _physics_process(delta: float) -> void:
 
 
 	move_and_slide()
-
-
+	move_and_slide()
 	if not is_on_wall():
 		puede_agarrarse_pared = true
 
@@ -588,6 +669,11 @@ func start(pos: Vector2, projectile_container) -> void:
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 	puede_agarrarse_pared = true
+
+	# Al aparecer, vuelve a poder chocar
+	# con el terreno de las madrigueras.
+	esta_en_madriguera = false
+	set_collision_mask_value(MADRIGUERA_LAYER, true)
 
 	set_physics_process(true)
 	set_process(true)

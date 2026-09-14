@@ -94,6 +94,7 @@ radius = 73.0695
 height = 187.914
 
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
+collision_mask = 3
 script = ExtResource("1_l1ths")
 projectile_scene = ExtResource("2_bqvfx")
 
