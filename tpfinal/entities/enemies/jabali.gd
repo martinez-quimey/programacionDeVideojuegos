@@ -8,7 +8,6 @@ extends "res://entities/abstract/abstract_enemy.gd"
 
 
 @onready var orientacion_jabali: Node2D = $OrientacionJabali
-
 @onready var area_ataque: Area2D = $OrientacionJabali/CollisionAtaque
 
 
@@ -168,7 +167,69 @@ func comprobar_colision_con_jugador():
 			# Contacto físico normal = 1 de daño.
 			cuerpo.herir(1)
 
+			# El contacto físico calcula desde qué lado
+			# viene el jugador.
+			aplicar_empuje_contacto(cuerpo)
+
 			return
+
+
+# =========================================================
+# EMPUJE POR CONTACTO
+# =========================================================
+
+func aplicar_empuje_contacto(cuerpo: Node2D) -> void:
+
+	if cuerpo == null:
+		return
+
+
+	var diferencia_x: float = cuerpo.global_position.x - global_position.x
+
+	var direccion_empuje := Vector2.RIGHT
+
+
+	# =====================================================
+	# JUGADOR A LA IZQUIERDA
+	# =====================================================
+
+	if diferencia_x < -0.1:
+
+		direccion_empuje = Vector2.LEFT
+
+
+	# =====================================================
+	# JUGADOR A LA DERECHA
+	# =====================================================
+
+	elif diferencia_x > 0.1:
+
+		direccion_empuje = Vector2.RIGHT
+
+
+	# =====================================================
+	# JUGADOR PRÁCTICAMENTE ENCIMA
+	# =====================================================
+
+	else:
+
+		# Si están prácticamente en la misma posición
+		# horizontal, usamos la dirección del jabalí.
+
+		if direccion < 0:
+
+			direccion_empuje = Vector2.LEFT
+
+		else:
+
+			direccion_empuje = Vector2.RIGHT
+
+
+	# =====================================================
+	# APLICAR EMPUJE
+	# =====================================================
+
+	cuerpo.retroceso(direccion_empuje, 500)
 
 
 # =========================================================
@@ -284,9 +345,6 @@ func dejarDeActuarContraPlayer():
 # PERSEGUIR AL JUGADOR
 # =========================================================
 
-
-
-
 func perseguir_jugador():
 
 	if pausado_caminata:
@@ -346,7 +404,7 @@ func comenzar_ataque():
 
 
 	# ==========================================
-	# DAÑO DEL ATAQUE
+	# DAÑO Y RETROCESO DEL ATAQUE
 	# ==========================================
 
 	var cuerpos = area_ataque.get_overlapping_bodies()
@@ -355,7 +413,15 @@ func comenzar_ataque():
 
 		if cuerpo.is_in_group("jugador"):
 
+			# Ataque = 2 de daño.
 			cuerpo.herir(2)
+
+			# El ataque SIEMPRE empuja en la dirección
+			# en la que está mirando el jabalí.
+			#
+			# direccion = 1  -> derecha
+			# direccion = -1 -> izquierda
+			cuerpo.retroceso(Vector2(direccion, 0), 700)
 
 			break
 
@@ -379,6 +445,7 @@ func comenzar_ataque():
 
 	# Volver explícitamente a patrullar.
 	animationPlay("caminar")
+
 	velocity.x = direccion * SPEEDCAMINANDO
 
 

@@ -10,6 +10,7 @@ var game: Node2D = null
 
 
 func _ready() -> void:
+	Settings.setearMain (self)
 	hud.start_game.connect(new_game)
 	hud.retry_game.connect(retry_game)
 	hud.main_menu.connect(_on_main_menu)
@@ -24,6 +25,7 @@ func retry_game() -> void:
 
 
 func load_level(level_scene: PackedScene) -> void:
+	print ("load level")
 	if game != null:
 		game.queue_free()
 		game = null

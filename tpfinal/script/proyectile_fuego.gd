@@ -10,5 +10,5 @@ func _on_body_entered(body):
 	if body.is_in_group("enemigos"):
 		body.herir(1)
 		explotar()
-	elif body is StaticBody2D:
+	elif body is TileMapLayer:
 		explotar()

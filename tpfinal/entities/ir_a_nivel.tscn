@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://csxfnv26kh7h4"]
+
+[ext_resource type="Script" uid="uid://bov6wajuxdnhw" path="res://script/ir_a_nivel.gd" id="1_qr6l8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
+size = Vector2(133, 110)
+
+[node name="irANivel" type="Area2D" unique_id=731967739]
+script = ExtResource("1_qr6l8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1525588083]
+position = Vector2(56.5, 45)
+shape = SubResource("RectangleShape2D_4jn62")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

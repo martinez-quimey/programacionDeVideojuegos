@@ -24,17 +24,17 @@ func entrarMadriguera():
 	if not Input.is_action_just_pressed("interactMadriguera"):
 		return
 
-	print("se presiono boton de entrar")
+
 
 	var cuerpos = areaMadriguera.get_overlapping_bodies()
 
 	for cuerpo in cuerpos:
 
-		print("se llego al for")
+
 
 		if cuerpo.is_in_group("jugador"):
 
-			print("se llego al if")
+		
 
 			cuerpo.entrar_madriguera()
 
@@ -45,30 +45,25 @@ func entrarMadriguera():
 
 func salirMadriguera():
 
-	print("salir")
-
-	print("puede_salir: ", puede_salir)
 
 
 	if not puede_salir:
-		print("NO puede salir todavía")
+
 		return
 
 	var cuerpos = collisionMadriguera.get_overlapping_bodies()
 
-	print("cuerpos salida: ", cuerpos.size())
 
 	for cuerpo in cuerpos:
 
-		print("cuerpo encontrado en salida")
+
 
 		if cuerpo.is_in_group("jugador"):
 
-			print("es jugador")
 
-			if cuerpo.estaEnMadriguera():
 
-				print("jugador esta en madriguera, lo saco")
+			if cuerpo.esta_en_madriguera:
+
 
 				cuerpo.salir_madriguera()
 

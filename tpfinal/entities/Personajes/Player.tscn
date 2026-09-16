@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://whuuytfa1xog"]
 
 [ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
+[ext_resource type="Script" uid="uid://dan4lcfk622wr" path="res://script/estadoManual.gd" id="1_utwpb"]
 [ext_resource type="Texture2D" uid="uid://cpo2ylm6clocq" path="res://sprites/eva/correr/eva two tales kitsuneCorrer2.png" id="2_a1f57"]
 [ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="2_bqvfx"]
 [ext_resource type="Texture2D" uid="uid://ctywnma7c8gtt" path="res://sprites/eva/caminar/eva two tales kitsune_0002.png" id="3_25mxy"]
@@ -15,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://bng1g4uxk2b1m" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo.png" id="13_uq2ph"]
 [ext_resource type="Texture2D" uid="uid://dysrk804eu5xd" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo2.png" id="14_3c5qw"]
 [ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
+[ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lderi"]
 animations = [{
@@ -96,7 +98,6 @@ height = 187.914
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
 collision_mask = 3
 script = ExtResource("1_l1ths")
-projectile_scene = ExtResource("2_bqvfx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1194749253]
 texture_filter = 3
@@ -118,6 +119,7 @@ position = Vector2(27, 39)
 
 [node name="TiempoRecargaFuego" type="Timer" parent="." unique_id=1043286744]
 wait_time = 2.0
+one_shot = true
 
 [node name="Invulnerabilidad" type="Timer" parent="." unique_id=1890532257]
 wait_time = 2.0
@@ -130,6 +132,15 @@ position = Vector2(22, -10)
 rotation = -1.55509
 shape = SubResource("CapsuleShape2D_5p1bl")
 
-[connection signal="died" from="." to="." method="_on_died"]
+[node name="estadoManual" type="Node2D" parent="." unique_id=395898327 groups=["jugador"]]
+script = ExtResource("1_utwpb")
+projectile_scene = ExtResource("2_bqvfx")
+
+[node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
+script = ExtResource("17_jkysx")
+projectile_scene = ExtResource("2_bqvfx")
+
 [connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
 [connection signal="body_entered" from="HitboxTurbo" to="." method="_on_hitbox_turbo_body_entered"]
+[connection signal="died" from="estadoManual" to="." method="_on_estado_manual_died"]
+[connection signal="died" from="estadoAutomatico" to="." method="_on_estado_automatico_died"]

@@ -7,7 +7,7 @@ func _ready():
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body):
-	if body is StaticBody2D and not body.is_in_group("enemigos"):
+	if body is TileMapLayer and not body.is_in_group("enemigos"):
 
 		explotar()
 	elif body.is_in_group("jugador"):
