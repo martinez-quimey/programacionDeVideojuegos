@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dr2aeey0rb868"
-path="res://.godot/imported/pendientes.png-2eb3e622091f39df5415e0fcad484abd.ctex"
+uid="uid://bxkm5gcd1k7e8"
+path="res://.godot/imported/decoracion.png-d53158fba10fb7748410561589e98570.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/escenario/pendientes.png"
-dest_files=["res://.godot/imported/pendientes.png-2eb3e622091f39df5415e0fcad484abd.ctex"]
+source_file="res://sprites/escenario/decoracion.png"
+dest_files=["res://.godot/imported/decoracion.png-d53158fba10fb7748410561589e98570.ctex"]
 
 [params]
 

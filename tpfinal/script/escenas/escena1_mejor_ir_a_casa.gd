@@ -1,8 +1,7 @@
-# escena
+
 extends Area2D
 
-
-@export var dialogue_scene: PackedScene
+@export var dialogue_script: Script
 func _on_body_entered(body):
 	
 	if body.is_in_group("jugador"):
@@ -10,7 +9,8 @@ func _on_body_entered(body):
 		body.estado_actual.cambiar_a_automatico()
 		await get_tree().create_timer(1.1).timeout
 		body.estado_actual.cambiar_a_manual()
-		var dialogue := dialogue_scene.instantiate() as Dialogue
+		var dialogue := dialogue_script.new() as DialogueAbstract
+
 
 		if dialogue == null:
 			return

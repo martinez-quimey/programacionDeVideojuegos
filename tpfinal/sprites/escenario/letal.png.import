@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dr2aeey0rb868"
-path="res://.godot/imported/pendientes.png-2eb3e622091f39df5415e0fcad484abd.ctex"
+uid="uid://ck8qdjmbeffth"
+path="res://.godot/imported/letal.png-4950d089cec37d7143d27e5623415931.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/escenario/pendientes.png"
-dest_files=["res://.godot/imported/pendientes.png-2eb3e622091f39df5415e0fcad484abd.ctex"]
+source_file="res://sprites/escenario/letal.png"
+dest_files=["res://.godot/imported/letal.png-4950d089cec37d7143d27e5623415931.ctex"]
 
 [params]
 

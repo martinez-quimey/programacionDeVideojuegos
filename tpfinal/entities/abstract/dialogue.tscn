@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://bac4l51qynyd7"]
+[gd_scene format=3 uid="uid://co4b1bkfew45o"]
 
-[ext_resource type="Script" uid="uid://b2v2oy1jac36w" path="res://script/dialogue.gd" id="1_h4va4"]
+[ext_resource type="Script" uid="uid://b2v2oy1jac36w" path="res://script/dialogueAbstract.gd" id="1_h4va4"]
 
-[node name="Dialogue" type="Node"]
+[node name="Dialogue" type="Node" unique_id=1127753288]
 script = ExtResource("1_h4va4")

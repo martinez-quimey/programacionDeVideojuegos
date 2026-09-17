@@ -13,6 +13,18 @@ var esta_en_madriguera: bool = false
 
 var estado_actual: EstadoPlayer
 
+
+# ==========================================
+# ANIMACIONES
+# ==========================================
+
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+var mirando_izquierda: bool = false
+
+var ultima_animacion: String = "quieta"
+
+
 # ==========================================
 # ENERGÍA DE FUEGO
 # ==========================================
@@ -69,6 +81,18 @@ func _ready() -> void:
 		)
 
 
+	# ==========================================
+	# ANIMACIÓN INICIAL
+	# ==========================================
+
+	animated_sprite.animation = "quieta"
+	animated_sprite.flip_h = false
+	animated_sprite.flip_v = false
+	animated_sprite.play()
+
+	ultima_animacion = "quieta"
+
+
 	print("==========================================")
 	print("PLAYER - ENERGÍA CONFIGURADA")
 	print("==========================================")
@@ -101,6 +125,244 @@ func _ready() -> void:
 	)
 
 	print("==========================================")
+
+
+# ==========================================
+# ANIMACIONES
+# ==========================================
+
+func guardar_animacion_actual() -> void:
+
+	if animated_sprite.animation != "":
+
+		ultima_animacion = animated_sprite.animation
+
+
+func reproducir_animacion(
+	nombre: String
+) -> void:
+
+	if animated_sprite.animation != nombre:
+
+		animated_sprite.animation = nombre
+
+	animated_sprite.play()
+
+	ultima_animacion = nombre
+
+
+func actualizar_animacion(
+	direccion_animacion: float
+) -> void:
+
+	# ==========================================
+	# ACTUALIZAR DIRECCIÓN VISUAL
+	# ==========================================
+	#
+	# Esto es importante.
+	#
+	# Antes EstadoPlayer cambiaba directamente
+	# su propia variable mirando_izquierda.
+	#
+	# Ahora Player es quien controla la animación,
+	# así que también debe actualizar su dirección
+	# visual a partir de la dirección REAL del
+	# movimiento.
+	#
+	# Si direccion_animacion es negativa:
+	# mira a la izquierda.
+	#
+	# Si es positiva:
+	# mira a la derecha.
+
+	if direccion_animacion != 0:
+
+		mirando_izquierda = direccion_animacion < 0
+
+
+	# ==========================================
+	# PARED
+	# ==========================================
+
+	if estado_actual.agarrado_pared:
+
+		animated_sprite.flip_h = false
+		animated_sprite.flip_v = false
+
+		reproducir_animacion("quieta")
+
+		return
+
+
+	# ==========================================
+	# AIRE
+	# ==========================================
+
+	if not is_on_floor():
+
+		animated_sprite.flip_v = false
+		animated_sprite.flip_h = mirando_izquierda
+
+		reproducir_animacion("salto")
+
+		return
+
+
+	# ==========================================
+	# SUELO
+	# ==========================================
+
+	animated_sprite.flip_v = false
+	animated_sprite.flip_h = mirando_izquierda
+
+
+	if direccion_animacion != 0:
+
+		reproducir_animacion("correr")
+
+	else:
+
+		reproducir_animacion("quieta")
+
+
+# ==========================================
+# DIRECCIÓN VISUAL
+# ==========================================
+
+func establecer_direccion_visual(
+	nueva_direccion: float
+) -> void:
+
+	if nueva_direccion != 0:
+
+		mirando_izquierda = nueva_direccion < 0
+
+		animated_sprite.flip_h = mirando_izquierda
+
+
+func aplicar_direccion_visual() -> void:
+
+	animated_sprite.flip_h = mirando_izquierda
+
+
+# ==========================================
+# ANIMACIÓN DE SALTO
+# ==========================================
+
+func animacion_salto() -> void:
+
+	rotation = 0.0
+
+	animated_sprite.flip_v = false
+	animated_sprite.flip_h = mirando_izquierda
+
+	reproducir_animacion("salto")
+
+
+# ==========================================
+# ANIMACIÓN DE TURBO
+# ==========================================
+
+func animacion_turbo() -> void:
+
+	rotation = 0.0
+
+	animated_sprite.flip_v = false
+	animated_sprite.flip_h = mirando_izquierda
+
+	reproducir_animacion("turboFuego")
+
+
+# ==========================================
+# ANIMACIÓN DE PARED
+# ==========================================
+
+func animacion_pared(
+	normal_pared: Vector2
+) -> void:
+
+	if normal_pared.x < 0:
+
+		rotation = deg_to_rad(-90.0)
+
+		animated_sprite.flip_v = false
+
+	else:
+
+		rotation = deg_to_rad(-90.0)
+
+		animated_sprite.flip_v = true
+
+
+	animated_sprite.flip_h = false
+
+	reproducir_animacion("quieta")
+
+
+# ==========================================
+# RESTABLECER VISUAL DEL SUELO
+# ==========================================
+
+func restablecer_visual_suelo() -> void:
+
+	rotation = 0.0
+
+	animated_sprite.flip_v = false
+
+	animated_sprite.flip_h = mirando_izquierda
+
+
+# ==========================================
+# COMPATIBILIDAD CON ESTADOPLAYER
+# ==========================================
+#
+# EstadoPlayer puede llamar a esta función
+# si todavía tiene esa llamada.
+#
+# No cambia la lógica. Simplemente hace lo mismo
+# que restablecer_visual_suelo().
+
+func restablecer_animacion_vertical() -> void:
+
+	rotation = 0.0
+
+	animated_sprite.flip_v = false
+
+
+# ==========================================
+# RESTAURAR ANIMACIÓN
+# ==========================================
+
+func restaurar_animacion() -> void:
+
+	animated_sprite.animation = ultima_animacion
+
+	animated_sprite.play()
+
+	animated_sprite.flip_h = mirando_izquierda
+
+
+# ==========================================
+# ANIMACIÓN DE HERIDA
+# ==========================================
+
+func animacionHerida() -> void:
+
+	while not $Invulnerabilidad.is_stopped():
+
+		animated_sprite.visible = false
+
+		await get_tree().create_timer(
+			0.1
+		).timeout
+
+		animated_sprite.visible = true
+
+		await get_tree().create_timer(
+			0.1
+		).timeout
+
+	animated_sprite.visible = true
 
 
 # ==========================================
@@ -245,7 +507,7 @@ func _on_tiempo_recarga_fuego_timeout() -> void:
 	recargar_energia_fuego()
 
 	print("==========================================")
-	
+
 
 # ==========================================
 # DAÑO
@@ -260,24 +522,44 @@ func herir(num: int) -> void:
 # RETROCESO
 # ==========================================
 
-func retroceso(direccion_empuje: Vector2,fuerza: float) -> void:
+func retroceso(
+	direccion_empuje: Vector2,
+	fuerza: float
+) -> void:
 
-	estado_actual.retroceso(direccion_empuje,fuerza)
+	estado_actual.retroceso(
+		direccion_empuje,
+		fuerza
+	)
 
+
+# ==========================================
+# MADRIGUERA
+# ==========================================
 
 func entrar_madriguera() -> void:
 
 	estado_actual.entrar_madriguera()
 
 
-func salir_madriguera ():
+func salir_madriguera():
 
 	estado_actual.salir_madriguera()
 
 
-func movimiento_forzado(direccion, velocidad):
+# ==========================================
+# MOVIMIENTO FORZADO
+# ==========================================
 
-	estado_actual.movimiento_forzado(direccion,velocidad)
+func movimiento_forzado(
+	direccion,
+	velocidad
+):
+
+	estado_actual.movimiento_forzado(
+		direccion,
+		velocidad
+	)
 
 
 func detener_movimiento_forzado():

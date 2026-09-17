@@ -1,4 +1,3 @@
-
 # EstadoPlayer.gd
 extends Node
 class_name EstadoPlayer
@@ -9,8 +8,6 @@ class_name EstadoPlayer
 # ==========================================
 
 # EstadoPlayer NO es el Player.
-# Es la clase padre de EstadoManual y
-# EstadoAutomatico.
 #
 # El Player real es el padre de estos nodos.
 
@@ -21,18 +18,7 @@ class_name EstadoPlayer
 # ESTADO
 # ==========================================
 
-# IMPORTANTE:
-# El estado_actual pertenece al PLAYER.
-#
-# NO declaramos:
-# var estado_actual: EstadoPlayer
-#
-# porque eso crearía una copia del estado
-# dentro de cada EstadoPlayer.
-
-
 @onready var estado_manual: EstadoPlayer = $"../estadoManual"
-
 @onready var estado_automatico: EstadoPlayer = $"../estadoAutomatico"
 
 
@@ -41,9 +27,7 @@ class_name EstadoPlayer
 # ==========================================
 
 var esta_forzado := false
-
 var direccion_forzada := Vector2.ZERO
-
 var velocidad_forzada := 0.0
 
 
@@ -56,9 +40,7 @@ var velocidad_forzada := 0.0
 const DURACION_RETROCESO: float = 0.5
 
 var retroceso_activo: bool = false
-
 var tiempo_retroceso: float = 0.0
-
 var estado_anterior_retroceso: EstadoPlayer = null
 
 
@@ -76,15 +58,9 @@ var projectile_container: Node
 # ==========================================
 
 @onready var Invulnerabilidad: Timer = $"../Invulnerabilidad"
-
 @onready var fire_position: Marker2D = $"../FirePosition"
-
-@onready var animated_sprite: AnimatedSprite2D = $"../AnimatedSprite2D"
-
 @onready var collision_shape: CollisionShape2D = $"../CollisionShape2D"
-
 @onready var barraVida = $"../../CanvasLayer2/barraDeVida"
-
 @onready var hitbox_turbo: Area2D = $"../HitboxTurbo"
 
 
@@ -93,7 +69,6 @@ var projectile_container: Node
 # ==========================================
 
 signal hit
-
 signal died
 
 
@@ -102,9 +77,7 @@ signal died
 # ==========================================
 
 @export var GRAVITY: float = 600.0
-
 @export var JUMP_FORCE: float = -600.0
-
 @export var JUMP_FIRE_FORCE: float = -880.0
 
 
@@ -113,9 +86,7 @@ signal died
 # ==========================================
 
 @export var MAX_SPEED: float = 600.0
-
 @export var ACCELERATION: float = 1500.0
-
 @export var FRICTION: float = 1000.0
 
 
@@ -124,7 +95,6 @@ signal died
 # ==========================================
 
 const ANGULO_MAXIMO_PENDIENTE: float = 50.0
-
 const DISTANCIA_SNAP_SUELO: float = 12.0
 
 
@@ -133,9 +103,7 @@ const DISTANCIA_SNAP_SUELO: float = 12.0
 # ==========================================
 
 const WALL_JUMP_FORCE = 650.0
-
 const WALL_SLIDE_SPEED = 150.0
-
 const WALL_LAYER = 3
 
 
@@ -155,21 +123,15 @@ var esta_en_madriguera: bool = false
 const ENERGIA_TURBO = 3
 
 @export var FUERZA_TURBO: float = 3500
-
 @export var DURACION_TURBO: float = 0.15
-
 @export var DAÑO_TURBO_FUEGO: int = 3
-
 @export var retrocesoPorTurboFuego: int = 200
-
 @export var INVULNERABILIDAD_POST_TURBO: float = 0.4
 
 const ENEMIGO_LAYER = 4
 
 var turbo_activo: bool = false
-
 var tiempo_invulnerabilidad_turbo: float = 0.0
-
 var colision_enemigos_original: bool
 
 
@@ -187,11 +149,9 @@ var enemigos_golpeados_turbo: Dictionary = {}
 @export var speed = 400.0
 
 var screen_size: Vector2
-
 var activo: bool = false
 
 var seSalto: bool = false
-
 var saltoFuego: bool = false
 
 var direccion: float = 0.0
@@ -209,9 +169,7 @@ var mirando_izquierda: bool = false
 # ==========================================
 
 var agarrado_pared: bool = false
-
 var pared_normal: Vector2 = Vector2.ZERO
-
 var puede_agarrarse_pared: bool = true
 
 
@@ -236,7 +194,6 @@ func _ready() -> void:
 	# ==========================================
 
 	barraVida.max_value = vida
-
 	barraVida.value = vida
 
 
@@ -334,23 +291,6 @@ func cambiar_estado(
 
 	nuevo_estado.activo = true
 
-	# ==========================================
-	# IMPORTANTE
-	# ==========================================
-	# El estado actual pertenece al PLAYER.
-	#
-	# Antes estaba:
-	#
-	# estado_actual = nuevo_estado
-	#
-	# Eso modificaba la variable del EstadoPlayer.
-	#
-	# Ahora:
-	#
-	# player.estado_actual = nuevo_estado
-	#
-	# Esto modifica el estado real del Player.
-
 	player.estado_actual = nuevo_estado
 
 
@@ -370,10 +310,8 @@ func cambiar_a_manual() -> void:
 
 
 	estado_manual.activo = true
-
 	estado_automatico.activo = false
 
-	# El estado actual REAL está en Player.
 	player.estado_actual = estado_manual
 
 
@@ -393,10 +331,8 @@ func cambiar_a_automatico() -> void:
 
 
 	estado_manual.activo = false
-
 	estado_automatico.activo = true
 
-	# El estado actual REAL está en Player.
 	player.estado_actual = estado_automatico
 
 
@@ -423,6 +359,19 @@ func establecer_direccion(
 	if direccion != 0:
 
 		mirando_izquierda = direccion < 0
+
+		# ==========================================
+		# DIRECCIÓN VISUAL
+		# ==========================================
+		#
+		# Ahora Player también conoce la dirección.
+		# EstadoPlayer conserva mirando_izquierda
+		# porque la necesita para el turbo y otras
+		# partes de la lógica.
+
+		player.establecer_direccion_visual(
+			direccion
+		)
 
 
 # ==========================================
@@ -518,7 +467,6 @@ func retroceso(
 
 
 	retroceso_activo = true
-
 	tiempo_retroceso = DURACION_RETROCESO
 
 	estado_anterior_retroceso = player.estado_actual
@@ -533,9 +481,7 @@ func retroceso(
 	direccion = 0.0
 
 	esta_forzado = false
-
 	direccion_forzada = Vector2.ZERO
-
 	velocidad_forzada = 0.0
 
 
@@ -642,6 +588,15 @@ func procesar_retroceso(delta: float) -> void:
 	)
 
 
+	# ==========================================
+	# MUERTE POR TILE MORTAL DURANTE RETROCESO
+	# ==========================================
+
+	if comprobar_tile_mortal():
+
+		return
+
+
 	if tiempo_retroceso <= 0.0:
 
 		terminar_retroceso()
@@ -670,7 +625,6 @@ func terminar_retroceso() -> void:
 
 
 	retroceso_activo = false
-
 	tiempo_retroceso = 0.0
 
 	player.velocity.x = 0.0
@@ -727,6 +681,89 @@ func estaEnMadriguera():
 
 
 # ==========================================
+# COMPROBAR LAYER DE UNA COLISIÓN
+# ==========================================
+
+func colision_tiene_layer(
+	collision: KinematicCollision2D,
+	layer: int
+) -> bool:
+
+	var rid := collision.get_collider_rid()
+
+
+	if not rid.is_valid():
+
+		return false
+
+
+	var collision_layer := (
+		PhysicsServer2D.body_get_collision_layer(rid)
+	)
+
+
+	return (
+		collision_layer
+		&
+		(1 << (layer - 1))
+	) != 0
+
+
+# ==========================================
+# COMPROBAR TILE MORTAL
+# ==========================================
+
+func comprobar_tile_mortal() -> bool:
+
+	for i in range(player.get_slide_collision_count()):
+
+		var collision := (
+			player.get_slide_collision(i)
+		)
+
+		var objeto := collision.get_collider()
+
+
+		# ==========================================
+		# TILE MORTAL
+		# ==========================================
+		#
+		# Solo comprobamos TileMapLayer.
+		#
+		# Esto es importante porque ENEMIGO_LAYER
+		# también es la Layer 4.
+		#
+		# De esta forma un enemigo en Layer 4
+		# no mata al jugador simplemente por
+		# haber chocado físicamente con él.
+		#
+		# En cambio, un TileMapLayer cuyo tile
+		# tenga física en Layer 4 sí lo mata.
+
+		if objeto is TileMapLayer:
+
+			if colision_tiene_layer(
+				collision,
+				ENEMIGO_LAYER
+			):
+
+				print("==========================================")
+				print("!!! PLAYER TOCÓ UN TILE MORTAL !!!")
+				print(
+					"Layer mortal: ",
+					ENEMIGO_LAYER
+				)
+				print("==========================================")
+
+				morir()
+
+				return true
+
+
+	return false
+
+
+# ==========================================
 # PROCESO FÍSICO
 # ==========================================
 
@@ -773,6 +810,10 @@ func _physics_process(delta: float) -> void:
 		)
 
 		player.move_and_slide()
+
+		if comprobar_tile_mortal():
+
+			return
 
 		return
 
@@ -839,6 +880,15 @@ func _physics_process(delta: float) -> void:
 
 
 	# ==========================================
+	# MUERTE AL TOCAR TILE MORTAL
+	# ==========================================
+
+	if comprobar_tile_mortal():
+
+		return
+
+
+	# ==========================================
 	# PARED
 	# ==========================================
 
@@ -859,18 +909,14 @@ func _physics_process(delta: float) -> void:
 	if player.is_on_floor() and not turbo_activo:
 
 		seSalto = false
-
 		saltoFuego = false
 
 		agarrado_pared = false
-
 		pared_normal = Vector2.ZERO
 
 		puede_agarrarse_pared = true
 
-		player.rotation = 0.0
-
-		animated_sprite.flip_v = false
+		player.restablecer_visual_suelo()
 
 
 	# ==========================================
@@ -879,7 +925,7 @@ func _physics_process(delta: float) -> void:
 
 	if not turbo_activo:
 
-		actualizar_animacion(direccion)
+		player.actualizar_animacion(direccion)
 
 
 # ==========================================
@@ -912,18 +958,19 @@ func saltar() -> void:
 		player.velocity.y = JUMP_FORCE
 
 		seSalto = false
-
 		saltoFuego = false
 
 		agarrado_pared = false
-
 		pared_normal = Vector2.ZERO
+
+		# IMPORTANTE:
+		# Después de saltar de la pared no puede
+		# volver a agarrarse inmediatamente.
 
 		puede_agarrarse_pared = false
 
 		player.rotation = 0.0
-
-		animated_sprite.flip_v = false
+		player.restablecer_visual_suelo()
 
 		return
 
@@ -943,15 +990,7 @@ func saltar() -> void:
 
 		seSalto = true
 
-		player.rotation = 0.0
-
-		animated_sprite.flip_v = false
-
-		animated_sprite.flip_h = mirando_izquierda
-
-		animated_sprite.animation = "salto"
-
-		animated_sprite.play()
+		player.animacion_salto()
 
 
 # ==========================================
@@ -996,12 +1035,11 @@ func salto_fuego() -> void:
 		saltoFuego = true
 
 		agarrado_pared = false
-
 		pared_normal = Vector2.ZERO
 
 		player.rotation = 0.0
 
-		animated_sprite.flip_v = false
+		player.animated_sprite.flip_v = false
 
 
 # ==========================================
@@ -1068,12 +1106,9 @@ func activar_turbo() -> void:
 
 
 	agarrado_pared = false
-
 	pared_normal = Vector2.ZERO
 
 	player.rotation = 0.0
-
-	animated_sprite.flip_v = false
 
 	Invulnerabilidad.stop()
 
@@ -1152,9 +1187,7 @@ func activar_turbo() -> void:
 	# ANIMACIÓN
 	# ==========================================
 
-	animated_sprite.animation = "turboFuego"
-
-	animated_sprite.play()
+	player.animacion_turbo()
 
 
 	# ==========================================
@@ -1286,6 +1319,7 @@ func comprobar_golpes_turbo() -> void:
 		print("!!! TURBO GOLPEÓ ENEMIGO !!!")
 		print("==========================================")
 
+
 		print(
 			"Enemigo: ",
 			body
@@ -1395,7 +1429,7 @@ func desactivar_turbo() -> void:
 	)
 
 
-	animated_sprite.visible = true
+	player.animated_sprite.visible = true
 
 
 	print(
@@ -1425,6 +1459,7 @@ func _on_hitbox_turbo_body_entered(
 	print("==========================================")
 	print("!!! HITBOX TURBO DETECTÓ UN BODY !!!")
 	print("==========================================")
+
 
 	print(
 		"Body: ",
@@ -1561,10 +1596,13 @@ func _on_hitbox_turbo_body_entered(
 
 func detectar_pared() -> void:
 
+	# ==========================================
+	# IGUAL QUE EL PLAYER VIEJO
+	# ==========================================
+
 	if not puede_agarrarse_pared:
 
 		agarrado_pared = false
-
 		pared_normal = Vector2.ZERO
 
 		player.rotation = 0.0
@@ -1575,7 +1613,6 @@ func detectar_pared() -> void:
 	if player.is_on_floor():
 
 		agarrado_pared = false
-
 		pared_normal = Vector2.ZERO
 
 		return
@@ -1584,113 +1621,75 @@ func detectar_pared() -> void:
 	if not player.is_on_wall():
 
 		agarrado_pared = false
-
 		pared_normal = Vector2.ZERO
 
 		return
 
 
-	for i in player.get_slide_collision_count():
+	# ==========================================
+	# BUSCAR LA COLISIÓN DE LA PARED
+	# ==========================================
 
-		var collision := player.get_slide_collision(i)
+	for i in range(player.get_slide_collision_count()):
+
+		var collision := (
+			player.get_slide_collision(i)
+		)
 
 		var collider := collision.get_collider()
 
+
+		# Solo consideramos superficies verticales,
+		# igual que en tu código viejo.
 
 		if abs(collision.get_normal().x) < 0.8:
 
 			continue
 
 
-		if not collider is CollisionObject2D:
+		# ==========================================
+		# LAYER DE LA PARED
+		# ==========================================
+		#
+		# Usamos el RID para que también funcione
+		# con TileMapLayer.
 
-			continue
-
-
-		if collider.collision_layer & (
-			1 << (WALL_LAYER - 1)
+		if colision_tiene_layer(
+			collision,
+			WALL_LAYER
 		):
 
 			agarrado_pared = true
 
-			pared_normal = collision.get_normal()
+			pared_normal = (
+				collision.get_normal()
+			)
 
 			player.velocity.x = 0.0
 
 			seSalto = false
-
 			saltoFuego = false
 
-			puede_agarrarse_pared = false
 
+			# ==========================================
+			# ANIMACIÓN DE PARED
+			# ==========================================
 
-			if pared_normal.x < 0:
-
-				player.rotation = deg_to_rad(-90.0)
-
-			else:
-
-				player.rotation = deg_to_rad(-90.0)
-
-				animated_sprite.flip_v = true
+			player.animacion_pared(
+				pared_normal
+			)
 
 			return
 
 
-	agarrado_pared = false
+	# ==========================================
+	# NO ENCONTRÓ PARED VÁLIDA
+	# ==========================================
 
+	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 
 	player.rotation = 0.0
-
-
-# ==========================================
-# ANIMACIONES
-# ==========================================
-
-func actualizar_animacion(
-	direccion_animacion: float
-) -> void:
-
-	if agarrado_pared:
-
-		animated_sprite.animation = "quieta"
-
-		animated_sprite.flip_h = false
-
-		animated_sprite.play()
-
-		return
-
-
-	if not player.is_on_floor():
-
-		animated_sprite.animation = "salto"
-
-		animated_sprite.flip_h = mirando_izquierda
-
-		animated_sprite.flip_v = false
-
-		animated_sprite.play()
-
-		return
-
-
-	animated_sprite.flip_v = false
-
-	animated_sprite.flip_h = mirando_izquierda
-
-
-	if direccion_animacion != 0:
-
-		animated_sprite.animation = "correr"
-
-	else:
-
-		animated_sprite.animation = "quieta"
-
-
-	animated_sprite.play()
 
 
 # ==========================================
@@ -1769,9 +1768,7 @@ func start(
 	player.rotation = 0.0
 
 	agarrado_pared = false
-
 	pared_normal = Vector2.ZERO
-
 	puede_agarrarse_pared = true
 
 
@@ -1781,7 +1778,6 @@ func start(
 	)
 
 	set_physics_process(true)
-
 	set_process(true)
 
 
@@ -1819,36 +1815,46 @@ func herir(num: int) -> void:
 
 		animacionHerida()
 
+
 		if vida <= 0:
 
 			morir()
 
 
+# ==========================================
+# ANIMACIÓN DE HERIDA
+# ==========================================
+
 func animacionHerida():
 
 	while not Invulnerabilidad.is_stopped():
 
-		animated_sprite.visible = false
+		player.animated_sprite.visible = false
 
 		await get_tree().create_timer(
 			0.1
 		).timeout
 
-		animated_sprite.visible = true
+		player.animated_sprite.visible = true
 
 		await get_tree().create_timer(
 			0.1
 		).timeout
 
-	animated_sprite.visible = true
+	player.animated_sprite.visible = true
 
+
+# ==========================================
+# MORIR
+# ==========================================
 
 func morir():
 
 	died.emit()
 
 	set_physics_process(false)
-
 	set_process(false)
+
+	player.velocity = Vector2.ZERO
 
 	player.hide()

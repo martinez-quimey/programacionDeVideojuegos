@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://u2aykl80bwip"]
+
+[ext_resource type="PackedScene" uid="uid://co4b1bkfew45o" path="res://entities/abstract/dialogue.tscn" id="1_qfies"]
+[ext_resource type="Script" uid="uid://bapq5vjdjyixa" path="res://script/dialogue/ciervo_1_dialogue.gd" id="2_5awq4"]
+
+[node name="Ciervo1Dialogue" unique_id=2082553222 instance=ExtResource("1_qfies")]
+script = ExtResource("2_5awq4")
+imagenDEEvaIdle = null

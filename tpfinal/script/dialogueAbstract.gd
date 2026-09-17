@@ -1,5 +1,5 @@
 #dialogue
-class_name Dialogue
+class_name DialogueAbstract
 extends Node
 
 

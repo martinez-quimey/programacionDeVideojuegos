@@ -1,17 +1,15 @@
 [gd_scene format=3 uid="uid://wvkhsmvoh8f3"]
 
-[ext_resource type="Script" uid="uid://b02fjcsn46ca2" path="res://escena1_mejor_ir_a_casa.gd" id="1_f40e0"]
-[ext_resource type="PackedScene" uid="uid://f0o8uas0enu0" path="res://entities/dialogue/escena1MejorIrACasa.tscn" id="2_wkond"]
+[ext_resource type="Script" uid="uid://b02fjcsn46ca2" path="res://script/escenas/escena1_mejor_ir_a_casa.gd" id="1_f40e0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vk7jq"]
-size = Vector2(87, 177)
+size = Vector2(96.5, 487.5)
 
 [node name="EscenaMejorIrACasa" type="Area2D" unique_id=1749308778]
 script = ExtResource("1_f40e0")
-dialogue_scene = ExtResource("2_wkond")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1913971151]
-position = Vector2(17, 49)
+position = Vector2(21.75, 204.25)
 shape = SubResource("RectangleShape2D_vk7jq")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

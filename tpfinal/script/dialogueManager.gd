@@ -1,8 +1,8 @@
 #dialogueMAnager
 extends Node
+class_name DialogueManagerScript
 
-
-var current_dialogue: Dialogue
+var current_dialogue: DialogueAbstract
 var current_line := 0
 
 var dialogue_box: DialogueBox
@@ -19,7 +19,7 @@ func _process(_delta: float) -> void:
 			next_line()
 
 
-func start_dialogue(dialogue: Dialogue) -> void:
+func start_dialogue(dialogue: DialogueAbstract) -> void:
 	print("start dialogue de dialogue manager")
 
 	if dialogue == null:

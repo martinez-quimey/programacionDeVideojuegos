@@ -239,6 +239,7 @@ position = Vector2(-1.5, 0)
 shape = SubResource("RectangleShape2D_3oyy8")
 
 [node name="AnimatedSprite2D" parent="OrientacionJabali" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
+texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_kwkry")
 animation = &"atacar"
 

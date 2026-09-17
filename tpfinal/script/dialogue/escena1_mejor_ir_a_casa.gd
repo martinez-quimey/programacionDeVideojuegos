@@ -1,5 +1,5 @@
 
-extends Dialogue
+extends DialogueAbstract
 
 @export var imagenDEEvaIdle: Texture2D
 
