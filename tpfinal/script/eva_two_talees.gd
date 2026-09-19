@@ -15,6 +15,21 @@ var estado_actual: EstadoPlayer
 
 
 # ==========================================
+# VIDA
+# ==========================================
+
+# La vida máxima comienza siendo la que
+# tenga configurada Settings.
+var vida_maxima: int
+
+# La vida actual también comienza desde Settings.
+var vida: int
+
+
+@onready var barraVida = $"../CanvasLayer2/barraDeVida"
+
+
+# ==========================================
 # ANIMACIONES
 # ==========================================
 
@@ -29,9 +44,17 @@ var ultima_animacion: String = "quieta"
 # ENERGÍA DE FUEGO
 # ==========================================
 
-const ENERGIA_MAXIMA = 5
+# Capacidad máxima de energía.
+#
+# Esta aumenta cuando se consiguen mejoras.
+var energia_maxima: int
 
-var energia_fuego: int = 5
+# Energía disponible actualmente.
+#
+# Esta es la que aparece en la barra y disminuye
+# cuando se usa salto fuego o turbo.
+var energia_fuego: int
+
 
 @onready var tiempo_recarga_fuego: Timer = $TiempoRecargaFuego
 
@@ -55,13 +78,33 @@ func _ready() -> void:
 
 
 	# ==========================================
-	# CONFIGURAR ENERGÍA
+	# CONFIGURAR VIDA DESDE SETTINGS
 	# ==========================================
 
+	vida_maxima = Settings.getVidaActual()
+	vida = Settings.getVidaActual()
+
+
+	barraVida.min_value = 0
+	barraVida.max_value = vida_maxima
+	barraVida.value = vida
+
+
+	# ==========================================
+	# CONFIGURAR ENERGÍA DESDE SETTINGS
+	# ==========================================
+
+	# energia_maxima representa la capacidad máxima
+	# que tiene actualmente el jugador.
+	energia_maxima = Settings.getEnergiaActual()
+
+	# energia_fuego representa la energía disponible
+	# actualmente.
+	energia_fuego = Settings.getEnergiaActual()
+
+
 	barra.min_value = 0
-
-	barra.max_value = ENERGIA_MAXIMA
-
+	barra.max_value = energia_maxima
 	barra.value = energia_fuego
 
 
@@ -88,43 +131,15 @@ func _ready() -> void:
 	animated_sprite.animation = "quieta"
 	animated_sprite.flip_h = false
 	animated_sprite.flip_v = false
+
 	animated_sprite.play()
 
 	ultima_animacion = "quieta"
 
 
-	print("==========================================")
-	print("PLAYER - ENERGÍA CONFIGURADA")
-	print("==========================================")
-
-	print(
-		"Energía inicial: ",
-		energia_fuego
-	)
-
-	print(
-		"Energía máxima: ",
-		ENERGIA_MAXIMA
-	)
-
-	print(
-		"Timer wait_time: ",
-		tiempo_recarga_fuego.wait_time
-	)
-
-	print(
-		"Timer one_shot: ",
-		tiempo_recarga_fuego.one_shot
-	)
-
-	print(
-		"Timer conectado: ",
-		tiempo_recarga_fuego.timeout.is_connected(
-			_on_tiempo_recarga_fuego_timeout
-		)
-	)
-
-	print("==========================================")
+	# ==========================================
+	# DEBUG
+	# ==========================================
 
 
 # ==========================================
@@ -150,30 +165,12 @@ func reproducir_animacion(
 
 	ultima_animacion = nombre
 
+func animacion_tornado() -> void:
 
+	animated_sprite.play("tornado")
 func actualizar_animacion(
 	direccion_animacion: float
 ) -> void:
-
-	# ==========================================
-	# ACTUALIZAR DIRECCIÓN VISUAL
-	# ==========================================
-	#
-	# Esto es importante.
-	#
-	# Antes EstadoPlayer cambiaba directamente
-	# su propia variable mirando_izquierda.
-	#
-	# Ahora Player es quien controla la animación,
-	# así que también debe actualizar su dirección
-	# visual a partir de la dirección REAL del
-	# movimiento.
-	#
-	# Si direccion_animacion es negativa:
-	# mira a la izquierda.
-	#
-	# Si es positiva:
-	# mira a la derecha.
 
 	if direccion_animacion != 0:
 
@@ -315,12 +312,6 @@ func restablecer_visual_suelo() -> void:
 # ==========================================
 # COMPATIBILIDAD CON ESTADOPLAYER
 # ==========================================
-#
-# EstadoPlayer puede llamar a esta función
-# si todavía tiene esa llamada.
-#
-# No cambia la lógica. Simplemente hace lo mismo
-# que restablecer_visual_suelo().
 
 func restablecer_animacion_vertical() -> void:
 
@@ -366,10 +357,83 @@ func animacionHerida() -> void:
 
 
 # ==========================================
+# VIDA
+# ==========================================
+
+func getVidaActual() -> int:
+
+	return vida
+
+
+func getVidaMaxima() -> int:
+
+	return vida_maxima
+
+
+func aumentarVida(cantidad: int) -> void:
+
+	if cantidad <= 0:
+
+		return
+
+
+	# Aumentamos el máximo.
+	vida_maxima += cantidad
+
+	# También aumentamos la vida actual.
+	vida += cantidad
+
+
+	# Actualizamos Settings.
+	Settings.vidaActual = vida_maxima
+
+
+	# Actualizamos la barra.
+	barraVida.max_value = vida_maxima
+	barraVida.value = vida
+
+
+
+func actualizar_barra_vida() -> void:
+
+	barraVida.max_value = vida_maxima
+	barraVida.value = vida
+
+
+# ==========================================
 # ENERGÍA
 # ==========================================
 
+# Devuelve la energía que el jugador tiene
+# actualmente disponible.
+#
+# NO devuelve la capacidad máxima.
+#
+# Ejemplo:
+# energia_maxima = 7
+# energia_fuego = 4
+# obtener_energia_fuego() devuelve 4.
 func obtener_energia_fuego() -> int:
+
+	return energia_fuego
+
+
+# Devuelve la capacidad máxima actual de energía.
+#
+# Ejemplo:
+# energia_maxima = 7
+# energia_fuego = 4
+# getEnergiaMaxima() devuelve 7.
+func getEnergiaMaxima() -> int:
+
+	return energia_maxima
+
+
+# Mantengo este método porque ya existía
+# y puede ser usado por otras partes del juego.
+#
+# Devuelve también la energía disponible actualmente.
+func getEnergiaActual() -> int:
 
 	return energia_fuego
 
@@ -385,35 +449,45 @@ func gastar_energia_fuego(cantidad: int) -> bool:
 
 	actualizar_barra_energia()
 
-	print(
-		"ENERGÍA GASTADA: ",
-		cantidad,
-		" | Energía actual: ",
-		energia_fuego,
-		"/",
-		ENERGIA_MAXIMA
-	)
-
-
 	iniciar_recarga_energia()
 
 	return true
 
 
+func aumentarEnergia(cantidad: int) -> void:
+
+	if cantidad <= 0:
+
+		return
+
+
+	# Aumentamos el máximo.
+	energia_maxima += cantidad
+
+	# También aumentamos la energía actual.
+	energia_fuego += cantidad
+
+
+	# Actualizamos Settings.
+	Settings.energiaActual = energia_maxima
+
+
+	# Actualizamos la barra.
+	barra.max_value = energia_maxima
+	barra.value = energia_fuego
+
+
 func actualizar_barra_energia() -> void:
 
+	barra.max_value = energia_maxima
 	barra.value = energia_fuego
 
 
 func iniciar_recarga_energia() -> void:
 
-	if energia_fuego >= ENERGIA_MAXIMA:
+	if energia_fuego >= energia_maxima:
 
 		tiempo_recarga_fuego.stop()
-
-		print(
-			"RECARGA: energía ya está al máximo"
-		)
 
 		return
 
@@ -426,88 +500,44 @@ func iniciar_recarga_energia() -> void:
 
 	if tiempo_recarga_fuego.is_stopped():
 
-		print(
-			"RECARGA: iniciando Timer | ",
-			"Energía actual = ",
-			energia_fuego
-		)
-
 		tiempo_recarga_fuego.start()
 
-		print(
-			"RECARGA: Timer iniciado | ",
-			"tiempo restante = ",
-			tiempo_recarga_fuego.time_left
-		)
 
 
 func recargar_energia_fuego() -> void:
 
-	print("")
-	print("==========================================")
-	print("!!! RECARGANDO ENERGÍA !!!")
-	print("==========================================")
-
-	print(
-		"Energía antes: ",
-		energia_fuego
-	)
 
 
-	if energia_fuego < ENERGIA_MAXIMA:
+
+	if energia_fuego < energia_maxima:
 
 		energia_fuego += 1
 
 		actualizar_barra_energia()
 
 
-		print(
-			"Energía después: ",
-			energia_fuego
-		)
+	
 
 
-	if energia_fuego < ENERGIA_MAXIMA:
+	if energia_fuego < energia_maxima:
 
-		print(
-			"Hay energía por recuperar."
-		)
-
-		print(
-			"Reiniciando Timer."
-		)
+	
 
 		tiempo_recarga_fuego.start()
 
 
 	else:
 
-		print(
-			"ENERGÍA COMPLETAMENTE RECARGADA"
-		)
+
 
 		tiempo_recarga_fuego.stop()
 
 
-	print("==========================================")
-
 
 func _on_tiempo_recarga_fuego_timeout() -> void:
 
-	print("")
-	print("==========================================")
-	print("!!! TIMEOUT DE RECARGA RECIBIDO !!!")
-	print("==========================================")
-
-	print(
-		"Energía antes de recargar: ",
-		energia_fuego
-	)
 
 	recargar_energia_fuego()
-
-	print("==========================================")
-
 
 # ==========================================
 # DAÑO

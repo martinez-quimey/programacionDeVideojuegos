@@ -51,7 +51,8 @@ func _physics_process(delta: float) -> void:
 
 		salto_fuego()
 
-
+	if Input.is_action_just_pressed ("tornado"):
+		activar_tornado()
 	# ==========================================
 	# FÍSICA DEL PLAYER
 	# ==========================================

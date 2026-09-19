@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnhtvjtnlqq8e"]
+[gd_scene format=3 uid="uid://dnhtvjtnlqq8e"]
 
 [ext_resource type="Script" uid="uid://bh8cv8kqckg8x" path="res://script/hud.gd" id="1_64ctp"]
 
@@ -8,11 +8,11 @@ action = &"start"
 [sub_resource type="Shortcut" id="Shortcut_8sq4i"]
 events = [SubResource("InputEventAction_64ctp")]
 
-[node name="HUD" type="CanvasLayer"]
+[node name="HUD" type="CanvasLayer" unique_id=798110992]
 process_mode = 3
 script = ExtResource("1_64ctp")
 
-[node name="MainMenu" type="Control" parent="."]
+[node name="MainMenu" type="Control" parent="." unique_id=1436447059]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +22,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="MainMenu"]
+[node name="CenterContainer" type="CenterContainer" parent="MainMenu" unique_id=77410990]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,10 +30,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu/CenterContainer" unique_id=1916464327]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="MainMenu/CenterContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1888398278]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
@@ -42,20 +42,26 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="StartButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer"]
+[node name="StartButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1848048737]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 64
 shortcut = SubResource("Shortcut_8sq4i")
 text = "Start"
 
-[node name="LanguageButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer"]
+[node name="ContinueButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=991633384]
 layout_mode = 2
 
-[node name="QuitGameButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer"]
+[node name="LanguageButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1630350228]
 layout_mode = 2
 
-[node name="GameOver" type="Control" parent="."]
+[node name="QuitGameButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=827418079]
+layout_mode = 2
+
+[node name="SelectorNiveles" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1826798165]
+layout_mode = 2
+
+[node name="SelectorNiveles" type="Control" parent="." unique_id=172355086]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,7 +71,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="GameOver"]
+[node name="CenterContainer" type="CenterContainer" parent="SelectorNiveles" unique_id=684391251]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -73,21 +79,54 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GameOver/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="SelectorNiveles/CenterContainer" unique_id=390871041]
 layout_mode = 2
 
-[node name="Message" type="Label" parent="GameOver/CenterContainer/VBoxContainer"]
+[node name="BackButton" type="Button" parent="SelectorNiveles/CenterContainer/VBoxContainer" unique_id=2112446187]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="SelectorNiveles/CenterContainer/VBoxContainer" unique_id=1698980161]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Eva Two Tales Kitsune"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="GameOver" type="Control" parent="." unique_id=1938582274]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="GameOver" unique_id=867888668]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOver/CenterContainer" unique_id=762786072]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="GameOver/CenterContainer/VBoxContainer" unique_id=610805773]
 layout_mode = 2
 text = "Has muerto
 "
 
-[node name="RetryButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer"]
+[node name="RetryButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer" unique_id=1364654888]
 layout_mode = 2
 
-[node name="MainMenuButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer"]
+[node name="MainMenuButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer" unique_id=1713026728]
 layout_mode = 2
 
-[node name="LanguageMenu" type="Control" parent="."]
+[node name="LanguageMenu" type="Control" parent="." unique_id=208200647]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -97,7 +136,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="LanguageMenu"]
+[node name="CenterContainer" type="CenterContainer" parent="LanguageMenu" unique_id=1122244401]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -105,22 +144,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LanguageMenu/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="LanguageMenu/CenterContainer" unique_id=1707995188]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=804674658]
 layout_mode = 2
 
-[node name="SpanishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+[node name="SpanishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=549829621]
 layout_mode = 2
 
-[node name="EnglishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+[node name="EnglishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=1356906398]
 layout_mode = 2
 
-[node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer"]
+[node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=2042497959]
 layout_mode = 2
 
-[node name="Pause" type="Control" parent="."]
+[node name="Pause" type="Control" parent="." unique_id=560659944]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -130,7 +169,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="Pause"]
+[node name="CenterContainer" type="CenterContainer" parent="Pause" unique_id=2108314746]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -138,17 +177,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Pause/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause/CenterContainer" unique_id=874991727]
 layout_mode = 2
 
-[node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer"]
+[node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer" unique_id=369891993]
 layout_mode = 2
 text = "pausa"
 
-[node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer"]
+[node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=546976929]
 layout_mode = 2
 
-[node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer"]
+[node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=614247921]
 layout_mode = 2
 text = "main menu"
 

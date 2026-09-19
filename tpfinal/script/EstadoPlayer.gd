@@ -3,6 +3,8 @@ extends Node
 class_name EstadoPlayer
 
 
+
+
 # ==========================================
 # PLAYER
 # ==========================================
@@ -13,7 +15,8 @@ class_name EstadoPlayer
 
 @onready var player: CharacterBody2D = get_parent()
 
-
+@onready var collision_shape_player: CollisionShape2D = $"../CollisionShape2D"
+@onready var collision_tornado: CollisionShape2D = $"../CollisionShapeTornado"
 # ==========================================
 # ESTADO
 # ==========================================
@@ -45,6 +48,23 @@ var estado_anterior_retroceso: EstadoPlayer = null
 
 
 # ==========================================
+# TORNADO
+# ==========================================
+
+const ENERGIA_TORNADO: int = 6
+
+@export var VELOCIDAD_TORNADO: float = 700.0
+@export var DURACION_TORNADO: float = 2.0
+
+var tornado_activo: bool = false
+var tiempo_tornado: float = 0.0
+
+var enemigos_golpeados_tornado: Dictionary = {}
+
+@onready var hitbox_tornado: Area2D = $"../HitboxTornado"
+
+
+# ==========================================
 # PROYECTILES
 # ==========================================
 
@@ -60,7 +80,6 @@ var projectile_container: Node
 @onready var Invulnerabilidad: Timer = $"../Invulnerabilidad"
 @onready var fire_position: Marker2D = $"../FirePosition"
 @onready var collision_shape: CollisionShape2D = $"../CollisionShape2D"
-@onready var barraVida = $"../../CanvasLayer2/barraDeVida"
 @onready var hitbox_turbo: Area2D = $"../HitboxTurbo"
 
 
@@ -128,11 +147,19 @@ const ENERGIA_TURBO = 3
 @export var retrocesoPorTurboFuego: int = 200
 @export var INVULNERABILIDAD_POST_TURBO: float = 0.4
 
-const ENEMIGO_LAYER = 4
+# ==========================================
+# LAYER MORTAL
+# ==========================================
+#
+# ESTA LAYER ES EXCLUSIVAMENTE PARA
+# TILES QUE MATAN AL PLAYER.
+#
+# LOS ATAQUES NO USAN ESTA LAYER.
+
+const Letal_layer = 4
 
 var turbo_activo: bool = false
 var tiempo_invulnerabilidad_turbo: float = 0.0
-var colision_enemigos_original: bool
 
 
 # ==========================================
@@ -174,10 +201,55 @@ var puede_agarrarse_pared: bool = true
 
 
 # ==========================================
-# VIDA
+# CONFIGURAR HITBOX DE ATAQUE
 # ==========================================
+#
+# Los ataques NO buscan enemigos en una layer
+# específica.
+#
+# Las hitbox detectan cuerpos de todas las layers
+# excepto la layer 4.
+#
+# Después de detectar un cuerpo, el código decide
+# qué hacer mediante grupos:
+#
+# "enemigos"
+# "rocas_destructibles"
+#
+# La layer 4 queda reservada exclusivamente
+# para los tiles mortales.
 
-var vida: int = 5
+
+func configurar_hitbox_ataque(
+	hitbox: Area2D
+) -> void:
+
+	# ==========================================
+	# LIMPIAR TODA LA MÁSCARA
+	# ==========================================
+
+	for layer in range(1, 33):
+
+		hitbox.set_collision_mask_value(
+			layer,
+			false
+		)
+
+
+	# ==========================================
+	# ACTIVAR TODAS LAS LAYERS EXCEPTO LA 4
+	# ==========================================
+
+	for layer in range(1, 33):
+
+		if layer == Letal_layer:
+
+			continue
+
+		hitbox.set_collision_mask_value(
+			layer,
+			true
+		)
 
 
 # ==========================================
@@ -190,31 +262,30 @@ func _ready() -> void:
 
 
 	# ==========================================
-	# VIDA
-	# ==========================================
-
-	barraVida.max_value = vida
-	barraVida.value = vida
-
-
-	# ==========================================
 	# HITBOX TURBO
 	# ==========================================
 
 	hitbox_turbo.monitoring = false
 
-	hitbox_turbo.set_collision_mask_value(
-		ENEMIGO_LAYER,
-		true
+	configurar_hitbox_ataque(
+		hitbox_turbo
 	)
 
 
-	colision_enemigos_original = (
-		player.get_collision_mask_value(
-			ENEMIGO_LAYER
-		)
+	# ==========================================
+	# HITBOX TORNADO
+	# ==========================================
+
+	hitbox_tornado.monitoring = false
+
+	configurar_hitbox_ataque(
+		hitbox_tornado
 	)
 
+
+	# ==========================================
+	# PLAYER
+	# ==========================================
 
 	player.set_collision_mask_value(
 		MADRIGUERA_LAYER,
@@ -253,13 +324,6 @@ func _ready() -> void:
 	print(
 		"HitboxTurbo collision_mask: ",
 		hitbox_turbo.collision_mask
-	)
-
-	print(
-		"HitboxTurbo detecta ENEMIGO_LAYER: ",
-		hitbox_turbo.get_collision_mask_value(
-			ENEMIGO_LAYER
-		)
 	)
 
 	print(
@@ -359,15 +423,6 @@ func establecer_direccion(
 	if direccion != 0:
 
 		mirando_izquierda = direccion < 0
-
-		# ==========================================
-		# DIRECCIÓN VISUAL
-		# ==========================================
-		#
-		# Ahora Player también conoce la dirección.
-		# EstadoPlayer conserva mirando_izquierda
-		# porque la necesita para el turbo y otras
-		# partes de la lógica.
 
 		player.establecer_direccion_visual(
 			direccion
@@ -579,14 +634,6 @@ func procesar_retroceso(delta: float) -> void:
 	player.move_and_slide()
 
 
-	print(
-		"RETROCESO DESPUÉS move_and_slide | ",
-		"velocity=",
-		player.velocity,
-		" | posicion=",
-		player.global_position
-	)
-
 
 	# ==========================================
 	# MUERTE POR TILE MORTAL DURANTE RETROCESO
@@ -608,20 +655,6 @@ func procesar_retroceso(delta: float) -> void:
 
 func terminar_retroceso() -> void:
 
-	print("")
-	print("==========================================")
-	print("!!! TERMINÓ RETROCESO !!!")
-	print("==========================================")
-
-	print(
-		"Velocity antes de terminar: ",
-		player.velocity
-	)
-
-	print(
-		"Posición final: ",
-		player.global_position
-	)
 
 
 	retroceso_activo = false
@@ -632,15 +665,431 @@ func terminar_retroceso() -> void:
 	estado_anterior_retroceso = null
 
 
-	print(
-		"Velocity después de terminar: ",
-		player.velocity
-	)
 
-	print("CONTROL DE MOVIMIENTO RESTAURADO")
+
+# ==========================================
+# ACTIVAR TORNADO
+# ==========================================
+
+func activar_tornado() -> void:
+
+	if retroceso_activo:
+
+		return
+
+
+	if turbo_activo:
+
+		return
+
+
+	if tornado_activo:
+
+		return
+
+
+	# ==========================================
+	# SOLO SE PUEDE ACTIVAR EN EL SUELO
+	# ==========================================
+
+	if not player.is_on_floor():
+
+		return
+
+
+	# ==========================================
+	# COMPROBAR ENERGÍA
+	# ==========================================
+
+	if player.obtener_energia_fuego() < ENERGIA_TORNADO:
+
+		return
+
+
+	if not player.gastar_energia_fuego(
+		ENERGIA_TORNADO
+	):
+
+		return
+
+
+	# ==========================================
+	# ACTIVAR TORNADO
+	# ==========================================
+
+	tornado_activo = true
+	tiempo_tornado = DURACION_TORNADO
+	# Desactivar colisión principal del Player
+	collision_tornado.set_deferred(
+		"disabled",
+		false
+	)
+	collision_shape_player.set_deferred(
+		"disabled",
+		true
+	)
+	
+
+	enemigos_golpeados_tornado.clear()
+
+
+	# ==========================================
+	# BLOQUEAR PARED
+	# ==========================================
+
+	agarrado_pared = false
+	pared_normal = Vector2.ZERO
+	puede_agarrarse_pared = false
+
+
+	# ==========================================
+	# LIMPIAR MOVIMIENTO ANTERIOR
+	# ==========================================
+
+	esta_forzado = false
+	direccion_forzada = Vector2.ZERO
+	velocidad_forzada = 0.0
+
+
+	# ==========================================
+	# ROTACIÓN NORMAL
+	# ==========================================
+
+	player.rotation = 0.0
+
+
+	# ==========================================
+	# HITBOX TORNADO
+	# ==========================================
+
+	hitbox_tornado.monitoring = true
 
 	print("==========================================")
-	print("CONTROL DEVUELTO")
+	print("TORNADO HITBOX")
+	print("==========================================")
+
+	print(
+		"Monitoring: ",
+		hitbox_tornado.monitoring
+	)
+
+	print(
+		"Collision mask: ",
+		hitbox_tornado.collision_mask
+	)
+
+	print(
+		"Detecta layer 1: ",
+		hitbox_tornado.get_collision_mask_value(1)
+	)
+
+	print(
+		"Detecta layer 4: ",
+		hitbox_tornado.get_collision_mask_value(4)
+	)
+
+	print("==========================================")
+	# ==========================================
+	# ANIMACIÓN
+	# ==========================================
+
+	player.animacion_tornado()
+
+
+	# ==========================================
+	# VELOCIDAD INICIAL
+	# ==========================================
+
+	if mirando_izquierda:
+
+		player.velocity.x = -VELOCIDAD_TORNADO
+
+	else:
+
+		player.velocity.x = VELOCIDAD_TORNADO
+
+
+	player.velocity.y = 0.0
+
+
+	print("==========================================")
+	print("TORNADO ACTIVADO")
+	print("==========================================")
+
+
+
+# ==========================================
+# PROCESAR TORNADO
+# ==========================================
+
+func procesar_tornado(delta: float) -> void:
+
+	if not tornado_activo:
+
+		return
+
+
+	tiempo_tornado -= delta
+
+
+	# ==========================================
+	# VELOCIDAD CONSTANTE
+	# ==========================================
+
+	if mirando_izquierda:
+
+		player.velocity.x = -VELOCIDAD_TORNADO
+
+	else:
+
+		player.velocity.x = VELOCIDAD_TORNADO
+
+
+	# ==========================================
+	# GRAVEDAD
+	# ==========================================
+
+	if not player.is_on_floor():
+
+		player.velocity.y += GRAVITY * delta
+
+
+	# ==========================================
+	# MOVIMIENTO
+	# ==========================================
+
+	player.move_and_slide()
+
+
+	# ==========================================
+	# GOLPES
+	# ==========================================
+
+	comprobar_golpes_tornado()
+
+
+	# ==========================================
+	# MUERTE POR TILE MORTAL
+	# ==========================================
+
+	if comprobar_tile_mortal():
+
+		return
+
+
+	# ==========================================
+	# TERMINAR
+	# ==========================================
+
+	if tiempo_tornado <= 0.0:
+
+		desactivar_tornado()
+
+
+# ==========================================
+# COMPROBAR GOLPES DEL TORNADO
+# ==========================================
+# ==========================================
+# COMPROBAR GOLPES DEL TORNADO
+# ==========================================
+
+func comprobar_golpes_tornado() -> void:
+
+	if not tornado_activo:
+
+		return
+
+
+	var cuerpos := (
+		hitbox_tornado.get_overlapping_bodies()
+	)
+
+
+	print(
+		"TORNADO DETECTÓ CUERPOS: ",
+		cuerpos.size()
+	)
+
+
+	for body in cuerpos:
+
+		if body == null:
+
+			continue
+
+
+		print(
+			"------------------------------------------"
+		)
+
+
+		print(
+			"TORNADO DETECTÓ: ",
+			body
+		)
+
+
+		print(
+			"Nombre: ",
+			body.name
+		)
+
+
+		# ==========================================
+		# COMPROBAR SI ES ROCA
+		# ==========================================
+
+		if body.is_in_group("rocas_destructibles"):
+
+			print(
+				"!!! ES UNA ROCA DESTRUCTIBLE !!!"
+			)
+
+
+			print(
+				"Tiene romper_por_tornado(): ",
+				body.has_method("romper_por_tornado")
+			)
+
+
+			if body.has_method("romper_por_tornado"):
+
+				print(
+					"!!! LLAMANDO romper_por_tornado() !!!"
+				)
+
+				body.romper_por_tornado()
+
+
+			continue
+
+
+		# ==========================================
+		# COMPROBAR SI ES ENEMIGO
+		# ==========================================
+
+		if body.is_in_group("enemigos"):
+
+			print(
+				"!!! ES UN ENEMIGO !!!"
+			)
+
+
+			var id := body.get_instance_id()
+
+
+			if enemigos_golpeados_tornado.has(id):
+
+				continue
+
+
+			enemigos_golpeados_tornado[id] = true
+
+
+			# ==========================================
+			# DAÑO
+			# ==========================================
+
+			if body.has_method("herir"):
+
+				body.herir(
+					DAÑO_TURBO_FUEGO
+				)
+
+
+			# ==========================================
+			# RETROCESO
+			# ==========================================
+
+			if body.has_method("retroceso"):
+
+				var direccion_empuje := Vector2.RIGHT
+
+
+				if mirando_izquierda:
+
+					direccion_empuje = Vector2.LEFT
+
+
+				body.retroceso(
+					direccion_empuje,
+					retrocesoPorTurboFuego
+				)
+
+
+			continue
+
+
+		# ==========================================
+		# OTRO CUERPO
+		# ==========================================
+
+		print(
+			"IGNORADO: no es enemigo ni roca"
+		)
+# ==========================================
+# DESACTIVAR TORNADO
+# ==========================================
+
+func desactivar_tornado() -> void:
+
+	if not tornado_activo:
+
+		return
+
+
+	tornado_activo = false
+	tiempo_tornado = 0.0
+
+
+	# ==========================================
+	# DESACTIVAR HITBOX
+	# ==========================================
+
+	hitbox_tornado.monitoring = false
+	# Volver a activar colisión principal del Player
+	collision_shape_player.set_deferred(
+		"disabled",
+		false
+	)
+	
+	collision_tornado.set_deferred(
+		"disabled",
+		false
+	)
+
+
+	# ==========================================
+	# RESTAURAR PARED
+	# ==========================================
+
+	puede_agarrarse_pared = true
+	agarrado_pared = false
+	pared_normal = Vector2.ZERO
+
+
+	# ==========================================
+	# REDUCIR VELOCIDAD
+	# ==========================================
+
+	player.velocity.x = (
+		sign(player.velocity.x)
+		* MAX_SPEED
+	)
+
+
+	# ==========================================
+	# RESTAURAR ANIMACIÓN
+	# ==========================================
+
+	player.restablecer_visual_suelo()
+
+
+	enemigos_golpeados_tornado.clear()
+
+
+	print("==========================================")
+	print("TORNADO TERMINADO")
 	print("==========================================")
 
 
@@ -650,14 +1099,9 @@ func terminar_retroceso() -> void:
 
 func entrar_madriguera() -> void:
 
-	print("el personaje intenta entrar")
+
 
 	player.esta_en_madriguera = true
-
-	print(
-		"antes de cambiar mask: ",
-		player.get_collision_mask()
-	)
 
 	player.set_collision_mask_value(
 		MADRIGUERA_LAYER,
@@ -727,33 +1171,14 @@ func comprobar_tile_mortal() -> bool:
 		# ==========================================
 		# TILE MORTAL
 		# ==========================================
-		#
-		# Solo comprobamos TileMapLayer.
-		#
-		# Esto es importante porque ENEMIGO_LAYER
-		# también es la Layer 4.
-		#
-		# De esta forma un enemigo en Layer 4
-		# no mata al jugador simplemente por
-		# haber chocado físicamente con él.
-		#
-		# En cambio, un TileMapLayer cuyo tile
-		# tenga física en Layer 4 sí lo mata.
 
 		if objeto is TileMapLayer:
 
 			if colision_tiene_layer(
 				collision,
-				ENEMIGO_LAYER
+				Letal_layer
 			):
 
-				print("==========================================")
-				print("!!! PLAYER TOCÓ UN TILE MORTAL !!!")
-				print(
-					"Layer mortal: ",
-					ENEMIGO_LAYER
-				)
-				print("==========================================")
 
 				morir()
 
@@ -811,9 +1236,22 @@ func _physics_process(delta: float) -> void:
 
 		player.move_and_slide()
 
+
 		if comprobar_tile_mortal():
 
 			return
+
+
+		return
+
+
+	# ==========================================
+	# TORNADO
+	# ==========================================
+
+	if tornado_activo:
+
+		procesar_tornado(delta)
 
 		return
 
@@ -825,6 +1263,7 @@ func _physics_process(delta: float) -> void:
 	if tiempo_invulnerabilidad_turbo > 0.0:
 
 		tiempo_invulnerabilidad_turbo -= delta
+
 
 		if tiempo_invulnerabilidad_turbo < 0.0:
 
@@ -936,7 +1375,18 @@ func saltar() -> void:
 
 	if retroceso_activo:
 
-		print("SALTO BLOQUEADO POR RETROCESO")
+		print(
+			"SALTO BLOQUEADO POR RETROCESO"
+		)
+
+		return
+
+
+	if tornado_activo:
+
+		print(
+			"SALTO BLOQUEADO POR TORNADO"
+		)
 
 		return
 
@@ -950,6 +1400,7 @@ func saltar() -> void:
 
 		var direccion_salto := pared_normal.x
 
+
 		player.velocity.x = (
 			direccion_salto
 			* WALL_JUMP_FORCE
@@ -957,19 +1408,19 @@ func saltar() -> void:
 
 		player.velocity.y = JUMP_FORCE
 
+
 		seSalto = false
 		saltoFuego = false
+
 
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
 
-		# IMPORTANTE:
-		# Después de saltar de la pared no puede
-		# volver a agarrarse inmediatamente.
-
 		puede_agarrarse_pared = false
 
+
 		player.rotation = 0.0
+
 		player.restablecer_visual_suelo()
 
 		return
@@ -1034,8 +1485,10 @@ func salto_fuego() -> void:
 
 		saltoFuego = true
 
+
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
+
 
 		player.rotation = 0.0
 
@@ -1053,6 +1506,11 @@ func activar_turbo() -> void:
 		print(
 			"TURBO BLOQUEADO POR RETROCESO"
 		)
+
+		return
+
+
+	if tornado_activo:
 
 		return
 
@@ -1098,10 +1556,6 @@ func activar_turbo() -> void:
 	)
 
 
-	# ==========================================
-	# REINICIAR LISTA DE ENEMIGOS
-	# ==========================================
-
 	enemigos_golpeados_turbo.clear()
 
 
@@ -1114,39 +1568,30 @@ func activar_turbo() -> void:
 
 
 	# ==========================================
-	# GUARDAR MÁSCARA ORIGINAL
-	# ==========================================
-
-	colision_enemigos_original = (
-		player.get_collision_mask_value(
-			ENEMIGO_LAYER
-		)
-	)
-
-
-	# ==========================================
 	# HITBOX TURBO
 	# ==========================================
+	#
+	# La hitbox NO busca enemigos en layer 4.
+	#
+	# La configuración ya fue realizada en _ready():
+	# detecta todas las layers excepto la 4.
+	#
+	# El grupo "enemigos" decide si el cuerpo
+	# realmente es un enemigo.
 
 	print("==========================================")
 	print("CONFIGURACIÓN HITBOX TURBO")
 	print("==========================================")
 
+
 	print(
-		"Collision layer ANTES: ",
+		"Collision layer: ",
 		hitbox_turbo.collision_layer
 	)
 
 	print(
-		"Collision mask ANTES: ",
+		"Collision mask: ",
 		hitbox_turbo.collision_mask
-	)
-
-	print(
-		"Detecta layer enemigo ANTES: ",
-		hitbox_turbo.get_collision_mask_value(
-			ENEMIGO_LAYER
-		)
 	)
 
 	print(
@@ -1154,11 +1599,6 @@ func activar_turbo() -> void:
 		hitbox_turbo.monitoring
 	)
 
-
-	hitbox_turbo.set_collision_mask_value(
-		ENEMIGO_LAYER,
-		true
-	)
 
 	hitbox_turbo.monitoring = true
 
@@ -1169,9 +1609,9 @@ func activar_turbo() -> void:
 	)
 
 	print(
-		"Detecta layer enemigo DESPUÉS: ",
+		"Layer 4 detectada: ",
 		hitbox_turbo.get_collision_mask_value(
-			ENEMIGO_LAYER
+			Letal_layer
 		)
 	)
 
@@ -1182,10 +1622,6 @@ func activar_turbo() -> void:
 
 	print("==========================================")
 
-
-	# ==========================================
-	# ANIMACIÓN
-	# ==========================================
 
 	player.animacion_turbo()
 
@@ -1285,6 +1721,10 @@ func comprobar_golpes_turbo() -> void:
 			body.has_method("retroceso")
 		)
 
+
+		# ==========================================
+		# FILTRO DE ENEMIGO
+		# ==========================================
 
 		if not body.is_in_group("enemigos"):
 
@@ -1412,11 +1852,17 @@ func desactivar_turbo() -> void:
 	hitbox_turbo.monitoring = false
 
 
-	player.set_collision_mask_value(
-		ENEMIGO_LAYER,
-		colision_enemigos_original
-	)
-
+	# ==========================================
+	# IMPORTANTE
+	# ==========================================
+	#
+	# Ya NO se modifica la máscara de colisión
+	# del Player.
+	#
+	# Layer 4 pertenece exclusivamente a los
+	# tiles mortales.
+	#
+	# El ataque nunca utilizó esa layer.
 
 	tiempo_invulnerabilidad_turbo = (
 		INVULNERABILIDAD_POST_TURBO
@@ -1490,6 +1936,10 @@ func _on_hitbox_turbo_body_entered(
 
 		return
 
+
+	# ==========================================
+	# FILTRO DE ENEMIGO
+	# ==========================================
 
 	if not body.is_in_group("enemigos"):
 
@@ -1596,15 +2046,20 @@ func _on_hitbox_turbo_body_entered(
 
 func detectar_pared() -> void:
 
-	# ==========================================
-	# IGUAL QUE EL PLAYER VIEJO
-	# ==========================================
-
 	if not puede_agarrarse_pared:
 
 		agarrado_pared = false
-		pared_normal = Vector2.ZERO
+	pared_normal = Vector2.ZERO
 
+	player.rotation = 0.0
+
+	return
+
+
+	if tornado_activo:
+
+		agarrado_pared = false
+		pared_normal = Vector2.ZERO
 		player.rotation = 0.0
 
 		return
@@ -1639,9 +2094,6 @@ func detectar_pared() -> void:
 		var collider := collision.get_collider()
 
 
-		# Solo consideramos superficies verticales,
-		# igual que en tu código viejo.
-
 		if abs(collision.get_normal().x) < 0.8:
 
 			continue
@@ -1650,9 +2102,6 @@ func detectar_pared() -> void:
 		# ==========================================
 		# LAYER DE LA PARED
 		# ==========================================
-		#
-		# Usamos el RID para que también funcione
-		# con TileMapLayer.
 
 		if colision_tiene_layer(
 			collision,
@@ -1670,10 +2119,6 @@ func detectar_pared() -> void:
 			seSalto = false
 			saltoFuego = false
 
-
-			# ==========================================
-			# ANIMACIÓN DE PARED
-			# ==========================================
 
 			player.animacion_pared(
 				pared_normal
@@ -1807,16 +2252,28 @@ func herir(num: int) -> void:
 
 	if Invulnerabilidad.is_stopped():
 
-		vida -= num
+		# ==========================================
+		# LA VIDA PERTENECE AL PLAYER
+		# ==========================================
 
-		barraVida.value = vida
+		player.vida -= num
+
+		player.actualizar_barra_vida()
 
 		Invulnerabilidad.start()
 
 		animacionHerida()
 
 
-		if vida <= 0:
+		print(
+			"PLAYER HERIDO | Vida actual: ",
+			player.getVidaActual(),
+			"/",
+			player.getVidaMaxima()
+		)
+
+
+		if player.getVidaActual() <= 0:
 
 			morir()
 
