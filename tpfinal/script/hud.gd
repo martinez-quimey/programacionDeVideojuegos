@@ -1,3 +1,4 @@
+
 # HUD.gd
 
 extends CanvasLayer
@@ -5,13 +6,7 @@ extends CanvasLayer
 signal start_game
 signal retry_game
 signal main_menu
-
-
-# =========================================================
-# CONFIGURACIÓN DE NIVELES
-# =========================================================
-
-const PRIMER_NIVEL = "res://Niveles/Nivel1.tscn"
+signal continue_game
 
 
 func _ready() -> void:
@@ -19,7 +14,7 @@ func _ready() -> void:
 	# =====================================================
 	# MAIN MENU
 	# =====================================================
-
+	$Confirmacion.hide()
 	var start_button = $MainMenu/CenterContainer/VBoxContainer/StartButton
 	if not start_button.pressed.is_connected(_on_start_button_pressed):
 		start_button.pressed.connect(_on_start_button_pressed)
@@ -90,6 +85,19 @@ func _ready() -> void:
 	var pause_menu_button = $Pause/CenterContainer/VBoxContainer/MainMenuButton
 	if not pause_menu_button.pressed.is_connected(_on_main_menu_button2_pressed):
 		pause_menu_button.pressed.connect(_on_main_menu_button2_pressed)
+
+	# =====================================================
+	# Confirmacion
+	# =====================================================
+
+	var YesButton = $Confirmacion/CenterContainer/VBoxContainer/YesButton
+	if not YesButton.pressed.is_connected(_on_yes_button_pressed):
+		YesButton.pressed.connect(_on_yes_button_pressed)
+
+
+	var NoButton = $Confirmacion/CenterContainer/VBoxContainer/NoButton
+	if not NoButton.pressed.is_connected(_on_no_button_pressed):
+		NoButton.pressed.connect(_on_no_button_pressed)
 
 
 	# =====================================================
@@ -174,106 +182,88 @@ func update_language() -> void:
 		# MAIN MENU
 
 		$MainMenu/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
-
 		$MainMenu/CenterContainer/VBoxContainer/StartButton.text = "Nueva partida"
-
 		$MainMenu/CenterContainer/VBoxContainer/ContinueButton.text = "Continuar"
-
 		$MainMenu/CenterContainer/VBoxContainer/SelectorNiveles.text = "Selector de niveles"
-
 		$MainMenu/CenterContainer/VBoxContainer/LanguageButton.text = "Idioma"
-
 		$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.text = "Cerrar juego"
 
 
 		# GAME OVER
 
 		$GameOver/CenterContainer/VBoxContainer/Message.text = "Game Over"
-
 		$GameOver/CenterContainer/VBoxContainer/RetryButton.text = "Reintentar"
-
 		$GameOver/CenterContainer/VBoxContainer/MainMenuButton.text = "Menú principal"
 
 
 		# LANGUAGE
 
 		$LanguageMenu/CenterContainer/VBoxContainer/Title.text = "Idioma"
-
 		$LanguageMenu/CenterContainer/VBoxContainer/SpanishButton.text = "Español"
-
-		$LanguageMenu/CenterContainer/VBoxContainer/EnglishButton.text = "Inglés"
-
+		$LanguageMenu/CenterContainer/VBoxContainer/EnglishButton.text = "English"
 		$LanguageMenu/CenterContainer/VBoxContainer/BackButton.text = "Volver"
 
 
 		# PAUSE
 
 		$Pause/CenterContainer/VBoxContainer/Message.text = "Pausa"
-
 		$Pause/CenterContainer/VBoxContainer/Continuar.text = "Continuar"
-
 		$Pause/CenterContainer/VBoxContainer/MainMenuButton.text = "Volver al menú principal"
 
 
 		# SELECTOR
 
 		$SelectorNiveles/CenterContainer/VBoxContainer/Title.text = "Selector de niveles"
-
 		$SelectorNiveles/CenterContainer/VBoxContainer/BackButton.text = "Volver"
-
-
+		#confirmacion
+		
+		$Confirmacion/CenterContainer/VBoxContainer/Message.text = "¿Está seguro de que desea iniciar una nueva partida? Los datos actuales se borrarán."
+		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "Si"
+		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "No"
+		
 	elif Settings.language == "en":
 
 		# MAIN MENU
 
 		$MainMenu/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
-
 		$MainMenu/CenterContainer/VBoxContainer/StartButton.text = "New Game"
-
 		$MainMenu/CenterContainer/VBoxContainer/ContinueButton.text = "Continue"
-
 		$MainMenu/CenterContainer/VBoxContainer/SelectorNiveles.text = "Level Select"
-
 		$MainMenu/CenterContainer/VBoxContainer/LanguageButton.text = "Language"
-
 		$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.text = "Quit Game"
 
 
 		# GAME OVER
 
 		$GameOver/CenterContainer/VBoxContainer/Message.text = "Game Over"
-
 		$GameOver/CenterContainer/VBoxContainer/RetryButton.text = "Retry"
-
 		$GameOver/CenterContainer/VBoxContainer/MainMenuButton.text = "Main Menu"
 
 
 		# LANGUAGE
 
 		$LanguageMenu/CenterContainer/VBoxContainer/Title.text = "Language"
-
-		$LanguageMenu/CenterContainer/VBoxContainer/SpanishButton.text = "Spanish"
-
+		$LanguageMenu/CenterContainer/VBoxContainer/SpanishButton.text = "Español"
 		$LanguageMenu/CenterContainer/VBoxContainer/EnglishButton.text = "English"
-
 		$LanguageMenu/CenterContainer/VBoxContainer/BackButton.text = "Back"
 
 
 		# PAUSE
 
 		$Pause/CenterContainer/VBoxContainer/Message.text = "Pause"
-
 		$Pause/CenterContainer/VBoxContainer/Continuar.text = "Resume"
-
 		$Pause/CenterContainer/VBoxContainer/MainMenuButton.text = "Back to Main Menu"
 
 
 		# SELECTOR
 
 		$SelectorNiveles/CenterContainer/VBoxContainer/Title.text = "Level Select"
-
 		$SelectorNiveles/CenterContainer/VBoxContainer/BackButton.text = "Back"
-
+		#confirmacion
+		
+		$Confirmacion/CenterContainer/VBoxContainer/Message.text = "Are you sure you want to start a new game? rent data will be deleted."
+		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "Yes"
+		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "No"
 
 # =========================================================
 # ESTADO DE LOS BOTONES
@@ -297,23 +287,43 @@ func actualizar_estado_botones() -> void:
 
 func _on_start_button_pressed() -> void:
 
-	print("NUEVA PARTIDA")
+	if (Save.existe_partida()):
+		$Confirmacion.show()
+		$MainMenu.hide()
+	else:
+		
+		# Crear una partida completamente nueva.
 
-	# Nueva partida
+		Save.iniciar_nueva_partida()
 
-	Save.iniciar_nueva_partida()
 
-	Settings.nivelActual = PRIMER_NIVEL
+		# El Main se encargará de cargar el nivel inicial
+		# y de obtener su ruta real mediante game.scene_file_path.
 
-	Save.guardar_partida()
+		$MainMenu.hide()
 
-	# EXACTAMENTE COMO EL HUD VIEJO:
-	# ocultamos el menú y avisamos al juego.
+		start_game.emit()
 
-	$MainMenu.hide()
 
-	retry_game.emit()
+func _on_yes_button_pressed() -> void:
+		# Crear una partida completamente nueva.
 
+		Save.iniciar_nueva_partida()
+
+
+		# El Main se encargará de cargar el nivel inicial
+		# y de obtener su ruta real mediante game.scene_file_path.
+		$Confirmacion.hide()
+		$MainMenu.hide()
+		
+
+		start_game.emit()
+
+
+
+func _on_no_button_pressed() -> void:
+	$Confirmacion.hide()
+	$MainMenu.show()
 
 func _on_language_button_pressed() -> void:
 
@@ -335,12 +345,17 @@ func _on_continuar_partida_pressed() -> void:
 
 	print("CONTINUAR PARTIDA")
 
+
+	# Cargar todos los datos del archivo.
+
 	if not Save.cargar_partida():
 
 		print("No se pudo cargar la partida")
 
 		return
 
+
+	# Comprobar que el guardado tenga un nivel.
 
 	if Settings.nivelActual == "":
 
@@ -351,11 +366,14 @@ func _on_continuar_partida_pressed() -> void:
 
 	print("Cargando nivel: ", Settings.nivelActual)
 
-	# Ocultamos el menú antes de cambiar de escena.
 
 	$MainMenu.hide()
 
-	get_tree().change_scene_to_file(Settings.nivelActual)
+
+	# Main utilizará Settings.nivelActual.
+	# No se fuerza ningún nivel concreto.
+
+	continue_game.emit()
 
 
 # =========================================================
@@ -366,9 +384,11 @@ func _on_selector_niveles_pressed() -> void:
 
 	print("SELECTOR DE NIVELES")
 
+
 	if not Save.existe_partida():
 
 		return
+
 
 	Save.cargar_partida()
 
@@ -418,13 +438,20 @@ func _on_nivel_seleccionado(nivel: String) -> void:
 
 	print("NIVEL SELECCIONADO: ", nivel)
 
+
+	# El nivel seleccionado pasa a ser el nivel actual.
+
 	Settings.nivelActual = nivel
 
 	Save.guardar_partida()
 
+
 	$SelectorNiveles.hide()
 
-	get_tree().change_scene_to_file(nivel)
+
+	# Main se encarga de cargar el nivel.
+
+	continue_game.emit()
 
 
 func _on_selector_niveles_back_pressed() -> void:
@@ -440,7 +467,7 @@ func _on_spanish_button_pressed() -> void:
 
 	Settings.language = "es"
 
-	Save.guardar_partida()
+	Save.guardar_idioma()
 
 	update_language()
 
@@ -451,7 +478,7 @@ func _on_english_button_pressed() -> void:
 
 	Settings.language = "en"
 
-	Save.guardar_partida()
+	Save.guardar_idioma()
 
 	update_language()
 

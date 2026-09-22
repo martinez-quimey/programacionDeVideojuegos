@@ -2,11 +2,128 @@
 
 [ext_resource type="Script" uid="uid://bh8cv8kqckg8x" path="res://script/hud.gd" id="1_64ctp"]
 
-[sub_resource type="InputEventAction" id="InputEventAction_64ctp"]
-action = &"start"
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nhrkl"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.2509804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
 
-[sub_resource type="Shortcut" id="Shortcut_8sq4i"]
-events = [SubResource("InputEventAction_64ctp")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cdv6k"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.62352943)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mcea6"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.4392157)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_npr4g"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0, 0, 0.2509804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jqn4v"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0.5882353, 0.6392157, 0, 0.4)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4jn62"]
+bg_color = Color(0.6748077, 0.5935568, 0.37265283, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fpuge"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.2509804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_agiu6"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.62352943)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i51r8"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.4392157)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ko5hl"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0, 0, 0.2509804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u6mqm"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0.5882353, 0.6392157, 0, 0.4)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
 
 [node name="HUD" type="CanvasLayer" unique_id=798110992]
 process_mode = 3
@@ -42,24 +159,88 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="StartButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1848048737]
+[node name="StartButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=38431286]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 64
-shortcut = SubResource("Shortcut_8sq4i")
-text = "Start"
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
 
-[node name="ContinueButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=991633384]
+[node name="ContinueButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1820123663]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
 
-[node name="LanguageButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1630350228]
+[node name="LanguageButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=846013093]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
 
-[node name="QuitGameButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=827418079]
+[node name="SelectorNiveles" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=317658958]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
 
-[node name="SelectorNiveles" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1826798165]
+[node name="QuitGameButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=593025086]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="Panel" type="Panel" parent="MainMenu" unique_id=436122633]
+z_index = -1
+layout_mode = 0
+offset_right = 1151.0
+offset_bottom = 633.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
 [node name="SelectorNiveles" type="Control" parent="." unique_id=172355086]
 layout_mode = 3
@@ -93,6 +274,14 @@ text = "Eva Two Tales Kitsune"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="Panel" type="Panel" parent="SelectorNiveles" unique_id=765224298]
+z_index = -1
+layout_mode = 0
+offset_right = 1151.0
+offset_bottom = 633.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
 [node name="GameOver" type="Control" parent="." unique_id=1938582274]
 layout_mode = 3
@@ -150,14 +339,58 @@ layout_mode = 2
 [node name="Title" type="Label" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=804674658]
 layout_mode = 2
 
-[node name="SpanishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=549829621]
+[node name="SpanishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=1422576158]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
 
-[node name="EnglishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=1356906398]
+[node name="EnglishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=634350840]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
 
-[node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=2042497959]
+[node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=285628134]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="Panel" type="Panel" parent="LanguageMenu" unique_id=649402937]
+z_index = -1
+layout_mode = 0
+offset_right = 1151.0
+offset_bottom = 633.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
 [node name="Pause" type="Control" parent="." unique_id=560659944]
 layout_mode = 3
@@ -169,29 +402,143 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="Pause" unique_id=2108314746]
+[node name="CenterContainer" type="Control" parent="Pause" unique_id=1708011231]
 layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 97.0
+offset_top = -5.0
+offset_right = 110.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause/CenterContainer" unique_id=1117220521]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 11.0
+offset_top = -6.0
+offset_right = 102.0
+offset_bottom = 44.0
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer" unique_id=2024934132]
+layout_mode = 2
+
+[node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=507573745]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/focus = SubResource("StyleBoxFlat_u6mqm")
+text = "Start"
+
+[node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=1726611479]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/focus = SubResource("StyleBoxFlat_u6mqm")
+text = "Exit"
+
+[node name="Confirmacion" type="Control" parent="." unique_id=1416754970]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Pause/CenterContainer" unique_id=874991727]
+[node name="CenterContainer" type="Control" parent="Confirmacion" unique_id=1807544683]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 97.0
+offset_top = -5.0
+offset_right = 110.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Confirmacion/CenterContainer" unique_id=305150223]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 11.0
+offset_top = -6.0
+offset_right = 102.0
+offset_bottom = 44.0
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Message" type="Label" parent="Confirmacion/CenterContainer/VBoxContainer" unique_id=59311020]
 layout_mode = 2
 
-[node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer" unique_id=369891993]
+[node name="YesButton" type="Button" parent="Confirmacion/CenterContainer/VBoxContainer" unique_id=970344171]
 layout_mode = 2
-text = "pausa"
+theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/focus = SubResource("StyleBoxFlat_u6mqm")
+text = "Start"
 
-[node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=546976929]
+[node name="NoButton" type="Button" parent="Confirmacion/CenterContainer/VBoxContainer" unique_id=492037568]
 layout_mode = 2
-
-[node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=614247921]
-layout_mode = 2
-text = "main menu"
+theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_agiu6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_i51r8")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_ko5hl")
+theme_override_styles/focus = SubResource("StyleBoxFlat_u6mqm")
+text = "Exit"
 
 [connection signal="main_menu" from="." to="." method="_on_main_menu"]
 [connection signal="retry_game" from="." to="." method="_on_retry_game"]
 [connection signal="start_game" from="." to="." method="_on_start_game"]
 [connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
+[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/SelectorNiveles" to="." method="_on_selector_niveles_pressed"]
+[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/QuitGameButton" to="." method="_on_quit_game_button_pressed"]
+[connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/YesButton" to="." method="_on_yes_button_pressed"]
+[connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/NoButton" to="." method="_on_no_button_pressed"]

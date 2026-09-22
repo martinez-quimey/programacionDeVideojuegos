@@ -1,6 +1,6 @@
 extends Node
 
-var language: String = "es"
+var language: String 
 var sePuedePausar = false
 var main = null
 

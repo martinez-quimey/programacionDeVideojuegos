@@ -58,7 +58,8 @@ position = Vector2(1694, 154)
 dialogue_script = ExtResource("5_q7tr2")
 
 [node name="Baya" parent="." index="9" unique_id=1021680987 instance=ExtResource("6_2lqro")]
-position = Vector2(821.00006, 604)
+position = Vector2(950, 600.00006)
+scale = Vector2(5, 5)
 tipo_baya = 1
 id_baya = "level1_1"
 

@@ -19,9 +19,11 @@ shape = SubResource("CircleShape2D_ge01d")
 one_way_collision_margin = 0.0
 
 [node name="Energia" type="Sprite2D" parent="." unique_id=1678430101]
+texture_filter = 1
 position = Vector2(-3, 7)
 texture = ExtResource("2_j62ur")
 
 [node name="Vida" type="Sprite2D" parent="." unique_id=886248895]
+texture_filter = 1
 position = Vector2(-3, 7)
 texture = ExtResource("3_8t80o")
