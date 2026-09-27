@@ -15,27 +15,27 @@ func _ready() -> void:
 	# MAIN MENU
 	# =====================================================
 	$Confirmacion.hide()
-	var start_button = $MainMenu/CenterContainer/VBoxContainer/StartButton
+	var start_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton
 	if not start_button.pressed.is_connected(_on_start_button_pressed):
 		start_button.pressed.connect(_on_start_button_pressed)
 
 
-	var continue_button = $MainMenu/CenterContainer/VBoxContainer/ContinueButton
+	var continue_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton
 	if not continue_button.pressed.is_connected(_on_continuar_partida_pressed):
 		continue_button.pressed.connect(_on_continuar_partida_pressed)
 
 
-	var selector_button = $MainMenu/CenterContainer/VBoxContainer/SelectorNiveles
+	var selector_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles
 	if not selector_button.pressed.is_connected(_on_selector_niveles_pressed):
 		selector_button.pressed.connect(_on_selector_niveles_pressed)
 
 
-	var language_button = $MainMenu/CenterContainer/VBoxContainer/LanguageButton
+	var language_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/LanguageButton
 	if not language_button.pressed.is_connected(_on_language_button_pressed):
 		language_button.pressed.connect(_on_language_button_pressed)
 
 
-	var quit_button = $MainMenu/CenterContainer/VBoxContainer/QuitGameButton
+	var quit_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton
 	if not quit_button.pressed.is_connected(_on_quit_game_button_pressed):
 		quit_button.pressed.connect(_on_quit_game_button_pressed)
 
@@ -132,14 +132,17 @@ func show_main_menu() -> void:
 
 	actualizar_estado_botones()
 
-
 func show_game_over() -> void:
+
+	print("HUD: MOSTRANDO GAME OVER")
 
 	$MainMenu.hide()
 	$GameOver.show()
 	$LanguageMenu.hide()
 	$Pause.hide()
 	$SelectorNiveles.hide()
+
+	print("HUD: GameOver visible = ", $GameOver.visible)
 
 
 func show_language_menu() -> void:
@@ -181,12 +184,12 @@ func update_language() -> void:
 
 		# MAIN MENU
 
-		$MainMenu/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
-		$MainMenu/CenterContainer/VBoxContainer/StartButton.text = "Nueva partida"
-		$MainMenu/CenterContainer/VBoxContainer/ContinueButton.text = "Continuar"
-		$MainMenu/CenterContainer/VBoxContainer/SelectorNiveles.text = "Selector de niveles"
-		$MainMenu/CenterContainer/VBoxContainer/LanguageButton.text = "Idioma"
-		$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.text = "Cerrar juego"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton.text = "Nueva partida"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton.text = "Continuar"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles.text = "Selector de niveles"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/LanguageButton.text = "Idioma"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton.text = "Cerrar juego"
 
 
 		# GAME OVER
@@ -225,12 +228,12 @@ func update_language() -> void:
 
 		# MAIN MENU
 
-		$MainMenu/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
-		$MainMenu/CenterContainer/VBoxContainer/StartButton.text = "New Game"
-		$MainMenu/CenterContainer/VBoxContainer/ContinueButton.text = "Continue"
-		$MainMenu/CenterContainer/VBoxContainer/SelectorNiveles.text = "Level Select"
-		$MainMenu/CenterContainer/VBoxContainer/LanguageButton.text = "Language"
-		$MainMenu/CenterContainer/VBoxContainer/QuitGameButton.text = "Quit Game"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton.text = "New Game"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton.text = "Continue"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles.text = "Level Select"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/LanguageButton.text = "Language"
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton.text = "Quit Game"
 
 
 		# GAME OVER
@@ -273,9 +276,9 @@ func actualizar_estado_botones() -> void:
 
 	var hay_partida = Save.existe_partida()
 
-	$MainMenu/CenterContainer/VBoxContainer/ContinueButton.disabled = not hay_partida
+	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton.disabled = not hay_partida
 
-	$MainMenu/CenterContainer/VBoxContainer/SelectorNiveles.disabled = (
+	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles.disabled = (
 		not hay_partida
 		or Settings.nivelesCompletados.is_empty()
 	)

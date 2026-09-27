@@ -8,11 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://bnc8ulhop5qxa" path="res://sprites/npc/Boar/Boar_Idle.png" id="6_n5ncv"]
 [ext_resource type="Texture2D" uid="uid://d1pmv10ufcqcd" path="res://sprites/npc/Boar/Boar_Death.png" id="7_teu7v"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_kwkry"]
-size = Vector2(88, 22.5)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3oyy8"]
-size = Vector2(23, 20)
+size = Vector2(23, 17.444445)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_18yi0"]
 atlas = ExtResource("3_vrg3o")
@@ -218,34 +215,38 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(19.65625, 26)
+size = Vector2(19.65625, 21.11111)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kwkry"]
+size = Vector2(61.222225, 22.5)
 
 [node name="Jabali" unique_id=2131858162 instance=ExtResource("1_kwkry")]
+scale = Vector2(9, 9)
 script = ExtResource("2_kwkry")
-SPEEDCAMINANDO = null
-SPEEDCORRIENDO = null
-CAMINATA = null
-GRAVITY = null
+SPEEDCAMINANDO = 200.0
+SPEEDCORRIENDO = 400.0
+CAMINATA = 400.0
+DISTANCIA_BORDE = 20.0
 PESO = 0.1
 vida = 5
 
-[node name="CollisionShape2D" parent="DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
-position = Vector2(0, -10.5)
-scale = Vector2(2, 2)
-shape = SubResource("RectangleShape2D_kwkry")
-
-[node name="CollisionShape2D" parent="." index="1" unique_id=1444408395]
-position = Vector2(-1.5, 0)
+[node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]
+position = Vector2(-1.5, 1.2777777)
 shape = SubResource("RectangleShape2D_3oyy8")
 
-[node name="AnimatedSprite2D" parent="OrientacionJabali" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
+[node name="AnimatedSprite2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_kwkry")
 animation = &"atacar"
 
-[node name="CollisionAtaque" type="Area2D" parent="OrientacionJabali" parent_id_path=PackedInt32Array(187453929) index="1" unique_id=1104407440]
+[node name="CollisionAtaque" type="Area2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="1" unique_id=1104407440]
 collision_layer = 0
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="OrientacionJabali/CollisionAtaque" index="0" unique_id=1834044500]
-position = Vector2(7.171875, -2)
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="OrientacionEnemy/CollisionAtaque" index="0" unique_id=1834044500]
+position = Vector2(7.6666665, -0.77777755)
 shape = SubResource("RectangleShape2D_4jn62")
+
+[node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
+position = Vector2(12.444445, -13.111112)
+scale = Vector2(2, 2)
+shape = SubResource("RectangleShape2D_kwkry")

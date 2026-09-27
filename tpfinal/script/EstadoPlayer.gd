@@ -96,6 +96,7 @@ signal died
 # ==========================================
 
 @export var GRAVITY: float = 600.0
+@export var GRAVITY_CAIDA: float = 1600
 @export var JUMP_FORCE: float = -600.0
 @export var JUMP_FIRE_FORCE: float = -880.0
 
@@ -144,7 +145,7 @@ const ENERGIA_TURBO = 3
 @export var FUERZA_TURBO: float = 3500
 @export var DURACION_TURBO: float = 0.15
 @export var DAÑO_TURBO_FUEGO: int = 3
-@export var retrocesoPorTurboFuego: int = 200
+@export var retrocesoPorTurboFuego: int = 600
 @export var INVULNERABILIDAD_POST_TURBO: float = 0.4
 
 # ==========================================
@@ -281,6 +282,10 @@ func _ready() -> void:
 	configurar_hitbox_ataque(
 		hitbox_tornado
 	)
+	collision_tornado.set_deferred(
+	"disabled",
+	true
+	)
 
 
 	# ==========================================
@@ -312,27 +317,6 @@ func _ready() -> void:
 	# DEBUG DEL HITBOX
 	# ==========================================
 
-	print("==========================================")
-	print("PLAYER READY")
-	print("PESO: ", PESO)
-
-	print(
-		"HitboxTurbo collision_layer: ",
-		hitbox_turbo.collision_layer
-	)
-
-	print(
-		"HitboxTurbo collision_mask: ",
-		hitbox_turbo.collision_mask
-	)
-
-	print(
-		"HitboxTurbo monitoring: ",
-		hitbox_turbo.monitoring
-	)
-
-	print("==========================================")
-
 
 # ==========================================
 # CAMBIO DE ESTADO
@@ -344,9 +328,7 @@ func cambiar_estado(
 
 	if retroceso_activo:
 
-		print(
-			"CAMBIO DE ESTADO BLOQUEADO POR RETROCESO"
-		)
+		
 
 		return
 
@@ -366,9 +348,7 @@ func cambiar_a_manual() -> void:
 
 	if player.estado_actual.retroceso_activo:
 
-		print(
-			"CAMBIO A MANUAL BLOQUEADO POR RETROCESO"
-		)
+		
 
 		return
 
@@ -387,9 +367,6 @@ func cambiar_a_automatico() -> void:
 
 	if player.estado_actual.retroceso_activo:
 
-		print(
-			"CAMBIO A AUTOMÁTICO BLOQUEADO POR RETROCESO"
-		)
 
 		return
 
@@ -410,9 +387,7 @@ func establecer_direccion(
 
 	if retroceso_activo:
 
-		print(
-			"DIRECCIÓN BLOQUEADA POR RETROCESO"
-		)
+	
 
 		return
 
@@ -464,59 +439,35 @@ func retroceso(
 	direccion_empuje: Vector2,
 	fuerza: float
 ) -> void:
+	
 
-	print("")
-	print("==========================================")
-	print("!!! RETROCESO RECIBIDO !!!")
-	print("==========================================")
+	if turbo_activo or tiempo_invulnerabilidad_turbo > 0.0:
 
-	print(
-		"Dirección recibida: ",
-		direccion_empuje
-	)
+		print(
+			"RETROCESO BLOQUEADO: PLAYER INMUNE"
+		)
 
-	print(
-		"Fuerza recibida: ",
-		fuerza
-	)
+		return
 
-	print(
-		"Peso actual: ",
-		PESO
-	)
 
-	print(
-		"retroceso_activo antes: ",
-		retroceso_activo
-	)
-
-	print(
-		"Velocity antes: ",
-		player.velocity
-	)
 
 
 	if retroceso_activo:
 
-		print(
-			"RETROCESO IGNORADO: YA ESTABA EN RETROCESO"
-		)
 
 		return
 
 
 	if PESO <= 0:
 
-		print("ERROR: PESO <= 0")
+		
 
 		return
 
 
 	if direccion_empuje.length() == 0:
 
-		print(
-			"ERROR: DIRECCIÓN DE RETROCESO VACÍA"
-		)
+	
 
 		return
 
@@ -527,10 +478,7 @@ func retroceso(
 	estado_anterior_retroceso = player.estado_actual
 
 
-	print(
-		"Estado anterior: ",
-		estado_anterior_retroceso
-	)
+	
 
 
 	direccion = 0.0
@@ -549,31 +497,6 @@ func retroceso(
 	)
 
 
-	print("------------------------------------------")
-
-	print(
-		"Dirección normalizada: ",
-		direccion_normalizada
-	)
-
-	print(
-		"Fuerza: ",
-		fuerza
-	)
-
-	print(
-		"Peso: ",
-		PESO
-	)
-
-	print(
-		"Velocidad calculada: ",
-		velocidad_retroceso
-	)
-
-	print("------------------------------------------")
-
-
 	player.velocity.x = (
 		direccion_normalizada.x
 		* velocidad_retroceso
@@ -585,22 +508,6 @@ func retroceso(
 	)
 
 
-	print(
-		"Velocity DESPUÉS de aplicar retroceso: "
-	)
-
-	print(player.velocity)
-
-	print(
-		"retroceso_activo: ",
-		retroceso_activo
-	)
-
-	print("==========================================")
-	print("RETROCESO ACTIVADO")
-	print("==========================================")
-	print("")
-
 
 # ==========================================
 # PROCESAR RETROCESO
@@ -611,17 +518,6 @@ func procesar_retroceso(delta: float) -> void:
 	if not retroceso_activo:
 
 		return
-
-
-	print(
-		"RETROCESO PROCESANDO | tiempo=",
-		tiempo_retroceso,
-		" | velocity=",
-		player.velocity,
-		" | posicion=",
-		player.global_position
-	)
-
 
 	tiempo_retroceso -= delta
 
@@ -764,31 +660,7 @@ func activar_tornado() -> void:
 
 	hitbox_tornado.monitoring = true
 
-	print("==========================================")
-	print("TORNADO HITBOX")
-	print("==========================================")
-
-	print(
-		"Monitoring: ",
-		hitbox_tornado.monitoring
-	)
-
-	print(
-		"Collision mask: ",
-		hitbox_tornado.collision_mask
-	)
-
-	print(
-		"Detecta layer 1: ",
-		hitbox_tornado.get_collision_mask_value(1)
-	)
-
-	print(
-		"Detecta layer 4: ",
-		hitbox_tornado.get_collision_mask_value(4)
-	)
-
-	print("==========================================")
+	
 	# ==========================================
 	# ANIMACIÓN
 	# ==========================================
@@ -812,9 +684,6 @@ func activar_tornado() -> void:
 	player.velocity.y = 0.0
 
 
-	print("==========================================")
-	print("TORNADO ACTIVADO")
-	print("==========================================")
 
 
 
@@ -905,10 +774,6 @@ func comprobar_golpes_tornado() -> void:
 	)
 
 
-	print(
-		"TORNADO DETECTÓ CUERPOS: ",
-		cuerpos.size()
-	)
 
 
 	for body in cuerpos:
@@ -918,21 +783,7 @@ func comprobar_golpes_tornado() -> void:
 			continue
 
 
-		print(
-			"------------------------------------------"
-		)
 
-
-		print(
-			"TORNADO DETECTÓ: ",
-			body
-		)
-
-
-		print(
-			"Nombre: ",
-			body.name
-		)
 
 
 		# ==========================================
@@ -941,22 +792,11 @@ func comprobar_golpes_tornado() -> void:
 
 		if body.is_in_group("rocas_destructibles"):
 
-			print(
-				"!!! ES UNA ROCA DESTRUCTIBLE !!!"
-			)
 
-
-			print(
-				"Tiene romper_por_tornado(): ",
-				body.has_method("romper_por_tornado")
-			)
 
 
 			if body.has_method("romper_por_tornado"):
 
-				print(
-					"!!! LLAMANDO romper_por_tornado() !!!"
-				)
 
 				body.romper_por_tornado()
 
@@ -970,9 +810,6 @@ func comprobar_golpes_tornado() -> void:
 
 		if body.is_in_group("enemigos"):
 
-			print(
-				"!!! ES UN ENEMIGO !!!"
-			)
 
 
 			var id := body.get_instance_id()
@@ -1024,9 +861,7 @@ func comprobar_golpes_tornado() -> void:
 		# OTRO CUERPO
 		# ==========================================
 
-		print(
-			"IGNORADO: no es enemigo ni roca"
-		)
+		
 # ==========================================
 # DESACTIVAR TORNADO
 # ==========================================
@@ -1087,10 +922,6 @@ func desactivar_tornado() -> void:
 
 	enemigos_golpeados_tornado.clear()
 
-
-	print("==========================================")
-	print("TORNADO TERMINADO")
-	print("==========================================")
 
 
 # ==========================================
@@ -1308,8 +1139,13 @@ func _physics_process(delta: float) -> void:
 
 		elif not turbo_activo:
 
-			player.velocity.y += GRAVITY * delta
+			if player.velocity.y > 0:
 
+				player.velocity.y += GRAVITY_CAIDA * delta
+
+			else:
+
+				player.velocity.y += GRAVITY * delta
 
 	# ==========================================
 	# MOVIMIENTO FÍSICO
@@ -1375,18 +1211,12 @@ func saltar() -> void:
 
 	if retroceso_activo:
 
-		print(
-			"SALTO BLOQUEADO POR RETROCESO"
-		)
+
 
 		return
 
 
 	if tornado_activo:
-
-		print(
-			"SALTO BLOQUEADO POR TORNADO"
-		)
 
 		return
 
@@ -1437,11 +1267,12 @@ func saltar() -> void:
 
 	if not seSalto:
 
-		player.velocity.y = JUMP_FORCE
+		if player.poseeDobleSalto:
+			player.velocity.y = JUMP_FORCE
 
-		seSalto = true
+			seSalto = true
 
-		player.animacion_salto()
+			player.animacion_salto()
 
 
 # ==========================================
@@ -1452,9 +1283,7 @@ func salto_fuego() -> void:
 
 	if retroceso_activo:
 
-		print(
-			"SALTO FUEGO BLOQUEADO POR RETROCESO"
-		)
+		
 
 		return
 
@@ -1969,7 +1798,7 @@ func _on_hitbox_turbo_body_entered(
 	# DAÑO
 	# ==========================================
 
-	print("!!! APLICANDO DAÑO DEL TURBO !!!")
+
 
 	print(
 		"Daño: ",
@@ -2035,29 +1864,38 @@ func _on_hitbox_turbo_body_entered(
 		)
 
 
-	print("==========================================")
-	print("FIN DEL GOLPE DEL TURBO")
-	print("==========================================")
-
 
 # ==========================================
 # PARED
 # ==========================================
-
 func detectar_pared() -> void:
 
+	# ==========================================
+	# PUEDE AGARRARSE A PARED
+	# ==========================================
+
+	
 	if not puede_agarrarse_pared:
 
+	
+
 		agarrado_pared = false
-	pared_normal = Vector2.ZERO
+		pared_normal = Vector2.ZERO
 
-	player.rotation = 0.0
+		player.rotation = 0.0
 
-	return
+		return
+
+
+
+	# ==========================================
+	# TORNADO
+	# ==========================================
 
 
 	if tornado_activo:
 
+	
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
 		player.rotation = 0.0
@@ -2065,12 +1903,26 @@ func detectar_pared() -> void:
 		return
 
 
+
+
+	# ==========================================
+	# SUELO
+	# ==========================================
+
+
 	if player.is_on_floor():
 
+	
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
 
 		return
+
+
+	# ==========================================
+	# PARED
+	# ==========================================
+
 
 
 	if not player.is_on_wall():
@@ -2082,10 +1934,20 @@ func detectar_pared() -> void:
 
 
 	# ==========================================
+	# INFORMACIÓN GENERAL
+	# ==========================================
+
+
+
+
+	# ==========================================
 	# BUSCAR LA COLISIÓN DE LA PARED
 	# ==========================================
 
+	
 	for i in range(player.get_slide_collision_count()):
+
+	
 
 		var collision := (
 			player.get_slide_collision(i)
@@ -2094,37 +1956,95 @@ func detectar_pared() -> void:
 		var collider := collision.get_collider()
 
 
+
+
+
+		# ==========================================
+		# COMPROBAR SI ES REALMENTE UNA PARED
+		# ==========================================
+
 		if abs(collision.get_normal().x) < 0.8:
+
 
 			continue
 
 
 		# ==========================================
-		# LAYER DE LA PARED
+		# COMPROBAR LAYER
 		# ==========================================
 
-		if colision_tiene_layer(
+	
+
+
+		var tiene_layer_pared := colision_tiene_layer(
 			collision,
 			WALL_LAYER
-		):
-
-			agarrado_pared = true
-
-			pared_normal = (
-				collision.get_normal()
-			)
-
-			player.velocity.x = 0.0
-
-			seSalto = false
-			saltoFuego = false
+		)
 
 
-			player.animacion_pared(
-				pared_normal
-			)
 
-			return
+		if collider != null:
+
+			if collider is CollisionObject2D:
+
+				print(
+					"[9] collision_layer del collider = ",
+					collider.collision_layer
+				)
+
+				print(
+					"[9] collider tiene layer 1: ",
+					collider.get_collision_layer_value(1)
+				)
+
+		
+
+
+		if not tiene_layer_pared:
+
+
+			continue
+
+
+
+
+		# ==========================================
+		# ENCONTRÓ PARED VÁLIDA
+		# ==========================================
+
+
+
+
+		agarrado_pared = true
+
+
+		
+
+		pared_normal = (
+			collision.get_normal()
+		)
+
+
+	
+
+		player.velocity.x = 0.0
+
+
+	
+
+		seSalto = false
+		saltoFuego = false
+
+
+
+
+		
+
+		player.animacion_pared(
+			pared_normal
+		)
+
+		return
 
 
 	# ==========================================
@@ -2234,18 +2154,12 @@ func herir(num: int) -> void:
 
 	if turbo_activo:
 
-		print(
-			"DAÑO BLOQUEADO: TURBO ACTIVO"
-		)
 
 		return
 
 
 	if tiempo_invulnerabilidad_turbo > 0.0:
 
-		print(
-			"DAÑO BLOQUEADO: INVULNERABILIDAD POST TURBO"
-		)
 
 		return
 
@@ -2265,14 +2179,6 @@ func herir(num: int) -> void:
 		animacionHerida()
 
 
-		print(
-			"PLAYER HERIDO | Vida actual: ",
-			player.getVidaActual(),
-			"/",
-			player.getVidaMaxima()
-		)
-
-
 		if player.getVidaActual() <= 0:
 
 			morir()
@@ -2289,13 +2195,13 @@ func animacionHerida():
 		player.animated_sprite.visible = false
 
 		await get_tree().create_timer(
-			0.1
+			0.2
 		).timeout
 
 		player.animated_sprite.visible = true
 
 		await get_tree().create_timer(
-			0.1
+			0.2
 		).timeout
 
 	player.animated_sprite.visible = true

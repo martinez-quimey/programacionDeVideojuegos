@@ -1,4 +1,4 @@
-extends Dialogue
+extends DialogueAbstract
 
 @export var imagenDEEvaAlegre: Texture2D
 @export var imagenDeEvaFastidiada: Texture2D

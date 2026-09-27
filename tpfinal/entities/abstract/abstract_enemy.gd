@@ -2,8 +2,8 @@ extends CharacterBody2D
 
 
 @onready var Invulnerabilidad: Timer = $Invulnerabilidad
-@onready var detection_area: Area2D = $DetectionArea
-@onready var animated_sprite: AnimatedSprite2D = $OrientacionJabali/AnimatedSprite2D
+@onready var detection_area: Area2D = $OrientacionEnemy/DetectionArea
+@onready var animated_sprite: AnimatedSprite2D = $OrientacionEnemy/AnimatedSprite2D
 
 
 # ==========================================
@@ -56,7 +56,7 @@ func aplicar_gravedad(delta: float) -> void:
 
 func retroceso(direccion: Vector2, fuerza: int) -> void:
 
-	print("se activo el retroceso")
+	print("se activo el retroceso del enemigo")
 	print(str(direccion))
 	print(str(fuerza))
 
@@ -126,6 +126,7 @@ func morir():
 # ==========================================
 
 func herir(num: int):
+	print ("enemigo herido")
 	print("vida: " + str(vida))
 	if Invulnerabilidad.is_stopped():
 

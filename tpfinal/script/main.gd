@@ -1,4 +1,3 @@
-
 # Main.gd
 
 extends Node2D
@@ -20,6 +19,9 @@ extends Node2D
 # =========================================================
 
 var game: Node2D = null
+
+# Guardamos la ruta del nivel aunque el nodo game sea eliminado.
+var ruta_nivel_actual: String = ""
 
 
 # =========================================================
@@ -59,26 +61,16 @@ func _ready() -> void:
 
 func obtener_ruta_nivel_actual() -> String:
 
-	if game == null:
+	if ruta_nivel_actual == "":
 
-		print("ERROR: no hay ningún nivel cargado")
-
-		return ""
-
-
-	var ruta = game.scene_file_path
-
-
-	if ruta == "":
-
-		print("ERROR: no se pudo obtener la ruta del nivel actual")
+		print("ERROR: no hay ninguna ruta de nivel guardada")
 
 		return ""
 
 
-	print("Ruta del nivel actual: ", ruta)
+	print("Ruta del nivel actual: ", ruta_nivel_actual)
 
-	return ruta
+	return ruta_nivel_actual
 
 
 # =========================================================
@@ -177,6 +169,7 @@ func continue_game() -> void:
 
 	print("OK: el nivel es Node2D")
 
+
 	if game != null:
 
 		print("Eliminando nivel anterior...")
@@ -189,6 +182,12 @@ func continue_game() -> void:
 	print("Asignando nuevo nivel a game...")
 
 	game = nuevo_game
+
+	# Guardamos la ruta del nivel.
+	ruta_nivel_actual = Settings.nivelActual
+
+	print("Ruta guardada para reintentar: ", ruta_nivel_actual)
+
 
 	print("Agregando nivel al GameContainer...")
 
@@ -251,13 +250,9 @@ func new_game() -> void:
 
 func retry_game() -> void:
 
+	print("====================================")
 	print("REINTENTAR NIVEL")
-
-	if game == null:
-
-		print("No hay nivel actual para reintentar")
-
-		return
+	print("====================================")
 
 
 	var ruta_nivel = obtener_ruta_nivel_actual()
@@ -267,6 +262,9 @@ func retry_game() -> void:
 		print("No se puede reintentar: ruta inválida")
 
 		return
+
+
+	print("Cargando nuevamente: ", ruta_nivel)
 
 
 	var escena_nivel = load(ruta_nivel)
@@ -298,6 +296,7 @@ func load_level(level_scene: PackedScene) -> void:
 	print("CARGANDO NIVEL")
 	print("====================================")
 
+
 	if level_scene == null:
 
 		print("ERROR: level_scene es null")
@@ -306,6 +305,12 @@ func load_level(level_scene: PackedScene) -> void:
 
 
 	print("Nivel recibido: ", level_scene.resource_path)
+
+
+	# Guardamos la ruta ANTES de crear/eliminar nodos.
+	ruta_nivel_actual = level_scene.resource_path
+
+	print("Ruta guardada para reintentar: ", ruta_nivel_actual)
 
 
 	if game != null:
@@ -356,6 +361,13 @@ func load_level(level_scene: PackedScene) -> void:
 # =========================================================
 
 func _on_player_died() -> void:
+
+	print("====================================")
+	print("MAIN: PLAYER MURIÓ")
+	print("MAIN: ruta guardada: ", ruta_nivel_actual)
+	print("MAIN: mostrando GAME OVER")
+	print("====================================")
+
 
 	if game != null:
 

@@ -1,18 +1,23 @@
-[gd_scene load_steps=2 format=3 uid="uid://h2yw1rfppqnk"]
+[gd_scene format=3 uid="uid://h2yw1rfppqnk"]
 
 [ext_resource type="Script" uid="uid://b1mbghmqwc743" path="res://script/dialogue_box.gd" id="1_7hyon"]
 
-[node name="DialogueBox" type="CanvasLayer" groups=["dialogue_box"]]
+[node name="DialogueBox" type="CanvasLayer" unique_id=1527073477 groups=["dialogue_box"]]
 process_mode = 3
 script = ExtResource("1_7hyon")
 
-[node name="Panel" type="Panel" parent="."]
-offset_left = -3.0
-offset_top = 550.0
-offset_right = 1155.0
-offset_bottom = 749.0
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1509912943]
+anchors_preset = -1
+anchor_top = 0.628
+anchor_right = 0.767
+anchor_bottom = 0.81
+offset_right = 40.0
+offset_bottom = 40.0
 
-[node name="Portrait" type="TextureRect" parent="Panel"]
+[node name="Panel" type="Panel" parent="MarginContainer" unique_id=1020383961]
+layout_mode = 2
+
+[node name="Portrait" type="TextureRect" parent="MarginContainer/Panel" unique_id=78369268]
 z_index = 10
 texture_filter = 1
 layout_mode = 0
@@ -22,22 +27,22 @@ offset_right = 107.0
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TextContainer" type="VBoxContainer" parent="Panel"]
+[node name="TextContainer" type="VBoxContainer" parent="MarginContainer/Panel" unique_id=1341025822]
 layout_mode = 0
 offset_left = 15.0
 offset_top = 2.0
-offset_right = 1142.0
-offset_bottom = 191.0
+offset_right = 921.0
+offset_bottom = 157.056
 
-[node name="Name" type="Label" parent="Panel/TextContainer"]
+[node name="Name" type="Label" parent="MarginContainer/Panel/TextContainer" unique_id=836604215]
 layout_mode = 2
 theme_override_font_sizes/font_size = 38
 
-[node name="Text" type="RichTextLabel" parent="Panel/TextContainer"]
+[node name="Text" type="RichTextLabel" parent="MarginContainer/Panel/TextContainer" unique_id=1878401977]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 30
+theme_override_font_sizes/bold_font_size = 30
 theme_override_font_sizes/bold_italics_font_size = 30
 theme_override_font_sizes/italics_font_size = 30
 theme_override_font_sizes/mono_font_size = 30
-theme_override_font_sizes/normal_font_size = 30
-theme_override_font_sizes/bold_font_size = 30

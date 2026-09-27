@@ -106,14 +106,14 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
-size = Vector2(129, 90)
+size = Vector2(129, 91)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
 radius = 73.0695
 height = 187.914
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(128.90556, 144.96642)
+size = Vector2(130.13062, 143.02948)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uqenk"]
 size = Vector2(143, 129)
@@ -129,7 +129,7 @@ sprite_frames = SubResource("SpriteFrames_lderi")
 animation = &"tornado"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
-position = Vector2(29.5, -4)
+position = Vector2(29.5, -3.5)
 shape = SubResource("RectangleShape2D_l1ths")
 
 [node name="PlayerStart" type="Marker2D" parent="." unique_id=331214768]
@@ -158,22 +158,29 @@ shape = SubResource("CapsuleShape2D_5p1bl")
 [node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTornado" unique_id=225583521]
-position = Vector2(7.4867635, -16.657288)
-rotation = -1.55509
+position = Vector2(14.527819, -15.934088)
+rotation = 1.5707964
 shape = SubResource("RectangleShape2D_4jn62")
 
 [node name="estadoManual" type="Node2D" parent="." unique_id=395898327 groups=["jugador"]]
 script = ExtResource("1_utwpb")
+PESO = 0.5
 projectile_scene = ExtResource("2_bqvfx")
+GRAVITY = 660.0
+JUMP_FORCE = -550.0
 JUMP_FIRE_FORCE = -700.0
 FRICTION = 2000.0
 
 [node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
 script = ExtResource("17_jkysx")
+PESO = 0.5
 projectile_scene = ExtResource("2_bqvfx")
+GRAVITY = 660.0
+JUMP_FORCE = -550.0
 JUMP_FIRE_FORCE = -700.0
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
+visible = false
 position = Vector2(7.5, -16.5)
 shape = SubResource("RectangleShape2D_uqenk")
 

@@ -6,9 +6,17 @@ extends "res://entities/abstract/abstract_enemy.gd"
 @export var SPEEDCORRIENDO: float = 400.0
 @export var CAMINATA: float = 400.0
 
+# =========================================================
+# DETECCIÓN DEL BORDE
+# =========================================================
 
-@onready var orientacion_jabali: Node2D = $OrientacionJabali
-@onready var area_ataque: Area2D = $OrientacionJabali/CollisionAtaque
+# Distancia horizontal desde el centro del jabalí
+# hasta donde se comprobará si hay suelo.
+@export var DISTANCIA_BORDE: float = 20.0
+
+
+@onready var orientacion_jabali: Node2D = $OrientacionEnemy
+@onready var area_ataque: Area2D = $OrientacionEnemy/CollisionAtaque
 
 
 # ==========================================
@@ -77,8 +85,9 @@ func _physics_process(delta: float) -> void:
 
 		# No modificar velocity.x.
 		#
-		# Esto permite que el retroceso siga funcionando
-		# mientras el movimiento normal está pausado.
+		# Esto permite que un retroceso continúe
+		# mientras el movimiento automático del jabalí
+		# está pausado.
 
 		pass
 
@@ -114,6 +123,31 @@ func _physics_process(delta: float) -> void:
 			# Comprobar que sea una pared y no el piso/techo.
 			if abs(normal.x) > abs(normal.y):
 
+				# =================================================
+				# ESTÁ PERSIGUIENDO AL JUGADOR
+				# =================================================
+
+				if jugador_detectado != null and is_instance_valid(jugador_detectado):
+
+					# Si está persiguiendo y choca con una pared,
+					# NO cambia de dirección.
+					#
+					# Se queda quieto.
+					#
+					# La dirección se volverá a calcular en
+					# perseguir_jugador() cuando el jugador
+					# cambie de lado.
+
+					velocity.x = 0
+					animationPlay("idle")
+
+					break
+
+
+				# =================================================
+				# ESTÁ PATRULLANDO
+				# =================================================
+
 				# Está caminando hacia la derecha
 				# y chocó contra una pared.
 				if direccion > 0 and normal.x < 0:
@@ -143,6 +177,42 @@ func _physics_process(delta: float) -> void:
 	# =====================================================
 
 	comprobar_colision_con_jugador()
+
+
+# =========================================================
+# DETECTAR SUELO DELANTE
+# =========================================================
+
+func hay_suelo_delante() -> bool:
+
+	var espacio = get_world_2d().direct_space_state
+
+	# El raycast empieza 20 píxeles hacia adelante
+	# desde el centro del jabalí.
+	var origen = global_position + Vector2(
+		direccion * DISTANCIA_BORDE,
+		0
+	)
+
+	# Busca 100 píxeles hacia abajo.
+	var destino = origen + Vector2(
+		0,
+		100
+	)
+
+	var parametros = PhysicsRayQueryParameters2D.create(
+		origen,
+		destino
+	)
+
+	parametros.exclude = [self]
+
+	# El suelo está en la capa 1.
+	parametros.collision_mask = 1
+
+	var resultado = espacio.intersect_ray(parametros)
+
+	return not resultado.is_empty()
 
 
 # =========================================================
@@ -229,7 +299,7 @@ func aplicar_empuje_contacto(cuerpo: Node2D) -> void:
 	# APLICAR EMPUJE
 	# =====================================================
 
-	cuerpo.retroceso(direccion_empuje, 500)
+	cuerpo.retroceso(direccion_empuje, 400)
 
 
 # =========================================================
@@ -242,6 +312,30 @@ func patrullar(delta: float) -> void:
 		return
 
 
+	# =====================================================
+	# COMPROBAR BORDE
+	# =====================================================
+
+	if not hay_suelo_delante():
+
+		# Se detiene antes de llegar al vacío.
+		velocity.x = 0
+
+		# Cambia de dirección inmediatamente.
+		cambiar_direccion()
+
+		# Sigue mirando hacia la nueva dirección.
+		velocity.x = direccion * SPEEDCAMINANDO
+
+		animationPlay("caminar")
+
+		return
+
+
+	# =====================================================
+	# MOVIMIENTO NORMAL
+	# =====================================================
+
 	animationPlay("caminar")
 
 	velocity.x = direccion * SPEEDCAMINANDO
@@ -251,7 +345,16 @@ func patrullar(delta: float) -> void:
 
 	if distancia_caminada >= CAMINATA:
 
+		# La patrulla es la que detiene su propio movimiento.
+		#
+		# Esto NO está dentro de frenarCaminatas()
+		# porque frenarCaminatas() también es utilizada
+		# por el retroceso.
+
+		velocity.x = 0
+
 		cambiar_direccion()
+
 		frenarCaminatas()
 
 		return
@@ -267,12 +370,23 @@ func frenarCaminatas():
 		return
 
 
+	# Solo bloquea el movimiento automático.
+	#
+	# NO modificar velocity.x.
+	#
+	# Así, si esta función fue llamada durante un
+	# retroceso, el retroceso continúa.
+
 	pausado_caminata = true
 
 	animationPlay("idle")
 
 
 	await get_tree().create_timer(1.0).timeout
+
+
+	if muerto:
+		return
 
 
 	pausado_caminata = false
@@ -338,6 +452,8 @@ func dejarDeActuarContraPlayer():
 
 	jugador_detectado = null
 
+	# Cuando el jugador sale del rango,
+	# vuelve a patrullar cambiando de dirección.
 	cambiar_direccion()
 
 
@@ -362,8 +478,9 @@ func perseguir_jugador():
 		return
 
 
-	animationPlay("correr")
-
+	# =====================================================
+	# CALCULAR DIRECCIÓN DEL JUGADOR
+	# =====================================================
 
 	var diferencia_x = jugador_detectado.global_position.x - global_position.x
 
@@ -377,7 +494,33 @@ func perseguir_jugador():
 		direccion = -1.0
 
 
+	# Actualizar el sprite incluso cuando está detenido.
 	actualizar_direccion_sprite()
+
+
+	# =====================================================
+	# COMPROBAR BORDE
+	# =====================================================
+
+	if not hay_suelo_delante():
+
+		# Llegó al borde mientras perseguía al jugador.
+		#
+		# NO cambia de dirección.
+		# Se queda quieto mirando hacia el jugador.
+
+		velocity.x = 0
+
+		animationPlay("idle")
+
+		return
+
+
+	# =====================================================
+	# PERSECUCIÓN NORMAL
+	# =====================================================
+
+	animationPlay("correr")
 
 	velocity.x = direccion * SPEEDCORRIENDO
 
@@ -421,7 +564,7 @@ func comenzar_ataque():
 			#
 			# direccion = 1  -> derecha
 			# direccion = -1 -> izquierda
-			cuerpo.retroceso(Vector2(direccion, 0), 700)
+			cuerpo.retroceso(Vector2(direccion, 0), 600)
 
 			break
 

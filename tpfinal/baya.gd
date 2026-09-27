@@ -123,7 +123,7 @@ func recoger_baya(player: Node) -> void:
 
 	if tipo_baya == TipoBaya.VIDA:
 
-		aumentar_vida(player)
+		aumentar_vidaMax(player)
 
 		if not Settings.objetosVidaObtenidos.has(id_baya):
 
@@ -136,7 +136,7 @@ func recoger_baya(player: Node) -> void:
 
 	elif tipo_baya == TipoBaya.ENERGIA:
 
-		aumentar_energia(player)
+		aumentar_energiaMax(player)
 
 		if not Settings.objetosEnergiaObtenidos.has(id_baya):
 
@@ -159,7 +159,7 @@ func recoger_baya(player: Node) -> void:
 # AUMENTAR VIDA
 # =========================================================
 
-func aumentar_vida(player: Node) -> void:
+func aumentar_vidaMax(player: Node) -> void:
 
 	if cantidad <= 0:
 		return
@@ -187,13 +187,13 @@ func aumentar_vida(player: Node) -> void:
 # AUMENTAR ENERGÍA
 # =========================================================
 
-func aumentar_energia(player: Node) -> void:
+func aumentar_energiaMax(player: Node) -> void:
 
 	if cantidad <= 0:
 		return
 
 	# Usamos el método que ya tenés en Player.
-	player.aumentarEnergia(cantidad)
+	player.aumentarEnergiaMax(cantidad)
 
 	print(
 		"ENERGÍA AUMENTADA | Máximo: ",

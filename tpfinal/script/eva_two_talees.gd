@@ -13,6 +13,7 @@ var esta_en_madriguera: bool = false
 
 var estado_actual: EstadoPlayer
 
+var poseeDobleSalto: bool = false
 
 # ==========================================
 # VIDA
@@ -183,7 +184,6 @@ func actualizar_animacion(
 
 	if estado_actual.agarrado_pared:
 
-		animated_sprite.flip_h = false
 		animated_sprite.flip_v = false
 
 		reproducir_animacion("quieta")
@@ -273,7 +273,6 @@ func animacion_turbo() -> void:
 # ==========================================
 # ANIMACIÓN DE PARED
 # ==========================================
-
 func animacion_pared(
 	normal_pared: Vector2
 ) -> void:
@@ -283,18 +282,17 @@ func animacion_pared(
 		rotation = deg_to_rad(-90.0)
 
 		animated_sprite.flip_v = false
+		animated_sprite.flip_h = false
 
 	else:
 
-		rotation = deg_to_rad(-90.0)
+		rotation = deg_to_rad(90.0)
 
-		animated_sprite.flip_v = true
+		animated_sprite.flip_v = false
+		animated_sprite.flip_h = true
 
-
-	animated_sprite.flip_h = false
 
 	reproducir_animacion("quieta")
-
 
 # ==========================================
 # RESTABLECER VISUAL DEL SUELO
@@ -369,8 +367,20 @@ func getVidaMaxima() -> int:
 
 	return vida_maxima
 
+func aumentarVida(aumento: int):
+	var vidaAumentada = vida + aumento
+	if (vida_maxima < vidaAumentada):
+		vida = vida_maxima
+	else:
+		vida = vidaAumentada
 
-func aumentarVida(cantidad: int) -> void:
+func aumentarEnergia(aumento: int):
+	var energiaAumentada = energia_fuego + aumento
+	if (energia_maxima < energiaAumentada):
+		energia_fuego = energia_maxima
+	else:
+		energia_fuego = energiaAumentada
+func aumentarVidaMax(cantidad: int) -> void:
 
 	if cantidad <= 0:
 
@@ -454,7 +464,7 @@ func gastar_energia_fuego(cantidad: int) -> bool:
 	return true
 
 
-func aumentarEnergia(cantidad: int) -> void:
+func aumentarEnergiaMax(cantidad: int) -> void:
 
 	if cantidad <= 0:
 

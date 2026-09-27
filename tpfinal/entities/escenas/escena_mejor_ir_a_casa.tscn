@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://wvkhsmvoh8f3"]
 
-[ext_resource type="Script" uid="uid://b02fjcsn46ca2" path="res://script/escenas/escena1_mejor_ir_a_casa.gd" id="1_f40e0"]
+[ext_resource type="Script" uid="uid://b02fjcsn46ca2" path="res://script/escena1MejorIrACasa.gd" id="1_f40e0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vk7jq"]
 size = Vector2(96.5, 487.5)

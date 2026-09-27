@@ -139,7 +139,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="MainMenu" unique_id=77410990]
+[node name="MarginContainer" type="MarginContainer" parent="MainMenu" unique_id=1479732051]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -147,10 +147,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu/CenterContainer" unique_id=1916464327]
+[node name="CenterContainer" type="CenterContainer" parent="MainMenu/MarginContainer" unique_id=77410990]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1888398278]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu/MarginContainer/CenterContainer" unique_id=1916464327]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=1888398278]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
@@ -159,7 +162,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="StartButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=38431286]
+[node name="StartButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=38431286]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
@@ -174,7 +177,7 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
-[node name="ContinueButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=1820123663]
+[node name="ContinueButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=1820123663]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
@@ -189,7 +192,7 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
-[node name="LanguageButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=846013093]
+[node name="LanguageButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=846013093]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
@@ -204,7 +207,7 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
-[node name="SelectorNiveles" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=317658958]
+[node name="SelectorNiveles" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=317658958]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
@@ -219,7 +222,7 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
-[node name="QuitGameButton" type="Button" parent="MainMenu/CenterContainer/VBoxContainer" unique_id=593025086]
+[node name="QuitGameButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=593025086]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
@@ -234,11 +237,9 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
-[node name="Panel" type="Panel" parent="MainMenu" unique_id=436122633]
+[node name="Panel" type="Panel" parent="MainMenu/MarginContainer" unique_id=436122633]
 z_index = -1
-layout_mode = 0
-offset_right = 1151.0
-offset_bottom = 633.0
+layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
@@ -535,10 +536,10 @@ text = "Exit"
 [connection signal="main_menu" from="." to="." method="_on_main_menu"]
 [connection signal="retry_game" from="." to="." method="_on_retry_game"]
 [connection signal="start_game" from="." to="." method="_on_start_game"]
-[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
-[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
-[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/SelectorNiveles" to="." method="_on_selector_niveles_pressed"]
-[connection signal="pressed" from="MainMenu/CenterContainer/VBoxContainer/QuitGameButton" to="." method="_on_quit_game_button_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles" to="." method="_on_selector_niveles_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton" to="." method="_on_quit_game_button_pressed"]
 [connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/YesButton" to="." method="_on_yes_button_pressed"]
 [connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/NoButton" to="." method="_on_no_button_pressed"]
