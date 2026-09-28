@@ -1,6 +1,3 @@
-
-# HUD.gd
-
 extends CanvasLayer
 
 signal start_game
@@ -14,26 +11,24 @@ func _ready() -> void:
 	# =====================================================
 	# MAIN MENU
 	# =====================================================
+
 	$Confirmacion.hide()
+
 	var start_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton
 	if not start_button.pressed.is_connected(_on_start_button_pressed):
 		start_button.pressed.connect(_on_start_button_pressed)
-
 
 	var continue_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton
 	if not continue_button.pressed.is_connected(_on_continuar_partida_pressed):
 		continue_button.pressed.connect(_on_continuar_partida_pressed)
 
-
 	var selector_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles
 	if not selector_button.pressed.is_connected(_on_selector_niveles_pressed):
 		selector_button.pressed.connect(_on_selector_niveles_pressed)
 
-
 	var language_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/LanguageButton
 	if not language_button.pressed.is_connected(_on_language_button_pressed):
 		language_button.pressed.connect(_on_language_button_pressed)
-
 
 	var quit_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton
 	if not quit_button.pressed.is_connected(_on_quit_game_button_pressed):
@@ -48,7 +43,6 @@ func _ready() -> void:
 	if not retry_button.pressed.is_connected(_on_retry_button_pressed):
 		retry_button.pressed.connect(_on_retry_button_pressed)
 
-
 	var game_over_menu_button = $GameOver/CenterContainer/VBoxContainer/MainMenuButton
 	if not game_over_menu_button.pressed.is_connected(_on_main_menu_button_pressed):
 		game_over_menu_button.pressed.connect(_on_main_menu_button_pressed)
@@ -62,11 +56,9 @@ func _ready() -> void:
 	if not spanish_button.pressed.is_connected(_on_spanish_button_pressed):
 		spanish_button.pressed.connect(_on_spanish_button_pressed)
 
-
 	var english_button = $LanguageMenu/CenterContainer/VBoxContainer/EnglishButton
 	if not english_button.pressed.is_connected(_on_english_button_pressed):
 		english_button.pressed.connect(_on_english_button_pressed)
-
 
 	var back_button = $LanguageMenu/CenterContainer/VBoxContainer/BackButton
 	if not back_button.pressed.is_connected(_on_back_button_pressed):
@@ -81,19 +73,18 @@ func _ready() -> void:
 	if not continuar_button.pressed.is_connected(_on_continuar_button_pressed):
 		continuar_button.pressed.connect(_on_continuar_button_pressed)
 
-
 	var pause_menu_button = $Pause/CenterContainer/VBoxContainer/MainMenuButton
 	if not pause_menu_button.pressed.is_connected(_on_main_menu_button2_pressed):
 		pause_menu_button.pressed.connect(_on_main_menu_button2_pressed)
 
+
 	# =====================================================
-	# Confirmacion
+	# CONFIRMACION
 	# =====================================================
 
 	var YesButton = $Confirmacion/CenterContainer/VBoxContainer/YesButton
 	if not YesButton.pressed.is_connected(_on_yes_button_pressed):
 		YesButton.pressed.connect(_on_yes_button_pressed)
-
 
 	var NoButton = $Confirmacion/CenterContainer/VBoxContainer/NoButton
 	if not NoButton.pressed.is_connected(_on_no_button_pressed):
@@ -119,6 +110,111 @@ func _ready() -> void:
 
 
 # =========================================================
+# NAVEGACIÓN CON TECLADO
+# =========================================================
+
+func _unhandled_input(event: InputEvent) -> void:
+
+	if not event.is_pressed():
+		return
+
+	# Subir
+	if event.is_action_pressed("arriba"):
+		mover_seleccion(-1)
+		get_viewport().set_input_as_handled()
+
+	# Bajar
+	elif event.is_action_pressed("abajo"):
+		mover_seleccion(1)
+		get_viewport().set_input_as_handled()
+
+	# Seleccionar
+	elif event.is_action_pressed("adelante"):
+		activar_seleccion()
+		get_viewport().set_input_as_handled()
+
+
+func obtener_botones_visibles() -> Array[Button]:
+
+	var botones: Array[Button] = []
+
+	# Lista de menús que pueden estar activos.
+	var menus = [
+		$MainMenu,
+		$GameOver,
+		$LanguageMenu,
+		$Pause,
+		$Confirmacion,
+		$SelectorNiveles
+	]
+
+	for menu in menus:
+
+		if not menu.visible:
+			continue
+
+		var botones_menu = buscar_botones(menu)
+
+		for boton in botones_menu:
+			if not boton.disabled and boton.visible:
+				botones.append(boton)
+
+	return botones
+
+
+func buscar_botones(nodo: Node) -> Array[Button]:
+
+	var resultado: Array[Button] = []
+
+	for hijo in nodo.get_children():
+
+		if hijo is Button:
+			resultado.append(hijo)
+
+		resultado.append_array(buscar_botones(hijo))
+
+	return resultado
+
+
+func mover_seleccion(direccion: int) -> void:
+
+	var botones = obtener_botones_visibles()
+
+	if botones.is_empty():
+		return
+
+	var boton_actual = get_viewport().gui_get_focus_owner()
+
+	var indice_actual = botones.find(boton_actual)
+
+	# Si todavía no hay ningún botón seleccionado,
+	# empezamos por el primero.
+	if indice_actual == -1:
+		botones[0].grab_focus()
+		return
+
+	var nuevo_indice = indice_actual + direccion
+
+	# Evita salir del menú por arriba o por abajo.
+	if nuevo_indice < 0:
+		nuevo_indice = 0
+
+	if nuevo_indice >= botones.size():
+		nuevo_indice = botones.size() - 1
+
+	botones[nuevo_indice].grab_focus()
+
+
+func activar_seleccion() -> void:
+
+	var boton_actual = get_viewport().gui_get_focus_owner()
+
+	if boton_actual is Button:
+		if not boton_actual.disabled:
+			boton_actual.pressed.emit()
+
+
+# =========================================================
 # MENÚS
 # =========================================================
 
@@ -129,8 +225,12 @@ func show_main_menu() -> void:
 	$LanguageMenu.hide()
 	$Pause.hide()
 	$SelectorNiveles.hide()
+	$Confirmacion.hide()
 
 	actualizar_estado_botones()
+
+	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton.grab_focus()
+
 
 func show_game_over() -> void:
 
@@ -141,6 +241,9 @@ func show_game_over() -> void:
 	$LanguageMenu.hide()
 	$Pause.hide()
 	$SelectorNiveles.hide()
+	$Confirmacion.hide()
+
+	$GameOver/CenterContainer/VBoxContainer/RetryButton.grab_focus()
 
 	print("HUD: GameOver visible = ", $GameOver.visible)
 
@@ -152,6 +255,9 @@ func show_language_menu() -> void:
 	$LanguageMenu.show()
 	$Pause.hide()
 	$SelectorNiveles.hide()
+	$Confirmacion.hide()
+
+	$LanguageMenu/CenterContainer/VBoxContainer/SpanishButton.grab_focus()
 
 
 func show_pause_menu() -> void:
@@ -161,6 +267,9 @@ func show_pause_menu() -> void:
 	$LanguageMenu.hide()
 	$GameOver.hide()
 	$SelectorNiveles.hide()
+	$Confirmacion.hide()
+
+	$Pause/CenterContainer/VBoxContainer/Continuar.grab_focus()
 
 
 func show_selector_niveles() -> void:
@@ -170,6 +279,7 @@ func show_selector_niveles() -> void:
 	$LanguageMenu.hide()
 	$Pause.hide()
 	$SelectorNiveles.show()
+	$Confirmacion.hide()
 
 	actualizar_selector_niveles()
 
@@ -218,12 +328,15 @@ func update_language() -> void:
 
 		$SelectorNiveles/CenterContainer/VBoxContainer/Title.text = "Selector de niveles"
 		$SelectorNiveles/CenterContainer/VBoxContainer/BackButton.text = "Volver"
-		#confirmacion
-		
+
+
+		# CONFIRMACION
+
 		$Confirmacion/CenterContainer/VBoxContainer/Message.text = "¿Está seguro de que desea iniciar una nueva partida? Los datos actuales se borrarán."
-		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "Si"
-		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "No"
-		
+		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "Sí"
+		$Confirmacion/CenterContainer/VBoxContainer/NoButton.text = "No"
+
+
 	elif Settings.language == "en":
 
 		# MAIN MENU
@@ -262,11 +375,14 @@ func update_language() -> void:
 
 		$SelectorNiveles/CenterContainer/VBoxContainer/Title.text = "Level Select"
 		$SelectorNiveles/CenterContainer/VBoxContainer/BackButton.text = "Back"
-		#confirmacion
-		
-		$Confirmacion/CenterContainer/VBoxContainer/Message.text = "Are you sure you want to start a new game? rent data will be deleted."
+
+
+		# CONFIRMACION
+
+		$Confirmacion/CenterContainer/VBoxContainer/Message.text = "Are you sure you want to start a new game? Current data will be deleted."
 		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "Yes"
-		$Confirmacion/CenterContainer/VBoxContainer/YesButton.text = "No"
+		$Confirmacion/CenterContainer/VBoxContainer/NoButton.text = "No"
+
 
 # =========================================================
 # ESTADO DE LOS BOTONES
@@ -290,18 +406,16 @@ func actualizar_estado_botones() -> void:
 
 func _on_start_button_pressed() -> void:
 
-	if (Save.existe_partida()):
+	if Save.existe_partida():
+
 		$Confirmacion.show()
 		$MainMenu.hide()
+
+		$Confirmacion/CenterContainer/VBoxContainer/YesButton.grab_focus()
+
 	else:
-		
-		# Crear una partida completamente nueva.
 
 		Save.iniciar_nueva_partida()
-
-
-		# El Main se encargará de cargar el nivel inicial
-		# y de obtener su ruta real mediante game.scene_file_path.
 
 		$MainMenu.hide()
 
@@ -309,24 +423,22 @@ func _on_start_button_pressed() -> void:
 
 
 func _on_yes_button_pressed() -> void:
-		# Crear una partida completamente nueva.
 
-		Save.iniciar_nueva_partida()
+	Save.iniciar_nueva_partida()
 
+	$Confirmacion.hide()
+	$MainMenu.hide()
 
-		# El Main se encargará de cargar el nivel inicial
-		# y de obtener su ruta real mediante game.scene_file_path.
-		$Confirmacion.hide()
-		$MainMenu.hide()
-		
-
-		start_game.emit()
-
+	start_game.emit()
 
 
 func _on_no_button_pressed() -> void:
+
 	$Confirmacion.hide()
 	$MainMenu.show()
+
+	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton.grab_focus()
+
 
 func _on_language_button_pressed() -> void:
 
@@ -348,17 +460,11 @@ func _on_continuar_partida_pressed() -> void:
 
 	print("CONTINUAR PARTIDA")
 
-
-	# Cargar todos los datos del archivo.
-
 	if not Save.cargar_partida():
 
 		print("No se pudo cargar la partida")
 
 		return
-
-
-	# Comprobar que el guardado tenga un nivel.
 
 	if Settings.nivelActual == "":
 
@@ -366,15 +472,9 @@ func _on_continuar_partida_pressed() -> void:
 
 		return
 
-
 	print("Cargando nivel: ", Settings.nivelActual)
 
-
 	$MainMenu.hide()
-
-
-	# Main utilizará Settings.nivelActual.
-	# No se fuerza ningún nivel concreto.
 
 	continue_game.emit()
 
@@ -387,11 +487,9 @@ func _on_selector_niveles_pressed() -> void:
 
 	print("SELECTOR DE NIVELES")
 
-
 	if not Save.existe_partida():
 
 		return
-
 
 	Save.cargar_partida()
 
@@ -401,7 +499,6 @@ func _on_selector_niveles_pressed() -> void:
 func actualizar_selector_niveles() -> void:
 
 	var vbox = $SelectorNiveles/CenterContainer/VBoxContainer
-
 
 	# Borrar botones creados anteriormente.
 
@@ -427,6 +524,17 @@ func actualizar_selector_niveles() -> void:
 
 		vbox.add_child(boton)
 
+	# Esperamos un frame para que el VBox termine de agregar
+	# y ordenar los botones antes de darles el foco.
+
+	await get_tree().process_frame
+
+	var botones = obtener_botones_visibles()
+
+	if not botones.is_empty():
+
+		botones[0].grab_focus()
+
 
 func obtener_nombre_nivel(ruta_nivel: String) -> String:
 
@@ -441,18 +549,11 @@ func _on_nivel_seleccionado(nivel: String) -> void:
 
 	print("NIVEL SELECCIONADO: ", nivel)
 
-
-	# El nivel seleccionado pasa a ser el nivel actual.
-
 	Settings.nivelActual = nivel
 
 	Save.guardar_partida()
 
-
 	$SelectorNiveles.hide()
-
-
-	# Main se encarga de cargar el nivel.
 
 	continue_game.emit()
 
