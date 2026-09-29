@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://cueyj2qu63e7p"]
+
+[ext_resource type="PackedScene" uid="uid://d1rwpr237uskv" path="res://entities/abstract/abstractEnemy.tscn" id="1_1g1o7"]
+[ext_resource type="Script" uid="uid://bwuqmhrkr2qdi" path="res://entities/enemies/kasa_obake.gd" id="2_vowfh"]
+[ext_resource type="Texture2D" uid="uid://7hqxvx0np1qk" path="res://sprites/enemigos/paraguas.png" id="3_m5g7d"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a0wsy"]
+atlas = ExtResource("3_m5g7d")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bnr6u"]
+atlas = ExtResource("3_m5g7d")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4jn62"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a0wsy")
+}],
+"loop": 1,
+"name": &"abierto",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bnr6u")
+}],
+"loop": 1,
+"name": &"cerrado",
+"speed": 5.0
+}]
+
+[node name="CharacterBody2D" unique_id=86738375 instance=ExtResource("1_1g1o7")]
+script = ExtResource("2_vowfh")
+VELOCIDAD_CAIDA_LENTA = 80.0
+VELOCIDAD_CAIDA_RAPIDA = 700.0
+
+[node name="AnimatedSprite2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
+texture_filter = 1
+scale = Vector2(5, 5)
+sprite_frames = SubResource("SpriteFrames_4jn62")
+animation = &"cerrado"

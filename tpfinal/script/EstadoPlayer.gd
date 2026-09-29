@@ -525,7 +525,11 @@ func procesar_retroceso(delta: float) -> void:
 	if not player.is_on_floor():
 
 		player.velocity.y += GRAVITY * delta
-
+			
+		print(
+			"Ángulo del suelo: ",
+			rad_to_deg(player.get_floor_angle())
+		)
 
 	player.move_and_slide()
 
@@ -1129,7 +1133,12 @@ func _physics_process(delta: float) -> void:
 	# ==========================================
 
 	if not player.is_on_floor():
-
+		print(
+			"EN SUELO | Ángulo: ",
+			rad_to_deg(player.get_floor_angle()),
+			" | Normal: ",
+			player.get_floor_normal()
+		)
 		if agarrado_pared:
 
 			player.velocity.y = min(
