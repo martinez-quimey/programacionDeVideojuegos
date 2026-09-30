@@ -1,7 +1,6 @@
 extends "res://entities/abstract/abstract_enemy.gd"
 
 
-
 # ==========================================
 # VELOCIDADES
 # ==========================================
@@ -11,21 +10,25 @@ extends "res://entities/abstract/abstract_enemy.gd"
 
 
 # ==========================================
-# ESTADO DEL PARAGUAS
+# ESTADO
 # ==========================================
 
-var cayendo_rapido: bool = false
+var jugador_debajo: Node2D = null
 
 
 # ==========================================
 # INICIO
 # ==========================================
 
-func _ready():
+func _ready() -> void:
 
 	super._ready()
 
 	animationPlay("abierto")
+
+	# Conectar las señales del área de detección.
+	detection_area.body_entered.connect(_on_detection_body_entered)
+	detection_area.body_exited.connect(_on_detection_body_exited)
 
 
 # ==========================================
@@ -34,54 +37,43 @@ func _ready():
 
 func _physics_process(delta):
 
-	# Si ya está muerto, no hacemos nada.
 	if vida <= 0:
 		return
 
 
 	# ==========================================
-	# DETECTAR AL JUGADOR
+	# VELOCIDAD DE CAÍDA
 	# ==========================================
 
-	if player_in_range and not cayendo_rapido:
-
-		var jugador = obtener_jugador()
-
-		if jugador != null:
-
-			# El jugador debe estar debajo del paraguas.
-			if jugador.global_position.y > global_position.y:
-
-				cayendo_rapido = true
-
-				animationPlay("cerrado")
-
-
-	# ==========================================
-	# CAÍDA
-	# ==========================================
-
-	if cayendo_rapido:
+	if jugador_debajo != null:
 
 		velocity.y = VELOCIDAD_CAIDA_RAPIDA
+
+		animationPlay("cerrado")
 
 	else:
 
 		velocity.y = VELOCIDAD_CAIDA_LENTA
 
+		animationPlay("abierto")
+
 
 	# ==========================================
-	# MOVIMIENTO
+	# CAER RECTO
+	# ==========================================
+	#
+	# No modificamos velocity.x.
+	# El paraguas cae verticalmente.
 	# ==========================================
 
 	move_and_slide()
 
 
 	# ==========================================
-	# CONTACTO CON EL JUGADOR
+	# CONTACTO FÍSICO
 	# ==========================================
 
-	comprobar_colision_con_jugador()
+	comprobar_contacto_con_jugador()
 
 
 	# ==========================================
@@ -94,51 +86,91 @@ func _physics_process(delta):
 
 
 # ==========================================
-# OBTENER JUGADOR
+# JUGADOR ENTRA EN DETECTION AREA
 # ==========================================
 
-func obtener_jugador():
+func _on_detection_body_entered(body: Node2D) -> void:
 
-	for cuerpo in detection_area.get_overlapping_bodies():
+	if not body.is_in_group("jugador"):
+		return
 
-		if cuerpo.is_in_group("jugador"):
 
-			return cuerpo
+	# Solo detectamos al jugador si está debajo.
 
-	return null
+	if body.global_position.y > global_position.y:
+
+		jugador_debajo = body
+
+
+# ==========================================
+# JUGADOR SALE DE DETECTION AREA
+# ==========================================
+
+func _on_detection_body_exited(body: Node2D) -> void:
+
+	if body == jugador_debajo:
+
+		jugador_debajo = null
 
 
 # =========================================================
 # DAÑO POR CONTACTO FÍSICO
 # =========================================================
 
-func comprobar_colision_con_jugador():
+func comprobar_contacto_con_jugador():
 
 	for i in get_slide_collision_count():
 
-		var collision = get_slide_collision(i)
+		var colision = get_slide_collision(i)
 
-		var cuerpo = collision.get_collider()
+		var cuerpo = colision.get_collider()
 
 
 		if cuerpo == null:
 			continue
 
 
-		if cuerpo.is_in_group("jugador"):
+		if not cuerpo.is_in_group("jugador"):
+			continue
 
-			cuerpo.herir(2)
 
-			# El contacto físico calcula desde qué lado
-			# viene el jugador.
+		# ==========================================
+		# DE QUÉ LADO VIENE EL JUGADOR
+		# ==========================================
 
-			aplicar_empuje_contacto(cuerpo)
+		var diferencia_y: float = cuerpo.global_position.y - global_position.y
 
-			# El paraguas muere después de golpear al jugador.
 
-			morir()
+		# ==========================================
+		# JUGADOR VIENE DESDE ARRIBA
+		# ==========================================
 
-			return
+		if diferencia_y < 0:
+
+			continue
+
+
+		# ==========================================
+		# HACER DAÑO
+		# ==========================================
+
+		cuerpo.herir(2)
+
+
+		# ==========================================
+		# EMPUJE
+		# ==========================================
+
+		aplicar_empuje_contacto(cuerpo)
+
+
+		# ==========================================
+		# MORIR
+		# ==========================================
+
+		morir()
+
+		return
 
 
 # =========================================================
@@ -156,47 +188,26 @@ func aplicar_empuje_contacto(cuerpo: Node2D) -> void:
 	var direccion_empuje := Vector2.RIGHT
 
 
-	# =====================================================
-	# JUGADOR A LA IZQUIERDA
-	# =====================================================
-
+	# Jugador a la izquierda.
 	if diferencia_x < -0.1:
 
 		direccion_empuje = Vector2.LEFT
 
 
-	# =====================================================
-	# JUGADOR A LA DERECHA
-	# =====================================================
-
+	# Jugador a la derecha.
 	elif diferencia_x > 0.1:
 
 		direccion_empuje = Vector2.RIGHT
 
 
-	# =====================================================
-	# JUGADOR PRÁCTICAMENTE ENCIMA
-	# =====================================================
-
+	# Misma posición horizontal.
 	else:
 
-		# Si están prácticamente en la misma posición
-		# horizontal, usamos la dirección del paraguas.
-
-		if velocity.x < 0:
-
-			direccion_empuje = Vector2.LEFT
-
-		else:
-
-			direccion_empuje = Vector2.RIGHT
+		direccion_empuje = Vector2.RIGHT
 
 
-	# =====================================================
-	# APLICAR EMPUJE
-	# =====================================================
-
-	cuerpo.retroceso(direccion_empuje, 400)
+	# Empuje reducido.
+	cuerpo.retroceso(direccion_empuje, 200)
 
 
 # ==========================================

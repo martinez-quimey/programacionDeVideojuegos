@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://3xyu7i2srwrh"]
+
+[ext_resource type="Texture2D" uid="uid://cak2cejc8lcn7" path="res://sprites/checkpoint.png" id="1_5tqy1"]
+[ext_resource type="Script" uid="uid://nfeyjdf6pf" path="res://entities/escenario/checkpoint.gd" id="1_7pdxf"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3oyy8"]
+radius = 75.690155
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7pdxf"]
+atlas = ExtResource("1_5tqy1")
+region = Rect2(0, 0, 120, 120)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hwe5d"]
+atlas = ExtResource("1_5tqy1")
+region = Rect2(120, 0, 120, 120)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4jn62"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7pdxf")
+}],
+"loop": 1,
+"name": &"escrito",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hwe5d")
+}],
+"loop": 1,
+"name": &"vacio",
+"speed": 5.0
+}]
+
+[node name="Checkpoint" type="Area2D" unique_id=174763872]
+scale = Vector2(5, 5)
+script = ExtResource("1_7pdxf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2142999522]
+position = Vector2(13, 0)
+shape = SubResource("CircleShape2D_3oyy8")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=684976178]
+sprite_frames = SubResource("SpriteFrames_4jn62")
+animation = &"vacio"
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

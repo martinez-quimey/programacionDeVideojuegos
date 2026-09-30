@@ -95,12 +95,17 @@ func _process(delta: float) -> void:
 		return
 
 
+	# Reiniciamos el temporizador independientemente
+	# de si se pudo crear o no.
 	temporizador = tiempo_entre_creaciones
 
 
-	if puede_crear():
+	# Comprobamos todas las condiciones antes de crear.
+	if not puede_crear():
+		return
 
-		crear_objeto()
+
+	crear_objeto()
 
 
 # =========================================================
@@ -113,27 +118,23 @@ func puede_crear() -> bool:
 	# PANTALLA
 	# =====================================================
 
-	# Si se permite crear estando dentro de la pantalla,
-	# no necesitamos comprobar la cámara.
 	if not creacion_visible_en_pantalla:
 
-		var camara = get_viewport().get_camera_2d()
+		var camara := get_viewport().get_camera_2d()
 
 
 		if camara == null:
-
 			return false
 
 
-		var distancia = global_position.distance_to(
+		var distancia := global_position.distance_to(
 			camara.global_position
 		)
 
 
 		# Si está demasiado cerca de la cámara,
-		# no puede crear.
+		# no creamos el objeto.
 		if distancia < distancia_de_creacion:
-
 			return false
 
 
@@ -142,7 +143,6 @@ func puede_crear() -> bool:
 	# =====================================================
 
 	if hay_objeto_en_spawn():
-
 		return false
 
 
@@ -151,7 +151,6 @@ func puede_crear() -> bool:
 	# =====================================================
 
 	if hay_instancia_cerca():
-
 		return false
 
 
@@ -181,12 +180,13 @@ func hay_objeto_en_spawn() -> bool:
 		global_position
 	)
 
+
 	# Detectamos cuerpos y áreas.
 	parametros.collide_with_bodies = true
 	parametros.collide_with_areas = true
 
 
-	var resultados = espacio_fisico.intersect_shape(
+	var resultados := espacio_fisico.intersect_shape(
 		parametros,
 		1
 	)
@@ -201,14 +201,10 @@ func hay_objeto_en_spawn() -> bool:
 
 func hay_instancia_cerca() -> bool:
 
-	# Primero eliminamos referencias a objetos
-	# que ya fueron eliminados.
+	# Eliminamos referencias a objetos que ya no existen.
 	for i in range(objetos_creados.size() - 1, -1, -1):
 
-		var objeto = objetos_creados[i]
-
-
-		if not is_instance_valid(objeto):
+		if not is_instance_valid(objetos_creados[i]):
 
 			objetos_creados.remove_at(i)
 
@@ -216,7 +212,7 @@ func hay_instancia_cerca() -> bool:
 	# Comprobamos las instancias restantes.
 	for objeto in objetos_creados:
 
-		var distancia = global_position.distance_to(
+		var distancia := global_position.distance_to(
 			objeto.global_position
 		)
 
@@ -235,21 +231,41 @@ func hay_instancia_cerca() -> bool:
 
 func crear_objeto() -> void:
 
-	var objeto = escena_a_crear.instantiate()
+	# =====================================================
+	# CREAR INSTANCIA
+	# =====================================================
 
+	var objeto := escena_a_crear.instantiate()
+
+
+	# =====================================================
+	# CONFIGURAR POSICIÓN ANTES DE AGREGAR
+	# =====================================================
+
+	if objeto is Node2D:
+
+		objeto.global_position = global_position
+
+
+	# =====================================================
+	# AGREGAR AL ÁRBOL
+	# =====================================================
 
 	get_tree().current_scene.add_child(objeto)
 
 
-	objeto.global_position = global_position
+	# =====================================================
+	# GUARDAR REFERENCIA
+	# =====================================================
 
-
-	# Guardamos la instancia para poder comprobar
-	# posteriormente si hay otra demasiado cerca.
 	if objeto is Node2D:
 
 		objetos_creados.append(objeto)
 
+
+	# =====================================================
+	# CONTADOR
+	# =====================================================
 
 	cantidad_creada += 1
 

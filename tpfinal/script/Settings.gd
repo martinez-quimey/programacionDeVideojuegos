@@ -10,6 +10,8 @@ var vidaActual = 5
 const energiaInicial = 5
 var energiaActual = 5
 
+var checkpoint = 0
+
 # ==========================================
 # PROGRESO DE PARTIDA
 # ==========================================

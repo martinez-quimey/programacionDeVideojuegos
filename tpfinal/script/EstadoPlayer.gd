@@ -15,7 +15,7 @@ class_name EstadoPlayer
 
 @onready var player: CharacterBody2D = get_parent()
 
-@onready var collision_shape_player: CollisionShape2D = $"../CollisionShape2D"
+@onready var collision_shape_player: CollisionShape2D = $"..//CollisionShape2D"
 @onready var collision_tornado: CollisionShape2D = $"../CollisionShapeTornado"
 # ==========================================
 # ESTADO
@@ -61,7 +61,7 @@ var tiempo_tornado: float = 0.0
 
 var enemigos_golpeados_tornado: Dictionary = {}
 
-@onready var hitbox_tornado: Area2D = $"../HitboxTornado"
+@onready var hitbox_tornado: Area2D = $"../Orientacion/HitboxTornado"
 
 
 # ==========================================
@@ -78,9 +78,9 @@ var projectile_container: Node
 # ==========================================
 
 @onready var Invulnerabilidad: Timer = $"../Invulnerabilidad"
-@onready var fire_position: Marker2D = $"../FirePosition"
+@onready var fire_position: Marker2D = $"../Orientacion/FirePosition"
 @onready var collision_shape: CollisionShape2D = $"../CollisionShape2D"
-@onready var hitbox_turbo: Area2D = $"../HitboxTurbo"
+@onready var hitbox_turbo: Area2D = $"../Orientacion/HitboxTurbo"
 
 
 # ==========================================
@@ -1133,12 +1133,7 @@ func _physics_process(delta: float) -> void:
 	# ==========================================
 
 	if not player.is_on_floor():
-		print(
-			"EN SUELO | Ángulo: ",
-			rad_to_deg(player.get_floor_angle()),
-			" | Normal: ",
-			player.get_floor_normal()
-		)
+		
 		if agarrado_pared:
 
 			player.velocity.y = min(
@@ -1300,7 +1295,10 @@ func salto_fuego() -> void:
 	if turbo_activo:
 
 		return
+	
+	if agarrado_pared:
 
+		return
 
 	if player.obtener_energia_fuego() >= 2 \
 	and saltoFuego == false \

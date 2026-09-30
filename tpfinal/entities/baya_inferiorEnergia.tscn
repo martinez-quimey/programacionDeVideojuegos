@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://h7c0x1fgdmv2"]
+
+[ext_resource type="Script" uid="uid://bru4clw8bib5j" path="res://entities/baya_inferior_energia.gd" id="1_5afhj"]
+[ext_resource type="Texture2D" uid="uid://bahos4mpuo2h8" path="res://sprites/bayaAmarilla.png" id="2_i3yus"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ge01d"]
+radius = 10.049875
+
+[node name="BayaInferiorEnergia" type="Node2D" unique_id=1021680987]
+texture_filter = 1
+scale = Vector2(5, 5)
+script = ExtResource("1_5afhj")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=313686641]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=2050946783]
+shape = SubResource("CircleShape2D_ge01d")
+one_way_collision_margin = 0.0
+
+[node name="Energia" type="Sprite2D" parent="." unique_id=1464069212]
+modulate = Color(0.28627452, 0.36862746, 0.3019608, 1)
+texture_filter = 1
+position = Vector2(-3, 7)
+texture = ExtResource("2_i3yus")

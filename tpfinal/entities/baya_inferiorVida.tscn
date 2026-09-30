@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://hx3kmhbfmjab"]
+
+[ext_resource type="Script" uid="uid://dao0n62m0fd1o" path="res://entities/baya_inferior_vida.gd" id="1_n10qj"]
+[ext_resource type="Texture2D" uid="uid://br87ny0k8wsj7" path="res://sprites/bayaRoja.png" id="3_vwvfd"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ge01d"]
+radius = 10.049875
+
+[node name="BayaInferiorVida" type="Node2D" unique_id=1021680987]
+texture_filter = 1
+scale = Vector2(5, 5)
+script = ExtResource("1_n10qj")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=313686641]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=2050946783]
+shape = SubResource("CircleShape2D_ge01d")
+one_way_collision_margin = 0.0
+
+[node name="Vida" type="Sprite2D" parent="." unique_id=886248895]
+modulate = Color(0.28627452, 0.36862746, 0.3019608, 1)
+texture_filter = 1
+position = Vector2(-3, 7)
+texture = ExtResource("3_vwvfd")

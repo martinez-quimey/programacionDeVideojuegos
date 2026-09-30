@@ -2,9 +2,6 @@
 
 [ext_resource type="Script" uid="uid://d0u2kym344dlc" path="res://entities/abstract/abstract_enemy.gd" id="1_to83a"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_to83a"]
-size = Vector2(134, 85)
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_cjvmg"]
 radius = 369.168
 
@@ -12,7 +9,6 @@ radius = 369.168
 script = ExtResource("1_to83a")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1444408395]
-shape = SubResource("RectangleShape2D_to83a")
 
 [node name="Invulnerabilidad" type="Timer" parent="." unique_id=14355771]
 wait_time = 2.0

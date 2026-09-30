@@ -80,7 +80,7 @@ func completar_nivel(nombreNivel: String) -> void:
 # =========================================================
 
 func load_level(nivel: PackedScene) -> void:
-
+	Settings.checkpoint = 0
 	if nivel == null:
 
 		print("ERROR: levelSiguiente está vacío")

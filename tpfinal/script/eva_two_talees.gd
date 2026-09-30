@@ -15,6 +15,7 @@ var estado_actual: EstadoPlayer
 
 var poseeDobleSalto: bool = false
 
+
 # ==========================================
 # VIDA
 # ==========================================
@@ -34,7 +35,22 @@ var vida: int
 # ANIMACIONES
 # ==========================================
 
-@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+# Orientacion contiene el sprite y los elementos
+# que deben cambiar de orientación junto con él.
+
+@onready var orientacion: Node2D = $Orientacion
+
+@onready var animated_sprite: AnimatedSprite2D = (
+	$Orientacion/AnimatedSprite2D
+)
+
+# CollisionShape2D debe seguir siendo hijo directo
+# del CharacterBody2D.
+#
+# Su escala horizontal se sincroniza con Orientacion
+# para que el sprite y la colisión miren hacia
+# la misma dirección.
+@onready var collision_shape_player: CollisionShape2D = $CollisionShape2D
 
 var mirando_izquierda: bool = false
 
@@ -130,8 +146,12 @@ func _ready() -> void:
 	# ==========================================
 
 	animated_sprite.animation = "quieta"
-	animated_sprite.flip_h = false
+
 	animated_sprite.flip_v = false
+
+	orientacion.scale.x = 1.0
+
+	collision_shape_player.scale.x = orientacion.scale.x
 
 	animated_sprite.play()
 
@@ -162,13 +182,16 @@ func reproducir_animacion(
 
 		animated_sprite.animation = nombre
 
-	animated_sprite.play()
+		animated_sprite.play()
 
-	ultima_animacion = nombre
+		ultima_animacion = nombre
+
 
 func animacion_tornado() -> void:
 
 	animated_sprite.play("tornado")
+
+
 func actualizar_animacion(
 	direccion_animacion: float
 ) -> void:
@@ -198,7 +221,7 @@ func actualizar_animacion(
 	if not is_on_floor():
 
 		animated_sprite.flip_v = false
-		animated_sprite.flip_h = mirando_izquierda
+		aplicar_direccion_visual()
 
 		reproducir_animacion("salto")
 
@@ -210,7 +233,7 @@ func actualizar_animacion(
 	# ==========================================
 
 	animated_sprite.flip_v = false
-	animated_sprite.flip_h = mirando_izquierda
+	aplicar_direccion_visual()
 
 
 	if direccion_animacion != 0:
@@ -234,12 +257,22 @@ func establecer_direccion_visual(
 
 		mirando_izquierda = nueva_direccion < 0
 
-		animated_sprite.flip_h = mirando_izquierda
+		aplicar_direccion_visual()
 
 
 func aplicar_direccion_visual() -> void:
 
-	animated_sprite.flip_h = mirando_izquierda
+	if mirando_izquierda:
+
+		orientacion.scale.x = -1.0
+
+	else:
+
+		orientacion.scale.x = 1.0
+
+	# La colisión copia la orientación horizontal
+	# del nodo Orientacion.
+	collision_shape_player.scale.x = orientacion.scale.x
 
 
 # ==========================================
@@ -251,7 +284,8 @@ func animacion_salto() -> void:
 	rotation = 0.0
 
 	animated_sprite.flip_v = false
-	animated_sprite.flip_h = mirando_izquierda
+
+	aplicar_direccion_visual()
 
 	reproducir_animacion("salto")
 
@@ -265,7 +299,8 @@ func animacion_turbo() -> void:
 	rotation = 0.0
 
 	animated_sprite.flip_v = false
-	animated_sprite.flip_h = mirando_izquierda
+
+	aplicar_direccion_visual()
 
 	reproducir_animacion("turboFuego")
 
@@ -273,6 +308,7 @@ func animacion_turbo() -> void:
 # ==========================================
 # ANIMACIÓN DE PARED
 # ==========================================
+
 func animacion_pared(
 	normal_pared: Vector2
 ) -> void:
@@ -282,17 +318,24 @@ func animacion_pared(
 		rotation = deg_to_rad(-90.0)
 
 		animated_sprite.flip_v = false
-		animated_sprite.flip_h = false
+
+		orientacion.scale.x = 1.0
 
 	else:
 
 		rotation = deg_to_rad(90.0)
 
 		animated_sprite.flip_v = false
-		animated_sprite.flip_h = true
+
+		orientacion.scale.x = -1.0
+
+	# La colisión copia también la orientación
+	# usada durante el agarre de pared.
+	collision_shape_player.scale.x = orientacion.scale.x
 
 
 	reproducir_animacion("quieta")
+
 
 # ==========================================
 # RESTABLECER VISUAL DEL SUELO
@@ -304,7 +347,7 @@ func restablecer_visual_suelo() -> void:
 
 	animated_sprite.flip_v = false
 
-	animated_sprite.flip_h = mirando_izquierda
+	aplicar_direccion_visual()
 
 
 # ==========================================
@@ -328,7 +371,7 @@ func restaurar_animacion() -> void:
 
 	animated_sprite.play()
 
-	animated_sprite.flip_h = mirando_izquierda
+	aplicar_direccion_visual()
 
 
 # ==========================================
@@ -367,19 +410,35 @@ func getVidaMaxima() -> int:
 
 	return vida_maxima
 
-func aumentarVida(aumento: int):
-	var vidaAumentada = vida + aumento
-	if (vida_maxima < vidaAumentada):
-		vida = vida_maxima
-	else:
-		vida = vidaAumentada
 
-func aumentarEnergia(aumento: int):
-	var energiaAumentada = energia_fuego + aumento
-	if (energia_maxima < energiaAumentada):
-		energia_fuego = energia_maxima
+func aumentarVida(aumento: int):
+
+	var vidaAumentada = vida + aumento
+
+	if (vida_maxima < vidaAumentada):
+
+		vida = vida_maxima
+
 	else:
+
+		vida = vidaAumentada
+	actualizar_barra_vida()
+
+
+func aumentar_energia(aumento: int):
+	print ("se consumio baya de energia")
+	var energiaAumentada = energia_fuego + aumento
+
+	if (energia_maxima < energiaAumentada):
+
+		energia_fuego = energia_maxima
+
+	else:
+
 		energia_fuego = energiaAumentada
+	actualizar_barra_energia()
+
+
 func aumentarVidaMax(cantidad: int) -> void:
 
 	if cantidad <= 0:
@@ -401,7 +460,6 @@ func aumentarVidaMax(cantidad: int) -> void:
 	# Actualizamos la barra.
 	barraVida.max_value = vida_maxima
 	barraVida.value = vida
-
 
 
 func actualizar_barra_vida() -> void:
@@ -513,11 +571,7 @@ func iniciar_recarga_energia() -> void:
 		tiempo_recarga_fuego.start()
 
 
-
 func recargar_energia_fuego() -> void:
-
-
-
 
 	if energia_fuego < energia_maxima:
 
@@ -526,28 +580,19 @@ func recargar_energia_fuego() -> void:
 		actualizar_barra_energia()
 
 
-	
-
-
 	if energia_fuego < energia_maxima:
-
-	
 
 		tiempo_recarga_fuego.start()
 
-
 	else:
-
-
 
 		tiempo_recarga_fuego.stop()
 
 
-
 func _on_tiempo_recarga_fuego_timeout() -> void:
 
-
 	recargar_energia_fuego()
+
 
 # ==========================================
 # DAÑO

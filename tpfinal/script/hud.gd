@@ -612,6 +612,7 @@ func _on_main_menu_button_pressed() -> void:
 	print("VOLVER AL MENU")
 
 	main_menu.emit()
+	Settings.checkpoint = 0
 
 
 # =========================================================
@@ -640,3 +641,4 @@ func _on_main_menu_button2_pressed() -> void:
 	$Pause.hide()
 
 	main_menu.emit()
+	Settings.checkpoint = 0

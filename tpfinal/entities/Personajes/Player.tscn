@@ -21,6 +21,13 @@
 [ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
 [ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
+size = Vector2(130.13062, 143.02948)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
+radius = 73.0695
+height = 187.914
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_lderi"]
 animations = [{
 "frames": [{
@@ -105,40 +112,21 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
-size = Vector2(129, 91)
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
-radius = 73.0695
-height = 187.914
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(130.13062, 143.02948)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uqenk"]
 size = Vector2(143, 129)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
+size = Vector2(129, 91)
 
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
 collision_mask = 15
 script = ExtResource("1_l1ths")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1194749253]
-texture_filter = 3
-scale = Vector2(4, 4)
-sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"tornado"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
-position = Vector2(29.5, -3.5)
-shape = SubResource("RectangleShape2D_l1ths")
-
 [node name="PlayerStart" type="Marker2D" parent="." unique_id=331214768]
 position = Vector2(27, 39)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1120706322]
-
-[node name="FirePosition" type="Marker2D" parent="." unique_id=225568629]
-position = Vector2(27, 39)
+zoom = Vector2(0.9, 0.9)
 
 [node name="TiempoRecargaFuego" type="Timer" parent="." unique_id=1043286744]
 wait_time = 4.0
@@ -147,20 +135,6 @@ one_shot = true
 [node name="Invulnerabilidad" type="Timer" parent="." unique_id=1890532257]
 wait_time = 2.0
 one_shot = true
-
-[node name="HitboxTurbo" type="Area2D" parent="." unique_id=1704353825]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTurbo" unique_id=1166951105]
-position = Vector2(22, -10)
-rotation = -1.55509
-shape = SubResource("CapsuleShape2D_5p1bl")
-
-[node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTornado" unique_id=225583521]
-position = Vector2(14.527819, -15.934088)
-rotation = 1.5707964
-shape = SubResource("RectangleShape2D_4jn62")
 
 [node name="estadoManual" type="Node2D" parent="." unique_id=395898327 groups=["jugador"]]
 script = ExtResource("1_utwpb")
@@ -179,13 +153,41 @@ GRAVITY = 660.0
 JUMP_FORCE = -550.0
 JUMP_FIRE_FORCE = -700.0
 
+[node name="Orientacion" type="Node2D" parent="." unique_id=762263020]
+
+[node name="HitboxTornado" type="Area2D" parent="Orientacion" unique_id=595204128]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Orientacion/HitboxTornado" unique_id=225583521]
+position = Vector2(14.527819, -15.934088)
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_4jn62")
+
+[node name="HitboxTurbo" type="Area2D" parent="Orientacion" unique_id=1704353825]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Orientacion/HitboxTurbo" unique_id=1166951105]
+position = Vector2(22, -10)
+rotation = -1.55509
+shape = SubResource("CapsuleShape2D_5p1bl")
+
+[node name="FirePosition" type="Marker2D" parent="Orientacion" unique_id=225568629]
+position = Vector2(27, 39)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Orientacion" unique_id=1194749253]
+texture_filter = 3
+scale = Vector2(4, 4)
+sprite_frames = SubResource("SpriteFrames_lderi")
+animation = &"tornado"
+
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
-visible = false
 position = Vector2(7.5, -16.5)
 shape = SubResource("RectangleShape2D_uqenk")
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
+position = Vector2(29.5, -3.5)
+shape = SubResource("RectangleShape2D_l1ths")
+
 [connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
-[connection signal="body_entered" from="HitboxTurbo" to="." method="_on_hitbox_turbo_body_entered"]
-[connection signal="body_entered" from="HitboxTornado" to="." method="_on_hitbox_turbo_body_entered"]
 [connection signal="died" from="estadoManual" to="." method="_on_estado_manual_died"]
 [connection signal="died" from="estadoAutomatico" to="." method="_on_estado_automatico_died"]
+[connection signal="body_entered" from="Orientacion/HitboxTornado" to="." method="_on_hitbox_turbo_body_entered"]
+[connection signal="body_entered" from="Orientacion/HitboxTurbo" to="." method="_on_hitbox_turbo_body_entered"]

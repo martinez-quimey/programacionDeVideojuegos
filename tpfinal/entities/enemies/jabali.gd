@@ -698,3 +698,9 @@ func animationPlay(string: String):
 			await animated_sprite.animation_finished
 
 			queue_free()
+
+func morir():
+
+	animationPlay("muerte")
+	await get_tree().create_timer(1.0).timeout
+	queue_free()
