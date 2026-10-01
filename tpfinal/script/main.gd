@@ -97,8 +97,6 @@ func _ready() -> void:
 	hud.main_menu.connect(_on_main_menu)
 	hud.continue_game.connect(continue_game)
 
-	# Inicializamos los diagnósticos después de
-	# terminar la configuración inicial de Main.
 	ultimo_process_diagnostic = Time.get_ticks_msec()
 	ultimo_physics_diagnostic = Time.get_ticks_msec()
 
@@ -111,9 +109,6 @@ func _ready() -> void:
 
 # =========================================================
 # DIAGNÓSTICO PROCESS
-#
-# Mide cuánto tiempo pasa entre un _process() de Main
-# y el siguiente.
 # =========================================================
 
 func _process(_delta: float) -> void:
@@ -137,12 +132,6 @@ func _process(_delta: float) -> void:
 
 # =========================================================
 # DIAGNÓSTICO PHYSICS
-#
-# Mide cuánto tiempo pasa entre un _physics_process()
-# de Main y el siguiente.
-#
-# Esto permite compararlo con el diagnóstico de
-# estadoManual.
 # =========================================================
 
 func _physics_process(_delta: float) -> void:
@@ -356,11 +345,21 @@ func continue_game() -> void:
 		" ms"
 	)
 
+	var antes_add_child = Time.get_ticks_msec()
+
 	game_container.add_child(game)
+
+	var despues_add_child = Time.get_ticks_msec()
 
 	print(
 		"MAIN CONTINUE: después de add_child() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
+	print(
+		"MAIN CONTINUE: SOLO add_child() = ",
+		despues_add_child - antes_add_child,
 		" ms"
 	)
 
@@ -372,11 +371,21 @@ func continue_game() -> void:
 		" ms"
 	)
 
+	var antes_frame = Time.get_ticks_msec()
+
 	await get_tree().process_frame
+
+	var despues_frame = Time.get_ticks_msec()
 
 	print(
 		"MAIN CONTINUE: después de await process_frame | ",
 		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
+	print(
+		"MAIN CONTINUE: SOLO await process_frame = ",
+		despues_frame - antes_frame,
 		" ms"
 	)
 
@@ -480,8 +489,6 @@ func obtener_projectile_container() -> Node:
 
 # =========================================================
 # REINICIAR PLAYER
-#
-# NO CAMBIA LA POSICIÓN.
 # =========================================================
 
 func reiniciar_player() -> void:
@@ -538,20 +545,13 @@ func reiniciar_player() -> void:
 
 		return
 
-
 	if estado_automatico != null:
 		estado_automatico.activo = false
 
 	nuevo_player.estado_actual = estado_manual
 
-
-	# VIDA
-
 	nuevo_player.vida = nuevo_player.vida_maxima
 	nuevo_player.actualizar_barra_vida()
-
-
-	# ENERGÍA
 
 	nuevo_player.energia_fuego = (
 		nuevo_player.energia_maxima
@@ -559,24 +559,12 @@ func reiniciar_player() -> void:
 
 	nuevo_player.actualizar_barra_energia()
 
-
-	# RECARGA
-
 	nuevo_player.tiempo_recarga_fuego.stop()
-
-
-	# VISIBILIDAD
 
 	nuevo_player.show()
 	nuevo_player.animated_sprite.visible = true
 
-
-	# MOVIMIENTO
-
 	nuevo_player.velocity = Vector2.ZERO
-
-
-	# ESTADO MANUAL
 
 	estado_manual.activo = true
 
@@ -590,47 +578,26 @@ func reiniciar_player() -> void:
 	estado_manual.direccion_forzada = Vector2.ZERO
 	estado_manual.velocidad_forzada = 0.0
 
-
-	# RETROCESO
-
 	estado_manual.retroceso_activo = false
 	estado_manual.tiempo_retroceso = 0.0
 	estado_manual.estado_anterior_retroceso = null
-
-
-	# TORNADO
 
 	estado_manual.tornado_activo = false
 	estado_manual.tiempo_tornado = 0.0
 	estado_manual.enemigos_golpeados_tornado.clear()
 
-
-	# TURBO
-
 	estado_manual.turbo_activo = false
 	estado_manual.tiempo_invulnerabilidad_turbo = 0.0
 	estado_manual.enemigos_golpeados_turbo.clear()
-
-
-	# PARED
 
 	estado_manual.agarrado_pared = false
 	estado_manual.pared_normal = Vector2.ZERO
 	estado_manual.puede_agarrarse_pared = true
 
-
-	# SALTO
-
 	estado_manual.seSalto = false
 	estado_manual.saltoFuego = false
 
-
-	# MADRIGUERA
-
 	nuevo_player.esta_en_madriguera = false
-
-
-	# COLISIONES
 
 	nuevo_player.set_collision_mask_value(
 		2,
@@ -650,15 +617,9 @@ func reiniciar_player() -> void:
 	estado_manual.hitbox_tornado.monitoring = false
 	estado_manual.hitbox_turbo.monitoring = false
 
-
-	# INVULNERABILIDAD
-
 	nuevo_player.get_node(
 		"Invulnerabilidad"
 	).stop()
-
-
-	# SEÑAL DE MUERTE
 
 	if not estado_manual.died.is_connected(
 		_on_player_died
@@ -666,10 +627,7 @@ func reiniciar_player() -> void:
 
 		estado_manual.died.connect(
 			_on_player_died
-	)
-
-
-	# VISUAL
+		)
 
 	nuevo_player.restablecer_visual_suelo()
 
@@ -691,10 +649,7 @@ func reiniciar_player() -> void:
 
 # =========================================================
 # COLOCAR PLAYER EN CHECKPOINT
-#
-# ESTA ES LA PARTE MÁS IMPORTANTE DEL DIAGNÓSTICO.
 # =========================================================
-
 func colocar_player_en_checkpoint() -> void:
 
 	var tiempo_inicio = Time.get_ticks_msec()
@@ -703,7 +658,6 @@ func colocar_player_en_checkpoint() -> void:
 	print("========================================")
 	print("CHECKPOINT: empieza colocar_player")
 	print("========================================")
-
 
 	if game == null:
 
@@ -714,7 +668,6 @@ func colocar_player_en_checkpoint() -> void:
 		)
 
 		return
-
 
 	print(
 		"CHECKPOINT: antes de buscar Player | ",
@@ -737,7 +690,6 @@ func colocar_player_en_checkpoint() -> void:
 		)
 
 		return
-
 
 	print(
 		"CHECKPOINT: antes de posicionDeCheckpoint() | ",
@@ -767,6 +719,33 @@ func colocar_player_en_checkpoint() -> void:
 		player.position
 	)
 
+	# =====================================================
+	# PRUEBA:
+	# MOVER AL PLAYER ANTES DEL PRIMER FRAME
+	# =====================================================
+
+	print(
+		"CHECKPOINT: ANTES DE CAMBIAR POSICIÓN | ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
+	player.position = posicion_checkpoint
+
+	print(
+		"CHECKPOINT: DESPUÉS DE CAMBIAR POSICIÓN | ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
+	print(
+		"PLAYER: teletransportado al checkpoint = ",
+		player.position
+	)
+
+	# =====================================================
+	# AHORA SÍ DEJAMOS PASAR EL FRAME
+	# =====================================================
 
 	print(
 		"CHECKPOINT: ANTES DE await process_frame | ",
@@ -790,26 +769,6 @@ func colocar_player_en_checkpoint() -> void:
 		"CHECKPOINT: SOLO await process_frame = ",
 		despues_frame - antes_frame,
 		" ms"
-	)
-
-
-	print(
-		"CHECKPOINT: antes de cambiar posición | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
-
-	player.position = posicion_checkpoint
-
-	print(
-		"CHECKPOINT: después de cambiar posición | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
-
-	print(
-		"PLAYER: teletransportado al checkpoint = ",
-		player.position
 	)
 
 	print(
@@ -842,7 +801,6 @@ func retry_game() -> void:
 		" ms"
 	)
 
-
 	if game == null:
 
 		print(
@@ -851,7 +809,6 @@ func retry_game() -> void:
 
 		return
 
-
 	var checkpoint_guardado = Settings.checkpoint
 
 	print(
@@ -859,11 +816,9 @@ func retry_game() -> void:
 		checkpoint_guardado
 	)
 
-
 	get_tree().paused = false
 
 	Settings.sePuedePausar = true
-
 
 	var ruta_nivel = game.scene_file_path
 
@@ -878,12 +833,10 @@ func retry_game() -> void:
 
 		return
 
-
 	print(
 		"Nivel que se va a recargar: ",
 		ruta_nivel
 	)
-
 
 	print(
 		"RETRY: antes de load() | ",
@@ -917,7 +870,6 @@ func retry_game() -> void:
 
 		return
 
-
 	print(
 		"BORRANDO NIVEL COMPLETO"
 	)
@@ -948,7 +900,6 @@ func retry_game() -> void:
 		despues_frame_borrado - antes_frame_borrado,
 		" ms"
 	)
-
 
 	print(
 		"CREANDO NIVEL NUEVO"
@@ -987,18 +938,27 @@ func retry_game() -> void:
 
 		return
 
-
 	print(
 		"RETRY: antes de add_child() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
+	var antes_add_child = Time.get_ticks_msec()
+
 	game_container.add_child(game)
+
+	var despues_add_child = Time.get_ticks_msec()
 
 	print(
 		"RETRY: después de add_child() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
+	print(
+		"RETRY: SOLO add_child() = ",
+		despues_add_child - antes_add_child,
 		" ms"
 	)
 
@@ -1007,7 +967,6 @@ func retry_game() -> void:
 	Settings.sePuedePausar = true
 
 	Settings.checkpoint = checkpoint_guardado
-
 
 	print(
 		"RETRY: antes de colocar_player_en_checkpoint() | ",
@@ -1023,7 +982,6 @@ func retry_game() -> void:
 		" ms"
 	)
 
-
 	if game.has_signal("player_died"):
 
 		if not game.player_died.is_connected(
@@ -1033,7 +991,6 @@ func retry_game() -> void:
 			game.player_died.connect(
 				_on_player_died
 			)
-
 
 	print(
 		"CHECKPOINT FINAL: ",
@@ -1072,7 +1029,6 @@ func load_level(
 	print("CARGANDO NIVEL")
 	print("====================================")
 
-
 	if level_scene == null:
 
 		print(
@@ -1081,11 +1037,9 @@ func load_level(
 
 		return
 
-
 	ruta_nivel_actual = (
 		level_scene.resource_path
 	)
-
 
 	if game != null:
 
@@ -1104,11 +1058,11 @@ func load_level(
 			" ms"
 		)
 
-		var antes_frame = Time.get_ticks_msec()
+		var antes_frame_borrado = Time.get_ticks_msec()
 
 		await get_tree().process_frame
 
-		var despues_frame = Time.get_ticks_msec()
+		var despues_frame_borrado = Time.get_ticks_msec()
 
 		print(
 			"LOAD_LEVEL: después de await process_frame por nivel anterior | ",
@@ -1117,11 +1071,10 @@ func load_level(
 		)
 
 		print(
-			"LOAD_LEVEL: solo frame = ",
-			despues_frame - antes_frame,
+			"LOAD_LEVEL: solo frame de borrado = ",
+			despues_frame_borrado - antes_frame_borrado,
 			" ms"
 		)
-
 
 	print(
 		"LOAD_LEVEL: antes de instantiate() | ",
@@ -1145,14 +1098,17 @@ func load_level(
 
 		return
 
-
 	print(
 		"LOAD_LEVEL: antes de add_child() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
+	var antes_add_child = Time.get_ticks_msec()
+
 	game_container.add_child(game)
+
+	var despues_add_child = Time.get_ticks_msec()
 
 	print(
 		"LOAD_LEVEL: después de add_child() | ",
@@ -1160,10 +1116,15 @@ func load_level(
 		" ms"
 	)
 
+	print(
+		"LOAD_LEVEL: SOLO add_child() = ",
+		despues_add_child - antes_add_child,
+		" ms"
+	)
+
 	Settings.sePuedePausar = true
 
 	Settings.checkpoint = 0
-
 
 	print(
 		"LOAD_LEVEL: antes de colocar_player_en_checkpoint() | ",
@@ -1179,7 +1140,6 @@ func load_level(
 		" ms"
 	)
 
-
 	if game.has_signal("player_died"):
 
 		if not game.player_died.is_connected(
@@ -1189,7 +1149,6 @@ func load_level(
 			game.player_died.connect(
 				_on_player_died
 			)
-
 
 	print(
 		"LOAD_LEVEL: FIN | ",
@@ -1251,13 +1210,11 @@ func _on_main_menu() -> void:
 
 	Settings.sePuedePausar = false
 
-
 	if game != null:
 
 		game.queue_free()
 
 		game = null
-
 
 	ruta_nivel_actual = ""
 

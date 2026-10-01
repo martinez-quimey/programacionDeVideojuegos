@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://bng1g4uxk2b1m" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo.png" id="13_uq2ph"]
 [ext_resource type="Texture2D" uid="uid://cvob2ecmp77v7" path="res://sprites/eva/tornado3.png" id="14_2fb44"]
 [ext_resource type="Texture2D" uid="uid://dysrk804eu5xd" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo2.png" id="14_3c5qw"]
+[ext_resource type="Texture2D" uid="uid://bp5k5x52foybv" path="res://sprites/eva/pared.png" id="14_nm73a"]
 [ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
 [ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
 
@@ -112,11 +113,25 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_nm73a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_nm73a")
+}],
+"loop": 1,
+"name": &"pared",
+"speed": 5.0
+}]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uqenk"]
 size = Vector2(143, 129)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
-size = Vector2(129, 91)
+size = Vector2(153, 94)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2fb44"]
+size = Vector2(101.75, 155.5)
 
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
 collision_mask = 15
@@ -138,8 +153,8 @@ script = ExtResource("1_utwpb")
 PESO = 0.5
 projectile_scene = ExtResource("2_bqvfx")
 GRAVITY = 660.0
-JUMP_FORCE = -550.0
-JUMP_FIRE_FORCE = -700.0
+JUMP_FORCE = -500.0
+JUMP_FIRE_FORCE = -600.0
 FRICTION = 2000.0
 
 [node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
@@ -147,41 +162,53 @@ script = ExtResource("17_jkysx")
 PESO = 0.5
 projectile_scene = ExtResource("2_bqvfx")
 GRAVITY = 660.0
-JUMP_FORCE = -550.0
-JUMP_FIRE_FORCE = -700.0
+JUMP_FORCE = -500.0
+JUMP_FIRE_FORCE = -600.0
 
-[node name="Orientacion" type="Node2D" parent="." unique_id=762263020]
+[node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
+visible = false
 
-[node name="HitboxTornado" type="Area2D" parent="Orientacion" unique_id=595204128]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Orientacion/HitboxTornado" unique_id=225583521]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTornado" unique_id=225583521]
 position = Vector2(14.527819, -15.934088)
 rotation = 1.5707964
 shape = SubResource("RectangleShape2D_4jn62")
 
-[node name="HitboxTurbo" type="Area2D" parent="Orientacion" unique_id=1704353825]
+[node name="HitboxTurbo" type="Area2D" parent="." unique_id=1704353825]
+visible = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Orientacion/HitboxTurbo" unique_id=1166951105]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTurbo" unique_id=1166951105]
 position = Vector2(22, -10)
 rotation = -1.55509
 shape = SubResource("CapsuleShape2D_5p1bl")
 
-[node name="FirePosition" type="Marker2D" parent="Orientacion" unique_id=225568629]
+[node name="FirePosition" type="Marker2D" parent="." unique_id=225568629]
 position = Vector2(27, 39)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Orientacion" unique_id=1194749253]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1194749253]
 texture_filter = 3
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"tornado"
+animation = &"caminar"
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=2109890388]
+texture_filter = 3
+position = Vector2(48, -1)
+scale = Vector2(4, 4)
+sprite_frames = SubResource("SpriteFrames_nm73a")
+animation = &"pared"
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
+visible = false
 position = Vector2(7.5, -16.5)
 shape = SubResource("RectangleShape2D_uqenk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
-position = Vector2(29.5, -3.5)
+position = Vector2(17.5, -2)
 shape = SubResource("RectangleShape2D_l1ths")
+
+[node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
+position = Vector2(43.125, -32.75)
+shape = SubResource("RectangleShape2D_2fb44")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]
 zoom = Vector2(0.9, 0.9)
@@ -189,5 +216,5 @@ zoom = Vector2(0.9, 0.9)
 [connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
 [connection signal="died" from="estadoManual" to="." method="_on_estado_manual_died"]
 [connection signal="died" from="estadoAutomatico" to="." method="_on_estado_automatico_died"]
-[connection signal="body_entered" from="Orientacion/HitboxTornado" to="." method="_on_hitbox_turbo_body_entered"]
-[connection signal="body_entered" from="Orientacion/HitboxTurbo" to="." method="_on_hitbox_turbo_body_entered"]
+[connection signal="body_entered" from="HitboxTornado" to="." method="_on_hitbox_turbo_body_entered"]
+[connection signal="body_entered" from="HitboxTurbo" to="." method="_on_hitbox_turbo_body_entered"]

@@ -14,6 +14,10 @@ extends "res://entities/abstract/abstract_enemy.gd"
 # hasta donde se comprobará si hay suelo.
 @export var DISTANCIA_BORDE: float = 20.0
 
+# Distancia vertical desde el centro del jabalí
+# hasta aproximadamente la altura de sus pies.
+@export var DISTANCIA_PIES: float = 100.0
+
 
 @onready var orientacion_jabali: Node2D = $OrientacionEnemy
 @onready var area_ataque: Area2D = $OrientacionEnemy/CollisionAtaque
@@ -47,7 +51,6 @@ func _ready():
 	actualizar_direccion_sprite()
 	
 
-
 	print(
 		"READY jabali: ",
 		name,
@@ -56,8 +59,10 @@ func _ready():
 		" ms"
 	)
 
+
 func _physics_process(delta: float) -> void:
 	var inicio = Time.get_ticks_msec()
+
 	if muerto:
 
 		velocity = Vector2.ZERO
@@ -198,25 +203,25 @@ func _physics_process(delta: float) -> void:
 			duracion,
 			" ms"
 		)
+
+
 # =========================================================
 # DETECTAR SUELO DELANTE
 # =========================================================
-
 func hay_suelo_delante() -> bool:
 
 	var espacio = get_world_2d().direct_space_state
 
-	# El raycast empieza 20 píxeles hacia adelante
-	# desde el centro del jabalí.
+	# Punto horizontal delante del jabalí.
 	var origen = global_position + Vector2(
 		direccion * DISTANCIA_BORDE,
 		0
 	)
 
-	# Busca 100 píxeles hacia abajo.
+	# Buscamos bastante hacia abajo.
 	var destino = origen + Vector2(
 		0,
-		100
+		300
 	)
 
 	var parametros = PhysicsRayQueryParameters2D.create(
@@ -231,8 +236,27 @@ func hay_suelo_delante() -> bool:
 
 	var resultado = espacio.intersect_ray(parametros)
 
-	return not resultado.is_empty()
+	print(
+		"RAYO | direccion=",
+		direccion,
+		" | origen=",
+		origen,
+		" | destino=",
+		destino,
+		" | encontro=",
+		not resultado.is_empty()
+	)
 
+	if not resultado.is_empty():
+
+		print(
+			"RAYO | golpeó: ",
+			resultado.collider,
+			" | posición: ",
+			resultado.position
+		)
+
+	return not resultado.is_empty()
 
 # =========================================================
 # DAÑO POR CONTACTO FÍSICO
@@ -523,6 +547,8 @@ func perseguir_jugador():
 
 	if not hay_suelo_delante():
 
+		print("PERSIGUIENDO: hay_suelo_delante() = FALSE")
+
 		# Llegó al borde mientras perseguía al jugador.
 		#
 		# NO cambia de dirección.
@@ -533,6 +559,9 @@ func perseguir_jugador():
 		animationPlay("idle")
 
 		return
+
+
+	print("PERSIGUIENDO: hay_suelo_delante() = TRUE")
 
 
 	# =====================================================
@@ -718,8 +747,11 @@ func animationPlay(string: String):
 
 			queue_free()
 
+
 func morir():
 
 	animationPlay("muerte")
+
 	await get_tree().create_timer(1.0).timeout
+
 	queue_free()

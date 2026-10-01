@@ -37,6 +37,12 @@ const POSICION_SEGURA_PLAYER := Vector2(0.0, 0.0)
 
 func _ready() -> void:
 
+	for hijo in get_children():
+		if hijo is Node2D:
+			hijo.set_process(false)
+			hijo.set_physics_process(false)
+
+
 	var tiempo_inicio = Time.get_ticks_msec()
 
 	print("")
@@ -161,9 +167,7 @@ func _ready() -> void:
 			"LEVEL: antes de call_deferred(crear_cache_checkpoints)"
 		)
 
-		call_deferred(
-			"crear_cache_checkpoints"
-		)
+		call_deferred("crear_cache_checkpoints")
 
 		print(
 			"LEVEL: call_deferred realizado",
@@ -278,9 +282,23 @@ func crear_cache_checkpoints() -> void:
 			checkpoint.numero_checkpoint
 		)
 
-		posiciones[
-			checkpoint.numero_checkpoint
-		] = checkpoint.position
+		var marker = checkpoint.get_node_or_null(
+			"Marker2D"
+		)
+
+		if marker != null:
+
+			posiciones[
+				checkpoint.numero_checkpoint
+			] = marker.position
+
+		else:
+
+			print(
+				"ERROR: el checkpoint ",
+				checkpoint.numero_checkpoint,
+				" no tiene Marker2D"
+			)
 
 	print(
 		"CACHE: terminó recorrer checkpoints",

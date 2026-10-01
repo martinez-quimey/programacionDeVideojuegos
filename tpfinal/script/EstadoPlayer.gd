@@ -62,7 +62,7 @@ var tiempo_tornado: float = 0.0
 
 var enemigos_golpeados_tornado: Dictionary = {}
 
-@onready var hitbox_tornado: Area2D = $"../Orientacion/HitboxTornado"
+@onready var hitbox_tornado: Area2D = $"../HitboxTornado"
 
 
 # ==========================================
@@ -79,9 +79,9 @@ var projectile_container: Node
 # ==========================================
 
 @onready var Invulnerabilidad: Timer = $"../Invulnerabilidad"
-@onready var fire_position: Marker2D = $"../Orientacion/FirePosition"
+@onready var fire_position: Marker2D = $"../FirePosition"
 @onready var collision_shape: CollisionShape2D = $"../CollisionShape2D"
-@onready var hitbox_turbo: Area2D = $"../Orientacion/HitboxTurbo"
+@onready var hitbox_turbo: Area2D = $"../HitboxTurbo"
 
 
 # ==========================================

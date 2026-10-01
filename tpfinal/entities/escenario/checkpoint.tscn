@@ -34,6 +34,7 @@ animations = [{
 }]
 
 [node name="Checkpoint" type="Area2D" unique_id=174763872]
+texture_filter = 1
 scale = Vector2(4, 4)
 script = ExtResource("1_7pdxf")
 
@@ -44,5 +45,8 @@ shape = SubResource("CircleShape2D_3oyy8")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=684976178]
 sprite_frames = SubResource("SpriteFrames_4jn62")
 animation = &"vacio"
+
+[node name="Marker2D" type="Marker2D" parent="." unique_id=1382856088]
+position = Vector2(15.75, 32.5)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
