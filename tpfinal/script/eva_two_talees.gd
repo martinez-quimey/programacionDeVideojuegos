@@ -84,6 +84,7 @@ var energia_fuego: int
 
 func _ready() -> void:
 
+
 	# ==========================================
 	# CONFIGURAR ESTADOS
 	# ==========================================
@@ -156,6 +157,7 @@ func _ready() -> void:
 	animated_sprite.play()
 
 	ultima_animacion = "quieta"
+	
 
 
 	# ==========================================

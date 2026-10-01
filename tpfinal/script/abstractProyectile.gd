@@ -16,8 +16,21 @@ func set_starting_values(starting_position: Vector2, direction: Vector2):
 	set_physics_process(true)
 
 func _physics_process(delta):
+	var inicio = Time.get_ticks_msec()
 	position += direction * speed * delta
+	var duracion = Time.get_ticks_msec() - inicio
 
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO abstractProjectile | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)
+	
+	
 func _on_timer_timeout():
 	delete_requested.emit(self)
 

@@ -77,7 +77,7 @@ func _ready() -> void:
 # =========================================================
 
 func _process(delta: float) -> void:
-
+	var inicio = Time.get_ticks_msec()
 	if escena_a_crear == null:
 		return
 
@@ -106,7 +106,17 @@ func _process(delta: float) -> void:
 
 
 	crear_objeto()
+	var duracion = Time.get_ticks_msec() - inicio
 
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)
 
 # =========================================================
 # COMPROBAR SI PUEDE CREAR

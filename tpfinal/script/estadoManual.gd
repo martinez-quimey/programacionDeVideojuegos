@@ -8,7 +8,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-
+	var inicio = Time.get_ticks_msec()
 	if not activo:
 		return
 
@@ -58,3 +58,14 @@ func _physics_process(delta: float) -> void:
 	# ==========================================
 
 	super._physics_process(delta)
+	var duracion = Time.get_ticks_msec() - inicio
+
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO estadoManual | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)

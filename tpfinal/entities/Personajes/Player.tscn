@@ -125,9 +125,6 @@ script = ExtResource("1_l1ths")
 [node name="PlayerStart" type="Marker2D" parent="." unique_id=331214768]
 position = Vector2(27, 39)
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1120706322]
-zoom = Vector2(0.9, 0.9)
-
 [node name="TiempoRecargaFuego" type="Timer" parent="." unique_id=1043286744]
 wait_time = 4.0
 one_shot = true
@@ -185,6 +182,9 @@ shape = SubResource("RectangleShape2D_uqenk")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
 position = Vector2(29.5, -3.5)
 shape = SubResource("RectangleShape2D_l1ths")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]
+zoom = Vector2(0.9, 0.9)
 
 [connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
 [connection signal="died" from="estadoManual" to="." method="_on_estado_manual_died"]

@@ -19,6 +19,17 @@ extends CharacterBody2D
 
 @export var vida: int = 1
 
+
+# ==========================================
+# OPTIMIZACIÓN
+# ==========================================
+
+# Distancia máxima a la que el enemigo funciona.
+@export var distancia_maxima_actividad: float = 1000.0
+
+var enemigo_activo: bool = true
+
+
 # ==========================================
 # ESTADO
 # ==========================================
@@ -29,10 +40,40 @@ const isBoss = false
 var player_in_range: bool = false
 
 
+# ==========================================
+# INICIO
+# ==========================================
+
 func _ready():
 
 	detection_area.body_entered.connect(_on_body_entered)
 	detection_area.body_exited.connect(_on_body_exited)
+
+
+# ==========================================
+# OPTIMIZACIÓN
+# ==========================================
+
+func comprobar_distancia_al_player() -> void:
+
+	var player = get_tree().get_first_node_in_group("jugador")
+
+	if player == null:
+		return
+
+	var distancia = global_position.distance_to(player.global_position)
+
+	if distancia > distancia_maxima_actividad:
+
+		if enemigo_activo:
+			enemigo_activo = false
+			set_physics_process(false)
+
+	else:
+
+		if not enemigo_activo:
+			enemigo_activo = true
+			set_physics_process(true)
 
 
 # ==========================================
@@ -69,10 +110,13 @@ func retroceso(direccion: Vector2, fuerza: int) -> void:
 
 	velocity.x = direccion.x * retroceso
 
-	frenarCaminatas() # para que el movimiento del enemigo no anule el retroceso
+	frenarCaminatas()
+
 
 func frenarCaminatas():
+
 	pass
+
 
 # ==========================================
 # DETECCIÓN DEL JUGADOR
@@ -106,10 +150,6 @@ func dejarDeActuarContraPlayer():
 	pass
 
 
-
-	
-
-
 # ==========================================
 # MUERTE
 # ==========================================
@@ -124,17 +164,23 @@ func morir():
 # ==========================================
 
 func herir(num: int):
-	print ("enemigo herido")
+
+	print("enemigo herido")
 	print("vida: " + str(vida))
+
 	if Invulnerabilidad.is_stopped():
 
 		vida -= num
+
 		print("vidaNueva: " + str(vida))
+
 		if isBoss:
 			pass
 
 		if vida <= 0:
-			print ("morir")
+
+			print("morir")
+
 			morir()
 
 			return
@@ -151,6 +197,7 @@ func herir(num: int):
 func animationPlay(string: String):
 
 	pass
+
 
 func animacionHerida():
 

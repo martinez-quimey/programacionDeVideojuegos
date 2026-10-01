@@ -1,3 +1,4 @@
+
 # EstadoPlayer.gd
 extends Node
 class_name EstadoPlayer
@@ -221,6 +222,12 @@ var puede_agarrarse_pared: bool = true
 # para los tiles mortales.
 
 
+
+##esta var y este const deben borrarse
+var ultimo_physics_diagnostic: int = 0
+
+const UMBRAL_PHYSICS_LENTO: int = 100
+
 func configurar_hitbox_ataque(
 	hitbox: Area2D
 ) -> void:
@@ -258,7 +265,7 @@ func configurar_hitbox_ataque(
 # ==========================================
 
 func _ready() -> void:
-
+	ultimo_physics_diagnostic = Time.get_ticks_msec()
 	screen_size = player.get_viewport_rect().size
 
 
@@ -442,10 +449,6 @@ func retroceso(
 	
 
 	if turbo_activo or tiempo_invulnerabilidad_turbo > 0.0:
-
-		print(
-			"RETROCESO BLOQUEADO: PLAYER INMUNE"
-		)
 
 		return
 
@@ -1028,10 +1031,27 @@ func comprobar_tile_mortal() -> bool:
 # ==========================================
 
 func _physics_process(delta: float) -> void:
-
+	var inicio = Time.get_ticks_msec()
 	# ==========================================
 	# RETROCESO
 	# ==========================================
+	var ahora = Time.get_ticks_msec()
+
+	var tiempo_desde_ultimo = (
+		ahora - ultimo_physics_diagnostic
+	)
+
+	ultimo_physics_diagnostic = ahora
+
+	if tiempo_desde_ultimo >= UMBRAL_PHYSICS_LENTO:
+
+		print(
+			"⚠️ INTERVALO PHYSICS LENTO (este print fue hecho desde estado player) | ",
+			get_path(),
+			" | ",
+			tiempo_desde_ultimo,
+			" ms desde el último physics"
+		)
 
 	if retroceso_activo:
 
@@ -1207,10 +1227,21 @@ func _physics_process(delta: float) -> void:
 		player.actualizar_animacion(direccion)
 
 
+	var duracion = Time.get_ticks_msec() - inicio
+
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)
+
 # ==========================================
 # SALTO
 # ==========================================
-
 func saltar() -> void:
 
 	if retroceso_activo:
@@ -1677,11 +1708,6 @@ func comprobar_golpes_turbo() -> void:
 
 func desactivar_turbo() -> void:
 
-	print("")
-	print("==========================================")
-	print("DESACTIVANDO TURBO")
-	print("==========================================")
-
 
 	turbo_activo = false
 
@@ -1714,20 +1740,6 @@ func desactivar_turbo() -> void:
 	player.animated_sprite.visible = true
 
 
-	print(
-		"Hitbox monitoring: ",
-		hitbox_turbo.monitoring
-	)
-
-	print(
-		"Enemigos golpeados durante turbo: ",
-		enemigos_golpeados_turbo.size()
-	)
-
-	print("==========================================")
-	print("TURBO TERMINADO")
-	print("==========================================")
-
 
 # ==========================================
 # GOLPE DEL TURBO POR SEÑAL
@@ -1737,38 +1749,14 @@ func _on_hitbox_turbo_body_entered(
 	body: Node2D
 ) -> void:
 
-	print("")
-	print("==========================================")
-	print("!!! HITBOX TURBO DETECTÓ UN BODY !!!")
-	print("==========================================")
 
 
-	print(
-		"Body: ",
-		body
-	)
 
-	print(
-		"Nombre: ",
-		body.name
-	)
-
-	print(
-		"Es enemigo: ",
-		body.is_in_group("enemigos")
-	)
-
-	print(
-		"Turbo activo: ",
-		turbo_activo
-	)
 
 
 	if not turbo_activo:
 
-		print(
-			"Ignorado porque el turbo no está activo"
-		)
+	
 
 		return
 
@@ -1779,9 +1767,7 @@ func _on_hitbox_turbo_body_entered(
 
 	if not body.is_in_group("enemigos"):
 
-		print(
-			"Ignorado porque NO pertenece al grupo enemigos"
-		)
+	
 
 		return
 
@@ -1791,9 +1777,6 @@ func _on_hitbox_turbo_body_entered(
 
 	if enemigos_golpeados_turbo.has(id):
 
-		print(
-			"Ignorado porque ya recibió daño"
-		)
 
 		return
 
@@ -1807,10 +1790,6 @@ func _on_hitbox_turbo_body_entered(
 
 
 
-	print(
-		"Daño: ",
-		DAÑO_TURBO_FUEGO
-	)
 
 
 	if body.has_method("herir"):
@@ -1819,15 +1798,6 @@ func _on_hitbox_turbo_body_entered(
 			DAÑO_TURBO_FUEGO
 		)
 
-		print(
-			"DAÑO APLICADO CORRECTAMENTE"
-		)
-
-	else:
-
-		print(
-			"ERROR: el enemigo no tiene método herir()"
-		)
 
 
 	# ==========================================
@@ -1844,19 +1814,6 @@ func _on_hitbox_turbo_body_entered(
 			direccion_empuje = Vector2.LEFT
 
 
-		print(
-			"Aplicando retroceso al enemigo"
-		)
-
-		print(
-			"Dirección: ",
-			direccion_empuje
-		)
-
-		print(
-			"Fuerza: ",
-			retrocesoPorTurboFuego
-		)
 
 
 		body.retroceso(
@@ -1864,11 +1821,7 @@ func _on_hitbox_turbo_body_entered(
 			retrocesoPorTurboFuego
 		)
 
-	else:
-
-		print(
-			"El enemigo no tiene método retroceso()"
-		)
+	
 
 
 

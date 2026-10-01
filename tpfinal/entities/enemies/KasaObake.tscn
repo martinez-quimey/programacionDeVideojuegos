@@ -35,12 +35,12 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_go41v"]
-size = Vector2(88, 520)
+size = Vector2(88, 443)
 
 [node name="CharacterBody2D" unique_id=86738375 instance=ExtResource("1_1g1o7")]
 script = ExtResource("2_vowfh")
 VELOCIDAD_CAIDA_LENTA = 80.0
-VELOCIDAD_CAIDA_RAPIDA = 700.0
+VELOCIDAD_CAIDA_RAPIDA = 600.0
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]
 position = Vector2(4.5, 10)
@@ -53,5 +53,5 @@ sprite_frames = SubResource("SpriteFrames_4jn62")
 animation = &"cerrado"
 
 [node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
-position = Vector2(6, 221)
+position = Vector2(6, 182.5)
 shape = SubResource("RectangleShape2D_go41v")

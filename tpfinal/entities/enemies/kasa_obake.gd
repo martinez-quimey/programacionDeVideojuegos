@@ -31,12 +31,14 @@ func _ready() -> void:
 	detection_area.body_exited.connect(_on_detection_body_exited)
 
 
+
+
 # ==========================================
 # FÍSICA
 # ==========================================
 
 func _physics_process(delta):
-
+	var inicio = Time.get_ticks_msec()
 	if vida <= 0:
 		return
 
@@ -83,7 +85,17 @@ func _physics_process(delta):
 	if is_on_floor():
 
 		morir()
+	var duracion = Time.get_ticks_msec() - inicio
 
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO paraguas | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)
 
 # ==========================================
 # JUGADOR ENTRA EN DETECTION AREA
@@ -154,7 +166,7 @@ func comprobar_contacto_con_jugador():
 		# HACER DAÑO
 		# ==========================================
 
-		cuerpo.herir(2)
+		cuerpo.herir(1)
 
 
 		# ==========================================

@@ -34,7 +34,7 @@ animations = [{
 }]
 
 [node name="Checkpoint" type="Area2D" unique_id=174763872]
-scale = Vector2(5, 5)
+scale = Vector2(4, 4)
 script = ExtResource("1_7pdxf")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2142999522]

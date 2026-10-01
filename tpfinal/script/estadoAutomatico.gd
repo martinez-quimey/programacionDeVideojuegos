@@ -16,6 +16,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	var inicio = Time.get_ticks_msec()
 	if not activo:
 		return
 
@@ -56,7 +57,17 @@ func _physics_process(delta: float) -> void:
 	# Ejecuta toda la física y mecánicas del EstadoPlayer
 	super._physics_process(delta)
 
+	var duracion = Time.get_ticks_msec() - inicio
 
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)
 # =========================================================
 # IZQUIERDA
 # =========================================================

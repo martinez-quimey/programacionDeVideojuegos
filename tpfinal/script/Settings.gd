@@ -1,5 +1,6 @@
 extends Node
 
+var checkpoints_por_nivel: Dictionary = {}
 var language: String 
 var sePuedePausar = false
 var main = null

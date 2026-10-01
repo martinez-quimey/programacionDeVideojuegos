@@ -37,7 +37,7 @@ var jugador_dentro_ataque: bool = false
 
 
 func _ready():
-
+	var tiempo_inicio = Time.get_ticks_msec()
 	super._ready()
 
 	area_ataque.body_entered.connect(_on_area_ataque_body_entered)
@@ -45,10 +45,19 @@ func _ready():
 
 	# Empieza mirando hacia la derecha.
 	actualizar_direccion_sprite()
+	
 
+
+	print(
+		"READY jabali: ",
+		name,
+		" | ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
 
 func _physics_process(delta: float) -> void:
-
+	var inicio = Time.get_ticks_msec()
 	if muerto:
 
 		velocity = Vector2.ZERO
@@ -178,7 +187,17 @@ func _physics_process(delta: float) -> void:
 
 	comprobar_colision_con_jugador()
 
+	var duracion = Time.get_ticks_msec() - inicio
 
+	if duracion >= 50:
+
+		print(
+			"⚠️ PROCESS LENTO jabali | ",
+			get_path(),
+			" | ",
+			duracion,
+			" ms"
+		)
 # =========================================================
 # DETECTAR SUELO DELANTE
 # =========================================================
