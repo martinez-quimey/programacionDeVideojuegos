@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://jmh7ws7ajxjd"]
+
+[ext_resource type="Script" uid="uid://bgw5hxxcc7k6o" path="res://entities/impulso_derecha.gd" id="1_368rx"]
+[ext_resource type="Texture2D" uid="uid://l4gll516pd7o" path="res://sprites/otros/flecha.webp" id="2_xbi5d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
+size = Vector2(47.5, 43.5)
+
+[node name="ImpulsoDerecha" type="Area2D" unique_id=695283037]
+scale = Vector2(3, 3)
+script = ExtResource("1_368rx")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1450486567]
+position = Vector2(3.8146973e-06, 0)
+scale = Vector2(0.080168776, 0.067510545)
+texture = ExtResource("2_xbi5d")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1606608908]
+light_mask = 31
+visibility_layer = 31
+shape = SubResource("RectangleShape2D_4jn62")

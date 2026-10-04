@@ -1,3 +1,4 @@
+
 extends "res://entities/abstract/abstract_enemy.gd"
 
 
@@ -30,7 +31,8 @@ func _ready() -> void:
 	detection_area.body_entered.connect(_on_detection_body_entered)
 	detection_area.body_exited.connect(_on_detection_body_exited)
 
-
+	# Área que determina el daño y destrucción por contacto.
+	$DamageArea.body_entered.connect(_on_damage_area_body_entered)
 
 
 # ==========================================
@@ -38,7 +40,9 @@ func _ready() -> void:
 # ==========================================
 
 func _physics_process(delta):
+
 	var inicio = Time.get_ticks_msec()
+
 	if vida <= 0:
 		return
 
@@ -72,19 +76,14 @@ func _physics_process(delta):
 
 
 	# ==========================================
-	# CONTACTO FÍSICO
-	# ==========================================
-
-	comprobar_contacto_con_jugador()
-
-
-	# ==========================================
 	# CONTACTO CON EL SUELO
 	# ==========================================
 
 	if is_on_floor():
 
 		morir()
+
+
 	var duracion = Time.get_ticks_msec() - inicio
 
 	if duracion >= 50:
@@ -97,6 +96,7 @@ func _physics_process(delta):
 			" ms"
 		)
 
+
 # ==========================================
 # JUGADOR ENTRA EN DETECTION AREA
 # ==========================================
@@ -107,11 +107,7 @@ func _on_detection_body_entered(body: Node2D) -> void:
 		return
 
 
-	# Solo detectamos al jugador si está debajo.
-
-	if body.global_position.y > global_position.y:
-
-		jugador_debajo = body
+	jugador_debajo = body
 
 
 # ==========================================
@@ -125,64 +121,37 @@ func _on_detection_body_exited(body: Node2D) -> void:
 		jugador_debajo = null
 
 
-# =========================================================
-# DAÑO POR CONTACTO FÍSICO
-# =========================================================
+# ==========================================
+# DAMAGE AREA
+# ==========================================
 
-func comprobar_contacto_con_jugador():
+func _on_damage_area_body_entered(body: Node2D) -> void:
 
-	for i in get_slide_collision_count():
+	# ==========================================
+	# SI CHOCÓ CON EL JUGADOR
+	# ==========================================
 
-		var colision = get_slide_collision(i)
-
-		var cuerpo = colision.get_collider()
-
-
-		if cuerpo == null:
-			continue
-
-
-		if not cuerpo.is_in_group("jugador"):
-			continue
-
+	if body.is_in_group("jugador"):
 
 		# ==========================================
-		# DE QUÉ LADO VIENE EL JUGADOR
+		# DAÑO
 		# ==========================================
 
-		var diferencia_y: float = cuerpo.global_position.y - global_position.y
-
-
-		# ==========================================
-		# JUGADOR VIENE DESDE ARRIBA
-		# ==========================================
-
-		if diferencia_y < 0:
-
-			continue
-
-
-		# ==========================================
-		# HACER DAÑO
-		# ==========================================
-
-		cuerpo.herir(1)
+		body.herir(1)
 
 
 		# ==========================================
 		# EMPUJE
 		# ==========================================
 
-		aplicar_empuje_contacto(cuerpo)
+		aplicar_empuje_contacto(body)
 
 
-		# ==========================================
-		# MORIR
-		# ==========================================
+	# ==========================================
+	# EL PARAGUAS MUERE AL CHOCAR CON CUALQUIER CUERPO
+	# ==========================================
 
-		morir()
-
-		return
+	morir()
 
 
 # =========================================================

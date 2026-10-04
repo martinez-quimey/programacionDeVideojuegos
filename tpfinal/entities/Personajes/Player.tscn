@@ -131,7 +131,7 @@ size = Vector2(143, 129)
 size = Vector2(153, 94)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2fb44"]
-size = Vector2(101.75, 155.5)
+size = Vector2(97.75, 155.5)
 
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
 collision_mask = 15
@@ -198,7 +198,6 @@ sprite_frames = SubResource("SpriteFrames_nm73a")
 animation = &"pared"
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
-visible = false
 position = Vector2(7.5, -16.5)
 shape = SubResource("RectangleShape2D_uqenk")
 
@@ -207,7 +206,7 @@ position = Vector2(17.5, -2)
 shape = SubResource("RectangleShape2D_l1ths")
 
 [node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
-position = Vector2(43.125, -32.75)
+position = Vector2(41.125, -32.75)
 shape = SubResource("RectangleShape2D_2fb44")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]

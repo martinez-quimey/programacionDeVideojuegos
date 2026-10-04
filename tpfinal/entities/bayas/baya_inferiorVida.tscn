@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://hx3kmhbfmjab"]
 
-[ext_resource type="Script" uid="uid://dao0n62m0fd1o" path="res://entities/baya_inferior_vida.gd" id="1_n10qj"]
+[ext_resource type="Script" uid="uid://dao0n62m0fd1o" path="res://entities/bayas/baya_inferior_vida.gd" id="1_n10qj"]
 [ext_resource type="Texture2D" uid="uid://br87ny0k8wsj7" path="res://sprites/bayaRoja.png" id="3_vwvfd"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ge01d"]

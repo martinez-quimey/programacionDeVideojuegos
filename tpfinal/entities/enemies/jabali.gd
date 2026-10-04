@@ -236,25 +236,8 @@ func hay_suelo_delante() -> bool:
 
 	var resultado = espacio.intersect_ray(parametros)
 
-	print(
-		"RAYO | direccion=",
-		direccion,
-		" | origen=",
-		origen,
-		" | destino=",
-		destino,
-		" | encontro=",
-		not resultado.is_empty()
-	)
 
-	if not resultado.is_empty():
 
-		print(
-			"RAYO | golpeó: ",
-			resultado.collider,
-			" | posición: ",
-			resultado.position
-		)
 
 	return not resultado.is_empty()
 

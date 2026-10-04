@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bnms1gr1kji80"]
+
+[ext_resource type="PackedScene" uid="uid://4s4o0gfrimwv" path="res://entities/abstract/madrigueraAbstract.tscn" id="1_wgwdu"]
+
+[node name="MadrigueraArriba" unique_id=1249858680 instance=ExtResource("1_wgwdu")]
+position = Vector2(-30, -5)
+scale = Vector2(6, 6)
+
+[node name="impulsoParaSacar" parent="." index="3" unique_id=1482267724]
+visible = false
+
+[node name="Impulsos" parent="impulsoParaSacar" index="0" unique_id=2046197739]
+scale = Vector2(1, 1)
+tile_map_data = PackedByteArray(0, 0, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0)

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://h7c0x1fgdmv2"]
 
-[ext_resource type="Script" uid="uid://bru4clw8bib5j" path="res://entities/baya_inferior_energia.gd" id="1_5afhj"]
+[ext_resource type="Script" uid="uid://bru4clw8bib5j" path="res://entities/bayas/baya_inferior_energia.gd" id="1_5afhj"]
 [ext_resource type="Texture2D" uid="uid://bahos4mpuo2h8" path="res://sprites/bayaAmarilla.png" id="2_i3yus"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ge01d"]

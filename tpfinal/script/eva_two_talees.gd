@@ -43,6 +43,8 @@ var mirando_izquierda: bool = false
 
 var ultima_animacion: String = "quieta"
 
+var movimiento_forzado_activo: bool = false
+
 
 # ==========================================
 # ENERGÍA DE FUEGO
@@ -201,6 +203,24 @@ func actualizar_animacion(
 	if direccion_animacion != 0:
 
 		mirando_izquierda = direccion_animacion < 0
+
+
+	# ==========================================
+	# MOVIMIENTO FORZADO
+	# ==========================================
+
+	if movimiento_forzado_activo:
+
+		animated_sprite.visible = true
+		animated_sprite_pared.visible = false
+
+		animated_sprite.flip_v = false
+
+		aplicar_direccion_visual()
+
+		reproducir_animacion("salto")
+
+		return
 
 
 	# ==========================================
@@ -700,22 +720,74 @@ func salir_madriguera():
 
 	estado_actual.salir_madriguera()
 
-
 # ==========================================
 # MOVIMIENTO FORZADO
 # ==========================================
 
+
+var impulsos_activos: Dictionary = {}
+
+
 func movimiento_forzado(
+	impulso,
 	direccion,
 	velocidad
 ):
+
+	var fuerza_impulso = direccion * velocidad
+
+	impulsos_activos[impulso] = fuerza_impulso
+
+	movimiento_forzado_activo = true
 
 	estado_actual.movimiento_forzado(
 		direccion,
 		velocidad
 	)
 
+	reproducir_animacion("salto")
 
-func detener_movimiento_forzado():
 
-	estado_actual.detener_movimiento_forzado()
+func detener_movimiento_forzado(
+	impulso
+):
+
+	if impulsos_activos.has(impulso):
+
+		impulsos_activos.erase(impulso)
+
+
+	actualizar_movimiento_forzado()
+
+
+func actualizar_movimiento_forzado():
+
+	var fuerza_total: Vector2 = Vector2.ZERO
+
+
+	for fuerza in impulsos_activos.values():
+
+		fuerza_total += fuerza
+
+
+	if fuerza_total == Vector2.ZERO:
+
+		movimiento_forzado_activo = false
+
+		estado_actual.detener_movimiento_forzado()
+
+		return
+
+
+	movimiento_forzado_activo = true
+
+	var direccion_total = fuerza_total.normalized()
+	var velocidad_total = fuerza_total.length()
+
+
+	estado_actual.movimiento_forzado(
+		direccion_total,
+		velocidad_total
+	)
+
+	reproducir_animacion("salto")

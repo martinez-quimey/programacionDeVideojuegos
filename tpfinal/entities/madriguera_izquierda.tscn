@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://jocxgcatpy43"]
+
+[ext_resource type="PackedScene" uid="uid://4s4o0gfrimwv" path="res://entities/abstract/madrigueraAbstract.tscn" id="1_auqda"]
+
+[node name="MadrigueraIzquierda" unique_id=1249858680 instance=ExtResource("1_auqda")]
+rotation = -1.5707964
+scale = Vector2(6, 6)
+
+[node name="impulsoParaSacar" parent="." index="3" unique_id=1482267724]
+visible = false
+
+[node name="Impulsos" parent="impulsoParaSacar" index="0" unique_id=2046197739]
+rotation = 1.5707964
+tile_map_data = PackedByteArray(0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 2, 0, 252, 255, 0, 0, 0, 0, 0, 0, 4, 0, 2, 0, 248, 255, 0, 0, 0, 0, 0, 0, 4, 0)
