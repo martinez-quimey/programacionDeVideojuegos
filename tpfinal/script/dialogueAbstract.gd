@@ -1,8 +1,9 @@
-#dialogue
+# dialogue
 class_name DialogueAbstract
 extends Node
 
 
+@export var esAutomatico: bool = false
 
 var lines: Array[DialogueLine] = []
 

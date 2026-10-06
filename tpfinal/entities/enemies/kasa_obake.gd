@@ -1,4 +1,3 @@
-
 extends "res://entities/abstract/abstract_enemy.gd"
 
 
@@ -25,13 +24,12 @@ func _ready() -> void:
 
 	super._ready()
 
+
 	animationPlay("abierto")
 
-	# Conectar las señales del área de detección.
 	detection_area.body_entered.connect(_on_detection_body_entered)
 	detection_area.body_exited.connect(_on_detection_body_exited)
 
-	# Área que determina el daño y destrucción por contacto.
 	$DamageArea.body_entered.connect(_on_damage_area_body_entered)
 
 
@@ -44,6 +42,7 @@ func _physics_process(delta):
 	var inicio = Time.get_ticks_msec()
 
 	if vida <= 0:
+
 		return
 
 
@@ -67,10 +66,6 @@ func _physics_process(delta):
 	# ==========================================
 	# CAER RECTO
 	# ==========================================
-	#
-	# No modificamos velocity.x.
-	# El paraguas cae verticalmente.
-	# ==========================================
 
 	move_and_slide()
 
@@ -86,15 +81,8 @@ func _physics_process(delta):
 
 	var duracion = Time.get_ticks_msec() - inicio
 
-	if duracion >= 50:
 
-		print(
-			"⚠️ PROCESS LENTO paraguas | ",
-			get_path(),
-			" | ",
-			duracion,
-			" ms"
-		)
+
 
 
 # ==========================================
@@ -103,9 +91,9 @@ func _physics_process(delta):
 
 func _on_detection_body_entered(body: Node2D) -> void:
 
+
 	if not body.is_in_group("jugador"):
 		return
-
 
 	jugador_debajo = body
 
@@ -116,7 +104,9 @@ func _on_detection_body_entered(body: Node2D) -> void:
 
 func _on_detection_body_exited(body: Node2D) -> void:
 
+	
 	if body == jugador_debajo:
+
 
 		jugador_debajo = null
 
@@ -128,29 +118,34 @@ func _on_detection_body_exited(body: Node2D) -> void:
 func _on_damage_area_body_entered(body: Node2D) -> void:
 
 	# ==========================================
+	# IGNORAR EL PROPIO PARAGUAS
+	# ==========================================
+
+	if body == self:
+
+		return
+
+
+
+
+	# ==========================================
 	# SI CHOCÓ CON EL JUGADOR
 	# ==========================================
 
 	if body.is_in_group("jugador"):
 
-		# ==========================================
-		# DAÑO
-		# ==========================================
-
+	
 		body.herir(1)
-
-
-		# ==========================================
-		# EMPUJE
-		# ==========================================
-
+	
 		aplicar_empuje_contacto(body)
 
 
+
 	# ==========================================
-	# EL PARAGUAS MUERE AL CHOCAR CON CUALQUIER CUERPO
+	# EL PARAGUAS MUERE AL CHOCAR CON CUALQUIER CUERPO EXTERNO
 	# ==========================================
 
+	
 	morir()
 
 

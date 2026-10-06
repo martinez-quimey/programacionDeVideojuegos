@@ -8,68 +8,61 @@ var current_line := 0
 
 var dialogue_box: DialogueBox
 
+var timer_automatico: Timer
+
+var current_dialogue_es_automatico := false
+
 
 func _ready() -> void:
 	# El DialogueManager debe seguir funcionando
 	# aunque el juego esté pausado.
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
+	timer_automatico = Timer.new()
+	timer_automatico.wait_time = 2.0
+	timer_automatico.one_shot = true
+	timer_automatico.timeout.connect(_on_timer_automatico_timeout)
+
+	add_child(timer_automatico)
+
 
 func _process(_delta: float) -> void:
-	
-	var inicio = Time.get_ticks_msec()
-	# Comprobar continuamente si el árbol sigue pausado
-	# mientras hay un diálogo activo.
-	if current_dialogue != null:
-		print("DIALOGO ACTIVO | Árbol pausado: ", get_tree().paused)
 
 	if Input.is_action_just_pressed("avanzarDialogo"):
 		if current_dialogue != null:
-			print("Se presionó avanzarDialogo")
-			print("ANTES DE next_line | Árbol pausado: ", get_tree().paused)
+
+			# Los diálogos automáticos no avanzan con el botón.
+			if current_dialogue.esAutomatico:
+				return
 
 			next_line()
 
-			print("DESPUÉS DE next_line | Árbol pausado: ", get_tree().paused)
-			var duracion = Time.get_ticks_msec() - inicio
-
-			if duracion >= 50:
-
-				print(
-					"⚠️ PROCESS LENTO dialogue manager| ",
-					get_path(),
-					" | ",
-					duracion,
-					" ms"
-				)
 
 func start_dialogue(dialogue: DialogueAbstract) -> void:
-	print("========== START DIALOGUE ==========")
 
 	if dialogue == null:
-		print("ERROR: dialogue es null")
 		return
 
 	dialogue_box = get_tree().get_first_node_in_group("dialogue_box")
 
 	if dialogue_box == null:
-		print("ERROR: no existe DialogueBox")
 		return
 
 	current_dialogue = dialogue
 	current_line = 0
 
-	print("ANTES DE PAUSAR: ", get_tree().paused)
+	current_dialogue_es_automatico = dialogue.esAutomatico
 
-	get_tree().paused = true
-
-	print("DESPUÉS DE PAUSAR: ", get_tree().paused)
-
-	Settings.sePuedePausar = false
+	# Solamente los diálogos manuales pausan el juego.
+	if not current_dialogue_es_automatico:
+		get_tree().paused = true
+		Settings.sePuedePausar = false
 
 	show_current_line()
 
-	print("FINAL DE start_dialogue: ", get_tree().paused)
+	# Los diálogos automáticos empiezan su temporizador.
+	if current_dialogue_es_automatico:
+		iniciar_timer_automatico()
 
 
 func show_current_line() -> void:
@@ -101,16 +94,36 @@ func next_line() -> void:
 
 	show_current_line()
 
+	# Si es automático, volvemos a esperar 2 segundos.
+	if current_dialogue.esAutomatico:
+		iniciar_timer_automatico()
+
+
+func iniciar_timer_automatico() -> void:
+	if timer_automatico == null:
+		return
+
+	timer_automatico.start()
+
+
+func _on_timer_automatico_timeout() -> void:
+	if current_dialogue == null:
+		return
+
+	if not current_dialogue.esAutomatico:
+		return
+
+	next_line()
+
 
 func end_dialogue() -> void:
-	print("========== END DIALOGUE ==========")
 
-	print("ANTES DE ocultar diálogo | Árbol pausado: ", get_tree().paused)
+	# Detener el temporizador por si estaba funcionando.
+	if timer_automatico != null:
+		timer_automatico.stop()
 
 	if dialogue_box != null:
 		dialogue_box.hide_dialogue()
-
-	print("DESPUÉS DE ocultar diálogo | Árbol pausado: ", get_tree().paused)
 
 	if current_dialogue != null:
 		current_dialogue.queue_free()
@@ -118,12 +131,9 @@ func end_dialogue() -> void:
 
 	current_line = 0
 
-	print("ANTES DE DESPAUSAR | Árbol pausado: ", get_tree().paused)
+	# Solamente los diálogos manuales habían pausado el juego.
+	if not current_dialogue_es_automatico:
+		get_tree().paused = false
+		Settings.sePuedePausar = true
 
-	get_tree().paused = false
-
-	print("DESPUÉS DE DESPAUSAR | Árbol pausado: ", get_tree().paused)
-
-	Settings.sePuedePausar = true
-
-	print("Diálogo terminado")
+	current_dialogue_es_automatico = false

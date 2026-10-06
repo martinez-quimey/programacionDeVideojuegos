@@ -387,20 +387,17 @@ func cambiar_a_automatico() -> void:
 # ==========================================
 # DIRECCIÓN
 # ==========================================
-
 func establecer_direccion(
 	nueva_direccion: float
 ) -> void:
 
 	if retroceso_activo:
-
-	
-
 		return
 
+	if esta_forzado:
+		return
 
 	direccion = nueva_direccion
-
 
 	if direccion != 0:
 
@@ -436,7 +433,6 @@ func detener_movimiento_forzado() -> void:
 	direccion_forzada = Vector2.ZERO
 
 	velocidad_forzada = 0.0
-
 
 # ==========================================
 # RETROCESO
@@ -1029,12 +1025,14 @@ func comprobar_tile_mortal() -> bool:
 # ==========================================
 # PROCESO FÍSICO
 # ==========================================
-
 func _physics_process(delta: float) -> void:
+
 	var inicio = Time.get_ticks_msec()
+
 	# ==========================================
 	# RETROCESO
 	# ==========================================
+
 	var ahora = Time.get_ticks_msec()
 
 	var tiempo_desde_ultimo = (
@@ -1092,10 +1090,66 @@ func _physics_process(delta: float) -> void:
 		player.move_and_slide()
 
 
+		# ==========================================
+		# COMPROBAR SI EL MOVIMIENTO FORZADO
+		# CHOCÓ CONTRA ALGO
+		# ==========================================
+
+		for i in range(player.get_slide_collision_count()):
+
+			var collision := (
+				player.get_slide_collision(i)
+			)
+
+			var collider := collision.get_collider()
+
+			if collider == null:
+				continue
+
+			var normal := collision.get_normal()
+
+
+			print("========================================")
+			print("MOVIMIENTO FORZADO: COLISIÓN")
+			print("OBJETO = ", collider.name)
+			print("RUTA = ", collider.get_path())
+			print("NORMAL = ", normal)
+			print("DIRECCIÓN FORZADA = ", direccion_forzada)
+			print("VELOCIDAD FORZADA = ", velocidad_forzada)
+			print("========================================")
+
+
+			# ==========================================
+			# SI EL OBJETO ESTÁ FRENANDO EL MOVIMIENTO
+			# ==========================================
+
+			if direccion_forzada.dot(-normal) > 0.5:
+
+				print(
+					"MOVIMIENTO FORZADO: EL OBJETO ESTÁ FRENANDO AL PLAYER"
+				)
+
+				player.velocity = Vector2.ZERO
+
+				esta_forzado = false
+				direccion_forzada = Vector2.ZERO
+				velocidad_forzada = 0.0
+
+				return
+
+
+		# ==========================================
+		# MUERTE AL TOCAR TILE MORTAL
+		# ==========================================
+
 		if comprobar_tile_mortal():
 
 			return
 
+
+		# ==========================================
+		# NO EJECUTAR EL MOVIMIENTO NORMAL
+		# ==========================================
 
 		return
 
@@ -1118,7 +1172,6 @@ func _physics_process(delta: float) -> void:
 	if tiempo_invulnerabilidad_turbo > 0.0:
 
 		tiempo_invulnerabilidad_turbo -= delta
-
 
 		if tiempo_invulnerabilidad_turbo < 0.0:
 
@@ -1153,7 +1206,7 @@ func _physics_process(delta: float) -> void:
 	# ==========================================
 
 	if not player.is_on_floor():
-		
+
 		if agarrado_pared:
 
 			player.velocity.y = min(
@@ -1170,6 +1223,7 @@ func _physics_process(delta: float) -> void:
 			else:
 
 				player.velocity.y += GRAVITY * delta
+
 
 	# ==========================================
 	# MOVIMIENTO FÍSICO
@@ -1238,7 +1292,6 @@ func _physics_process(delta: float) -> void:
 			duracion,
 			" ms"
 		)
-
 # ==========================================
 # SALTO
 # ==========================================
@@ -1250,7 +1303,8 @@ func saltar() -> void:
 
 		return
 
-
+	if esta_forzado:
+		return
 	if tornado_activo:
 
 		return
@@ -1316,6 +1370,8 @@ func saltar() -> void:
 
 func salto_fuego() -> void:
 
+	if esta_forzado:
+		return
 	if retroceso_activo:
 
 		
@@ -1367,7 +1423,8 @@ func salto_fuego() -> void:
 # ==========================================
 
 func activar_turbo() -> void:
-
+	if esta_forzado:
+		return
 	if retroceso_activo:
 
 		print(

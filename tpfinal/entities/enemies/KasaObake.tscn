@@ -35,7 +35,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_go41v"]
-size = Vector2(88, 443)
+size = Vector2(104, 405)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vowfh"]
 size = Vector2(110, 83)
@@ -56,7 +56,7 @@ sprite_frames = SubResource("SpriteFrames_4jn62")
 animation = &"abierto"
 
 [node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
-position = Vector2(6, 182.5)
+position = Vector2(0, 201.5)
 shape = SubResource("RectangleShape2D_go41v")
 
 [node name="DamageArea" type="Area2D" parent="." index="3" unique_id=189345904]

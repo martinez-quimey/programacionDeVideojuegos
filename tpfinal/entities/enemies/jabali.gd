@@ -51,13 +51,6 @@ func _ready():
 	actualizar_direccion_sprite()
 	
 
-	print(
-		"READY jabali: ",
-		name,
-		" | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
 
 
 func _physics_process(delta: float) -> void:
@@ -530,7 +523,7 @@ func perseguir_jugador():
 
 	if not hay_suelo_delante():
 
-		print("PERSIGUIENDO: hay_suelo_delante() = FALSE")
+
 
 		# Llegó al borde mientras perseguía al jugador.
 		#

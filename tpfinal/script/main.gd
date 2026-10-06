@@ -625,9 +625,7 @@ func reiniciar_player() -> void:
 		_on_player_died
 	):
 
-		estado_manual.died.connect(
-			_on_player_died
-		)
+		estado_manual.died.connect(_on_player_died)
 
 	nuevo_player.restablecer_visual_suelo()
 
@@ -650,6 +648,7 @@ func reiniciar_player() -> void:
 # =========================================================
 # COLOCAR PLAYER EN CHECKPOINT
 # =========================================================
+
 func colocar_player_en_checkpoint() -> void:
 
 	var tiempo_inicio = Time.get_ticks_msec()
@@ -715,14 +714,14 @@ func colocar_player_en_checkpoint() -> void:
 	)
 
 	print(
-		"CHECKPOINT: posición actual Player = ",
+		"CHECKPOINT: posición actual Player LOCAL = ",
 		player.position
 	)
 
-	# =====================================================
-	# PRUEBA:
-	# MOVER AL PLAYER ANTES DEL PRIMER FRAME
-	# =====================================================
+	print(
+		"CHECKPOINT: posición actual Player GLOBAL = ",
+		player.global_position
+	)
 
 	print(
 		"CHECKPOINT: ANTES DE CAMBIAR POSICIÓN | ",
@@ -730,7 +729,13 @@ func colocar_player_en_checkpoint() -> void:
 		" ms"
 	)
 
-	player.position = posicion_checkpoint
+	# =====================================================
+	# CAMBIO IMPORTANTE:
+	# La posición obtenida del checkpoint se interpreta
+	# como posición GLOBAL.
+	# =====================================================
+
+	player.global_position = posicion_checkpoint
 
 	print(
 		"CHECKPOINT: DESPUÉS DE CAMBIAR POSICIÓN | ",
@@ -739,13 +744,14 @@ func colocar_player_en_checkpoint() -> void:
 	)
 
 	print(
-		"PLAYER: teletransportado al checkpoint = ",
-		player.position
+		"PLAYER: teletransportado al checkpoint GLOBAL = ",
+		player.global_position
 	)
 
-	# =====================================================
-	# AHORA SÍ DEJAMOS PASAR EL FRAME
-	# =====================================================
+	print(
+		"PLAYER: posición LOCAL después del teletransporte = ",
+		player.position
+	)
 
 	print(
 		"CHECKPOINT: ANTES DE await process_frame | ",
@@ -769,6 +775,16 @@ func colocar_player_en_checkpoint() -> void:
 		"CHECKPOINT: SOLO await process_frame = ",
 		despues_frame - antes_frame,
 		" ms"
+	)
+
+	print(
+		"CHECKPOINT: posición Player GLOBAL después de process_frame = ",
+		player.global_position
+	)
+
+	print(
+		"CHECKPOINT: posición Player LOCAL después de process_frame = ",
+		player.position
 	)
 
 	print(
@@ -877,6 +893,17 @@ func retry_game() -> void:
 	game.queue_free()
 	game = null
 
+	# =====================================================
+	# RESTAURAR CHECKPOINT ANTES DE CREAR EL NIVEL NUEVO
+	# =====================================================
+
+	Settings.checkpoint = checkpoint_guardado
+
+	print(
+		"RETRY: checkpoint restaurado antes de crear nivel = ",
+		Settings.checkpoint
+	)
+
 	print(
 		"RETRY: antes de await process_frame después de queue_free | ",
 		Time.get_ticks_msec() - tiempo_inicio,
@@ -966,8 +993,6 @@ func retry_game() -> void:
 
 	Settings.sePuedePausar = true
 
-	Settings.checkpoint = checkpoint_guardado
-
 	print(
 		"RETRY: antes de colocar_player_en_checkpoint() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
@@ -998,8 +1023,13 @@ func retry_game() -> void:
 	)
 
 	print(
-		"POSICIÓN FINAL PLAYER: ",
+		"POSICIÓN FINAL PLAYER LOCAL: ",
 		game.get_node("Player").position
+	)
+
+	print(
+		"POSICIÓN FINAL PLAYER GLOBAL: ",
+		game.get_node("Player").global_position
 	)
 
 	print(

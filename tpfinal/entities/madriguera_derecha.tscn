@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://4s4o0gfrimwv" path="res://entities/abstract/madrigueraAbstract.tscn" id="1_2db4p"]
 
 [node name="MadrigueraDerecha" unique_id=1249858680 instance=ExtResource("1_2db4p")]
+position = Vector2(24, 0)
 rotation = 1.5707964
 scale = Vector2(6, 6)
 
@@ -11,5 +12,4 @@ visible = false
 rotation = -1.5707964
 
 [node name="Impulsos" parent="impulsoParaSacar" index="0" unique_id=2046197739]
-visible = false
 tile_map_data = PackedByteArray(0, 0, 253, 255, 6, 0, 0, 0, 0, 0, 0, 0, 3, 0, 253, 255, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0)

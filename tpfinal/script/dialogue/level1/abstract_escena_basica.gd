@@ -1,6 +1,9 @@
 extends Area2D
 
+
 @export var dialogue_script: Script
+@export var esAutomatico: bool = false
+
 
 func _on_body_entered(body):
 
@@ -8,16 +11,20 @@ func _on_body_entered(body):
 
 		print("entro al body entered")
 
-		body.estado_actual.cambiar_a_automatico()
+		if not esAutomatico:
+			body.estado_actual.cambiar_a_automatico()
 
-		await get_tree().create_timer(0.2).timeout
+			await get_tree().create_timer(0.2).timeout
 
-		body.estado_actual.cambiar_a_manual()
+			body.estado_actual.cambiar_a_manual()
+
 
 		var dialogue: DialogueAbstract = dialogue_script.new()
 
 		if dialogue == null:
 			return
+
+		dialogue.esAutomatico = esAutomatico
 
 		dialogue.create_dialogue()
 

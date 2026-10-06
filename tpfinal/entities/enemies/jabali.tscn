@@ -221,12 +221,13 @@ size = Vector2(13.161459, 21.11111)
 size = Vector2(61.222225, 22.5)
 
 [node name="Jabali" unique_id=2131858162 instance=ExtResource("1_kwkry")]
-scale = Vector2(9, 9)
+scale = Vector2(8.5, 8.5)
 script = ExtResource("2_kwkry")
 SPEEDCAMINANDO = 200.0
 SPEEDCORRIENDO = 400.0
 CAMINATA = 400.0
 DISTANCIA_BORDE = 20.0
+DISTANCIA_PIES = 100.0
 PESO = 0.1
 vida = 5
 

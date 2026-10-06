@@ -1,104 +1,132 @@
 extends Node2D
 
-
 signal player_died
 signal game_paused
 
-
-# ==========================================
-# CONFIGURACIÓN DEL NIVEL
-# ==========================================
-
 @export var nombre_nivel: String = ""
-
-
-# ==========================================
-# NODOS
-# ==========================================
 
 @onready var player = $Player
 @onready var estado_manual: EstadoPlayer = $Player/estadoManual
 @onready var estado_automatico: EstadoPlayer = $Player/estadoAutomatico
-
 @onready var projectile_container = $Projectiles
 @onready var start_position = $StartPosition
-
-
-# ==========================================
-# POSICIÓN SEGURA INICIAL
-# ==========================================
 
 const POSICION_SEGURA_PLAYER := Vector2(0.0, 0.0)
 
 
-# ==========================================
-# INICIO
-# ==========================================
-
 func _ready() -> void:
-
-	for hijo in get_children():
-		if hijo is Node2D:
-			hijo.set_process(false)
-			hijo.set_physics_process(false)
-
 
 	var tiempo_inicio = Time.get_ticks_msec()
 
 	print("")
-	print("========================================")
-	print("LEVEL: empieza _ready")
-	print("========================================")
+	print("##################################################")
+	print("######## ABSTRACT LEVEL: INICIO _READY ###########")
+	print("##################################################")
 
+	print(
+		"LEVEL: nombre_nivel = [",
+		nombre_nivel,
+		"]"
+	)
 
-	# ==========================================
-	# CONECTAR SEÑALES
-	# ==========================================
+	print(
+		"LEVEL: Settings.checkpoint AL ENTRAR A _READY = ",
+		Settings.checkpoint
+	)
+
+	print(
+		"LEVEL: Player.position AL ENTRAR A _READY = ",
+		player.position
+	)
+
+	print(
+		"LEVEL: StartPosition.position = ",
+		start_position.position
+	)
+
+	print(
+		"LEVEL: POSICION_SEGURA_PLAYER = ",
+		POSICION_SEGURA_PLAYER
+	)
+
+	print(
+		"LEVEL: Settings.checkpoints_por_nivel ANTES DE _READY = ",
+		Settings.checkpoints_por_nivel
+	)
+
+	# =====================================================
+	# DESACTIVAR PROCESS DE HIJOS
+	# =====================================================
+
+	print("")
+	print("LEVEL: desactivando process de hijos")
+
+	for hijo in get_children():
+
+		if hijo is Node2D:
+
+			print(
+				"LEVEL: desactivando hijo = ",
+				hijo.name
+			)
+
+			hijo.set_process(false)
+			hijo.set_physics_process(false)
+
+	# =====================================================
+	# SEÑALES
+	# =====================================================
 
 	var tiempo_bloque = Time.get_ticks_msec()
 
+	print("")
 	print("LEVEL: antes de conectar señales")
 
 	estado_manual.died.connect(_on_player_died)
 	estado_automatico.died.connect(_on_player_died)
 
 	print(
-		"LEVEL: señales conectadas | bloque = ",
+		"LEVEL: señales conectadas | ",
 		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
-
-	# ==========================================
-	# ASEGURAR CHECKPOINT
-	# ==========================================
+	# =====================================================
+	# CHECKPOINT
+	# =====================================================
 
 	tiempo_bloque = Time.get_ticks_msec()
 
+	print("")
 	print("LEVEL: antes de comprobar checkpoint")
 
 	if not "checkpoint" in Settings:
+		print(
+			"LEVEL: Settings NO tenía checkpoint"
+		)
+
 		Settings.checkpoint = 0
 
 	print(
-		"LEVEL: checkpoint = ",
+		"LEVEL: checkpoint ACTUAL = ",
+		Settings.checkpoint
+	)
+
+	print(
+		"LEVEL: checkpoint después de comprobación = ",
 		Settings.checkpoint,
 		" | bloque = ",
 		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
-
-	# ==========================================
-	# COMPROBAR CACHÉ
-	# ==========================================
+	# =====================================================
+	# CACHÉ
+	# =====================================================
 
 	tiempo_bloque = Time.get_ticks_msec()
 
+	print("")
 	print("LEVEL: antes de comprobar caché")
 
 	var tiene_cache = Settings.checkpoints_por_nivel.has(
@@ -107,29 +135,49 @@ func _ready() -> void:
 
 	print(
 		"LEVEL: tiene_cache = ",
-		tiene_cache,
-		" | nombre_nivel = [",
+		tiene_cache
+	)
+
+	print(
+		"LEVEL: nombre_nivel = [",
 		nombre_nivel,
-		"] | claves actuales = ",
-		Settings.checkpoints_por_nivel.keys(),
-		" | bloque = ",
+		"]"
+	)
+
+	print(
+		"LEVEL: claves actuales de checkpoints_por_nivel = ",
+		Settings.checkpoints_por_nivel.keys()
+	)
+
+	if tiene_cache:
+
+		print(
+			"LEVEL: CONTENIDO DE LA CACHÉ PARA ESTE NIVEL = ",
+			Settings.checkpoints_por_nivel[nombre_nivel]
+		)
+
+	print(
+		"LEVEL: comprobación caché terminada | ",
 		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
+	# =====================================================
+	# INICIAR ESTADO MANUAL
+	# =====================================================
 
-	# ==========================================
-	# INICIALIZAR PLAYER
-	# ==========================================
-
-	tiempo_bloque = Time.get_ticks_msec()
+	print("")
+	print(
+		"LEVEL: Player.position ANTES DE estado_manual.start() = ",
+		player.position
+	)
 
 	print(
-		"LEVEL: posición inicial segura = ",
+		"LEVEL: posición que se enviará a estado_manual.start() = ",
 		POSICION_SEGURA_PLAYER
 	)
+
+	tiempo_bloque = Time.get_ticks_msec()
 
 	print(
 		"LEVEL: antes de estado_manual.start()"
@@ -141,61 +189,68 @@ func _ready() -> void:
 	)
 
 	print(
-		"LEVEL: después de estado_manual.start()",
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
+		"LEVEL: después de estado_manual.start()"
 	)
 
 	print(
-		"LEVEL: posición inicial del Player = ",
+		"LEVEL: Player.position DESPUÉS de estado_manual.start() = ",
 		player.position
 	)
 
+	print(
+		"LEVEL: estado_manual.activo = ",
+		estado_manual.activo
+	)
 
-	# ==========================================
-	# CREAR CACHÉ SI NO EXISTE
-	# ==========================================
+	print(
+		"LEVEL: bloque start() = ",
+		Time.get_ticks_msec() - tiempo_bloque,
+		" ms"
+	)
+
+	# =====================================================
+	# CREAR CACHÉ
+	# =====================================================
 
 	tiempo_bloque = Time.get_ticks_msec()
 
 	if not tiene_cache:
 
+		print("")
+		print(
+			"LEVEL: NO HAY CACHÉ"
+		)
+
 		print(
 			"LEVEL: antes de call_deferred(crear_cache_checkpoints)"
 		)
 
-		call_deferred("crear_cache_checkpoints")
+		call_deferred(
+			"crear_cache_checkpoints"
+		)
 
 		print(
-			"LEVEL: call_deferred realizado",
-			" | bloque = ",
-			Time.get_ticks_msec() - tiempo_bloque,
-			" ms | total = ",
-			Time.get_ticks_msec() - tiempo_inicio,
-			" ms"
+			"LEVEL: call_deferred realizado"
 		)
 
 	else:
 
+		print("")
 		print(
-			"LEVEL: la caché ya existe",
-			" | bloque = ",
-			Time.get_ticks_msec() - tiempo_bloque,
-			" ms | total = ",
-			Time.get_ticks_msec() - tiempo_inicio,
-			" ms"
+			"LEVEL: LA CACHÉ YA EXISTE"
 		)
 
+	print(
+		"LEVEL: bloque caché = ",
+		Time.get_ticks_msec() - tiempo_bloque,
+		" ms"
+	)
 
-	# ==========================================
+	# =====================================================
 	# PAUSA
-	# ==========================================
+	# =====================================================
 
-	tiempo_bloque = Time.get_ticks_msec()
-
+	print("")
 	print(
 		"LEVEL: antes de Settings.sePuedePausar"
 	)
@@ -203,83 +258,94 @@ func _ready() -> void:
 	Settings.sePuedePausar = true
 
 	print(
-		"LEVEL: _ready TERMINADO",
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | TOTAL _READY = ",
+		"LEVEL: Settings.sePuedePausar = ",
+		Settings.sePuedePausar
+	)
+
+	print("")
+	print(
+		"LEVEL: _READY TERMINADO"
+	)
+
+	print(
+		"LEVEL: Player.position AL TERMINAR _READY = ",
+		player.position
+	)
+
+	print(
+		"LEVEL: Settings.checkpoint AL TERMINAR _READY = ",
+		Settings.checkpoint
+	)
+
+	print(
+		"LEVEL: TOTAL _READY = ",
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
-	print("========================================")
-	print("LEVEL: fin _ready")
-	print("========================================")
+	print("##################################################")
+	print("######## ABSTRACT LEVEL: FIN _READY ##############")
+	print("##################################################")
+	print("")
 
-
-# ==========================================
-# CREAR CACHÉ DE CHECKPOINTS
-# ==========================================
 
 func crear_cache_checkpoints() -> void:
 
 	var tiempo_inicio = Time.get_ticks_msec()
 
 	print("")
-	print("========================================")
-	print("CACHE: empieza crear_cache_checkpoints")
-	print("========================================")
-
-
-	var tiempo_bloque = Time.get_ticks_msec()
+	print("##################################################")
+	print("######## CACHE: INICIO CREAR CACHE ################")
+	print("##################################################")
 
 	var posiciones: Dictionary = {}
 
 	print(
-		"CACHE: Dictionary creado | ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms"
+		"CACHE: Settings.checkpoint al empezar = ",
+		Settings.checkpoint
 	)
 
-
-	# ==========================================
-	# OBTENER CHECKPOINTS
-	# ==========================================
-
-	tiempo_bloque = Time.get_ticks_msec()
+	print(
+		"CACHE: nombre_nivel = [",
+		nombre_nivel,
+		"]"
+	)
 
 	print(
-		"CACHE: antes de get_children()"
+		"CACHE: antes de obtener checkpoints"
 	)
 
 	var checkpoints = $checkpoints.get_children()
 
 	print(
-		"CACHE: get_children terminado",
-		" | cantidad = ",
-		checkpoints.size(),
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
+		"CACHE: cantidad de checkpoints = ",
+		checkpoints.size()
 	)
 
-
-	# ==========================================
+	# =====================================================
 	# RECORRER CHECKPOINTS
-	# ==========================================
-
-	tiempo_bloque = Time.get_ticks_msec()
-
-	print(
-		"CACHE: empieza recorrer checkpoints"
-	)
+	# =====================================================
 
 	for checkpoint in checkpoints:
 
+		print("")
 		print(
-			"CACHE: guardando checkpoint ",
+			"CACHE: ----------------------------------------"
+		)
+
+		print(
+			"CACHE: checkpoint encontrado = ",
+			checkpoint.name
+		)
+
+		print(
+			"CACHE: numero_checkpoint = ",
 			checkpoint.numero_checkpoint
+		)
+
+		print(
+			"CACHE: posición del checkpoint = ",
+			checkpoint.position
 		)
 
 		var marker = checkpoint.get_node_or_null(
@@ -288,38 +354,51 @@ func crear_cache_checkpoints() -> void:
 
 		if marker != null:
 
+			print(
+				"CACHE: Marker2D encontrado"
+			)
+
+			print(
+				"CACHE: Marker2D.position = ",
+				marker.position
+			)
+
+			print(
+				"CACHE: GUARDANDO posición para checkpoint ",
+				checkpoint.numero_checkpoint,
+				" = ",
+				marker.position
+			)
+
 			posiciones[
 				checkpoint.numero_checkpoint
-			] = marker.position
+			] = marker.global_position
 
 		else:
 
 			print(
-				"ERROR: el checkpoint ",
+				"CACHE: ERROR: checkpoint ",
 				checkpoint.numero_checkpoint,
-				" no tiene Marker2D"
+				" NO tiene Marker2D"
 			)
 
+	# =====================================================
+	# MOSTRAR RESULTADO
+	# =====================================================
+
+	print("")
 	print(
-		"CACHE: terminó recorrer checkpoints",
-		" | cantidad = ",
-		checkpoints.size(),
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
+		"CACHE: ========================================="
 	)
 
-
-	# ==========================================
-	# GUARDAR CACHÉ
-	# ==========================================
-
-	tiempo_bloque = Time.get_ticks_msec()
+	print(
+		"CACHE: DICCIONARIO FINAL DE POSICIONES = ",
+		posiciones
+	)
 
 	print(
-		"CACHE: antes de guardar en Settings"
+		"CACHE: cantidad de posiciones guardadas = ",
+		posiciones.size()
 	)
 
 	Settings.checkpoints_por_nivel[
@@ -327,78 +406,94 @@ func crear_cache_checkpoints() -> void:
 	] = posiciones
 
 	print(
-		"CACHE: caché guardada",
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms | total = ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
+		"CACHE: caché guardada en Settings"
 	)
-
-
-	# ==========================================
-	# FIN
-	# ==========================================
 
 	print(
-		"CACHE: FIN",
-		" | TOTAL = ",
+		"CACHE: Settings.checkpoints_por_nivel = ",
+		Settings.checkpoints_por_nivel
+	)
+
+	print(
+		"CACHE: TOTAL = ",
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
-	print("========================================")
-	print("CACHE: fin crear_cache_checkpoints")
-	print("========================================")
+	print("##################################################")
+	print("######## CACHE: FIN CREAR CACHE ##################")
+	print("##################################################")
+	print("")
 
-
-# ==========================================
-# OBTENER POSICIÓN DEL CHECKPOINT
-# ==========================================
 
 func posicionDeCheckpoint(numero: int) -> Vector2:
 
 	var tiempo_inicio = Time.get_ticks_msec()
 
+	print("")
+	print("##################################################")
+	print("###### CHECKPOINT: INICIO BUSQUEDA ################")
+	print("##################################################")
+
 	print(
-		"CHECKPOINT: buscando posición de checkpoint ",
+		"CHECKPOINT: número solicitado = ",
 		numero
 	)
 
+	print(
+		"CHECKPOINT: Settings.checkpoint actual = ",
+		Settings.checkpoint
+	)
 
-	# ==========================================
+	print(
+		"CHECKPOINT: nombre_nivel = [",
+		nombre_nivel,
+		"]"
+	)
+
+	print(
+		"CHECKPOINT: claves disponibles = ",
+		Settings.checkpoints_por_nivel.keys()
+	)
+
+	# =====================================================
 	# COMPROBAR CACHÉ
-	# ==========================================
-
-	var tiempo_bloque = Time.get_ticks_msec()
+	# =====================================================
 
 	if not Settings.checkpoints_por_nivel.has(
 		nombre_nivel
 	):
 
+		print("")
 		print(
-			"CHECKPOINT: no existe caché",
-			" | bloque = ",
-			Time.get_ticks_msec() - tiempo_bloque,
+			"CHECKPOINT: !!! NO EXISTE CACHÉ PARA ESTE NIVEL !!!"
+		)
+
+		print(
+			"CHECKPOINT: se devolverá StartPosition"
+		)
+
+		print(
+			"CHECKPOINT: StartPosition.position = ",
+			start_position.position
+		)
+
+		print(
+			"CHECKPOINT: TOTAL = ",
+			Time.get_ticks_msec() - tiempo_inicio,
 			" ms"
 		)
 
+		print("##################################################")
+		print("###### CHECKPOINT: FIN BUSQUEDA ##################")
+		print("##################################################")
+		print("")
+
 		return start_position.position
 
-
-	print(
-		"CHECKPOINT: caché encontrada",
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms"
-	)
-
-
-	# ==========================================
-	# OBTENER POSICIONES
-	# ==========================================
-
-	tiempo_bloque = Time.get_ticks_msec()
+	# =====================================================
+	# OBTENER CACHÉ
+	# =====================================================
 
 	var checkpoints = (
 		Settings.checkpoints_por_nivel[
@@ -406,66 +501,140 @@ func posicionDeCheckpoint(numero: int) -> Vector2:
 		]
 	)
 
+	print("")
 	print(
-		"CHECKPOINT: posiciones obtenidas",
-		" | bloque = ",
-		Time.get_ticks_msec() - tiempo_bloque,
-		" ms"
+		"CHECKPOINT: caché encontrada"
 	)
 
+	print(
+		"CHECKPOINT: contenido completo = ",
+		checkpoints
+	)
 
-	# ==========================================
-	# BUSCAR CHECKPOINT
-	# ==========================================
+	print(
+		"CHECKPOINT: cantidad de entradas = ",
+		checkpoints.size()
+	)
 
-	tiempo_bloque = Time.get_ticks_msec()
+	print(
+		"CHECKPOINT: ¿existe número ",
+		numero,
+		"? ",
+		checkpoints.has(numero)
+	)
+
+	# =====================================================
+	# CHECKPOINT ENCONTRADO
+	# =====================================================
 
 	if checkpoints.has(numero):
 
+		var posicion = checkpoints[numero]
+
+		print("")
 		print(
-			"CHECKPOINT: posición encontrada = ",
-			checkpoints[numero],
-			" | bloque = ",
-			Time.get_ticks_msec() - tiempo_bloque,
-			" ms | TOTAL = ",
+			"CHECKPOINT: !!! POSICIÓN ENCONTRADA !!!"
+		)
+
+		print(
+			"CHECKPOINT: número = ",
+			numero
+		)
+
+		print(
+			"CHECKPOINT: posición almacenada = ",
+			posicion
+		)
+
+		print(
+			"CHECKPOINT: tipo de posición = ",
+			typeof(posicion)
+		)
+
+		print(
+			"CHECKPOINT: Player.position ANTES DE DEVOLVER = ",
+			player.position
+		)
+
+		print(
+			"CHECKPOINT: DEVOLVIENDO = ",
+			posicion
+		)
+
+		print(
+			"CHECKPOINT: TOTAL = ",
 			Time.get_ticks_msec() - tiempo_inicio,
 			" ms"
 		)
 
-		return checkpoints[numero]
+		print("##################################################")
+		print("###### CHECKPOINT: FIN BUSQUEDA ##################")
+		print("##################################################")
+		print("")
 
+		return posicion
 
-	# ==========================================
-	# FALLBACK
-	# ==========================================
+	# =====================================================
+	# CHECKPOINT NO ENCONTRADO
+	# =====================================================
+
+	print("")
+	print(
+		"CHECKPOINT: !!! NÚMERO NO ENCONTRADO !!!"
+	)
 
 	print(
-		"CHECKPOINT: número no encontrado",
-		" | TOTAL = ",
+		"CHECKPOINT: número buscado = ",
+		numero
+	)
+
+	print(
+		"CHECKPOINT: números existentes = ",
+		checkpoints.keys()
+	)
+
+	print(
+		"CHECKPOINT: se devolverá StartPosition"
+	)
+
+	print(
+		"CHECKPOINT: StartPosition.position = ",
+		start_position.position
+	)
+
+	print(
+		"CHECKPOINT: TOTAL = ",
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
+	print("##################################################")
+	print("###### CHECKPOINT: FIN BUSQUEDA ##################")
+	print("##################################################")
+	print("")
+
 	return start_position.position
 
 
-# ==========================================
-# MUERTE
-# ==========================================
-
 func _on_player_died() -> void:
 
+	print("")
+	print("############################################")
+	print("LEVEL: PLAYER DIED")
+	print("############################################")
+
 	print(
-		"LEVEL: player_died"
+		"LEVEL: Settings.checkpoint cuando murió = ",
+		Settings.checkpoint
+	)
+
+	print(
+		"LEVEL: Player.position cuando murió = ",
+		player.position
 	)
 
 	player_died.emit()
 
 
-# ==========================================
-# PAUSA
-# ==========================================
-
 func _on_game_paused() -> void:
-
 	pass

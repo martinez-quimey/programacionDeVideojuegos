@@ -278,9 +278,3 @@ func crear_objeto() -> void:
 	# =====================================================
 
 	cantidad_creada += 1
-
-
-	print(
-		"Spawner creó objeto. Total: ",
-		cantidad_creada
-	)

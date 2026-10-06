@@ -22,6 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://bnms1gr1kji80" path="res://entities/madriguera_arriba.tscn" id="19_0gjq2"]
 [ext_resource type="PackedScene" uid="uid://6qlppk75b2ee" path="res://entities/madriguera_derecha.tscn" id="20_5cf6w"]
 [ext_resource type="PackedScene" uid="uid://jocxgcatpy43" path="res://entities/madriguera_izquierda.tscn" id="21_87rbd"]
+[ext_resource type="PackedScene" uid="uid://cv78gsq2jrhn5" path="res://entities/escenario/Roca.tscn" id="23_0gjq2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x8ioc"]
 texture = ExtResource("2_x8ioc")
@@ -4732,6 +4733,14 @@ sources/2 = SubResource("TileSetScenesCollectionSource_7ehab")
 sources/0 = SubResource("TileSetScenesCollectionSource_t3kn7")
 sources/3 = SubResource("TileSetScenesCollectionSource_5obeg")
 
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_5cf6w"]
+resource_name = "roca"
+scenes/1/scene = ExtResource("23_0gjq2")
+
+[sub_resource type="TileSet" id="TileSet_h4vih"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetScenesCollectionSource_5cf6w")
+
 [node name="LevelAbstract" type="Node2D" unique_id=131755353]
 script = ExtResource("1_l8taw")
 
@@ -4875,5 +4884,8 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_x8ioc")
 tile_set = SubResource("TileSet_7rm4o")
 
 [node name="Player" parent="." unique_id=1818771140 instance=ExtResource("2_wn5rq")]
+
+[node name="Rocas" type="TileMapLayer" parent="." unique_id=828749125]
+tile_set = SubResource("TileSet_h4vih")
 
 [connection signal="game_paused" from="." to="." method="_on_game_paused"]

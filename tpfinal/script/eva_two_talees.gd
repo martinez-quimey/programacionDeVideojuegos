@@ -1,4 +1,3 @@
-
 # Player.gd
 extends CharacterBody2D
 
@@ -44,6 +43,8 @@ var mirando_izquierda: bool = false
 var ultima_animacion: String = "quieta"
 
 var movimiento_forzado_activo: bool = false
+
+var tiempo_print_movimiento_forzado: float = 0.0
 
 
 # ==========================================
@@ -720,6 +721,7 @@ func salir_madriguera():
 
 	estado_actual.salir_madriguera()
 
+
 # ==========================================
 # MOVIMIENTO FORZADO
 # ==========================================
@@ -774,6 +776,8 @@ func actualizar_movimiento_forzado():
 
 		movimiento_forzado_activo = false
 
+		tiempo_print_movimiento_forzado = 0.0
+
 		estado_actual.detener_movimiento_forzado()
 
 		return
@@ -791,3 +795,65 @@ func actualizar_movimiento_forzado():
 	)
 
 	reproducir_animacion("salto")
+
+
+# ==========================================
+# DEBUG MOVIMIENTO FORZADO
+# ==========================================
+
+func _physics_process(delta):
+
+	if not movimiento_forzado_activo:
+
+		tiempo_print_movimiento_forzado = 0.0
+
+		return
+
+
+	tiempo_print_movimiento_forzado += delta
+
+
+	# ==========================================
+	# IMPRIMIR DIRECCIÓN CADA 2 SEGUNDOS
+	# ==========================================
+
+	if tiempo_print_movimiento_forzado >= 2.0:
+
+		tiempo_print_movimiento_forzado = 0.0
+
+		print("========================================")
+		print("MOVIMIENTO FORZADO: DEBUG")
+		print("DIRECCIÓN VELOCIDAD = ", velocity)
+		print("DIRECCIÓN NORMALIZADA = ", velocity.normalized())
+		print("VELOCIDAD = ", velocity.length())
+		print("POSICIÓN = ", global_position)
+		print("========================================")
+
+
+	# ==========================================
+	# DETECTAR OBJETOS QUE FRENAN AL PLAYER
+	# ==========================================
+
+	var cantidad_colisiones = get_slide_collision_count()
+
+	if cantidad_colisiones > 0:
+
+		for i in cantidad_colisiones:
+
+			var colision = get_slide_collision(i)
+
+			var objeto = colision.get_collider()
+
+			if objeto == null:
+
+				continue
+
+
+			print("========================================")
+			print("⚠️ MOVIMIENTO FORZADO: COLISIÓN")
+			print("OBJETO QUE FRENA AL PLAYER = ", objeto.name)
+			print("RUTA DEL OBJETO = ", objeto.get_path())
+			print("TIPO = ", objeto.get_class())
+			print("NORMAL DE COLISIÓN = ", colision.get_normal())
+			print("POSICIÓN PLAYER = ", global_position)
+			print("========================================")

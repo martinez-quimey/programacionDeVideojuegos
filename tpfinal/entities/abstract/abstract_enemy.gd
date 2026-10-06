@@ -123,22 +123,9 @@ func frenarCaminatas():
 # ==========================================
 func _on_body_entered(body):
 
-	print(
-		"ABSTRACT ENEMY: BODY ENTERED | ",
-		name,
-		" | cuerpo = ",
-		body.name,
-		" | jugador = ",
-		body.is_in_group("jugador")
-	)
-
 	if body.is_in_group("jugador"):
 
 		player_in_range = true
-
-		print(
-			"ABSTRACT ENEMY: llamando actuarContraPlayer()"
-		)
 
 		actuarContraPlayer()
 

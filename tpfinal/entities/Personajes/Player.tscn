@@ -210,7 +210,7 @@ position = Vector2(41.125, -32.75)
 shape = SubResource("RectangleShape2D_2fb44")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]
-zoom = Vector2(0.9, 0.9)
+zoom = Vector2(0.8, 0.8)
 
 [connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
 [connection signal="died" from="estadoManual" to="." method="_on_estado_manual_died"]
