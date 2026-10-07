@@ -77,21 +77,31 @@ func _ready() -> void:
 # =========================================================
 
 func _process(delta: float) -> void:
+
 	var inicio = Time.get_ticks_msec()
+
+
 	if escena_a_crear == null:
+
 		return
 
 
 	# Si no es infinito y ya alcanzó el límite,
 	# dejamos de crear.
 	if not infinito and cantidad_creada >= cantidad_maxima:
+
 		return
 
+
+	# =====================================================
+	# TEMPORIZADOR
+	# =====================================================
 
 	temporizador -= delta
 
 
 	if temporizador > 0.0:
+
 		return
 
 
@@ -100,13 +110,24 @@ func _process(delta: float) -> void:
 	temporizador = tiempo_entre_creaciones
 
 
-	# Comprobamos todas las condiciones antes de crear.
+	# =====================================================
+	# COMPROBAR SI PUEDE CREAR
+	# =====================================================
+
 	if not puede_crear():
+
 		return
 
 
+	# =====================================================
+	# CREAR
+	# =====================================================
+
 	crear_objeto()
+
+
 	var duracion = Time.get_ticks_msec() - inicio
+
 
 	if duracion >= 50:
 
@@ -117,6 +138,7 @@ func _process(delta: float) -> void:
 			duracion,
 			" ms"
 		)
+
 
 # =========================================================
 # COMPROBAR SI PUEDE CREAR
@@ -134,17 +156,78 @@ func puede_crear() -> bool:
 
 
 		if camara == null:
+
 			return false
 
 
-		var distancia := global_position.distance_to(
-			camara.global_position
+		var viewport_size := get_viewport_rect().size
+
+		var zoom := camara.zoom
+
+
+		# Mitad del tamaño visible de la cámara.
+		var mitad_ancho := (
+			viewport_size.x
+			/ (2.0 * zoom.x)
+		)
+
+		var mitad_alto := (
+			viewport_size.y
+			/ (2.0 * zoom.y)
 		)
 
 
-		# Si está demasiado cerca de la cámara,
-		# no creamos el objeto.
-		if distancia < distancia_de_creacion:
+		var centro := camara.global_position
+
+
+		# =================================================
+		# RECTÁNGULO VISIBLE
+		# =================================================
+
+		var izquierda := (
+			centro.x
+			- mitad_ancho
+			- distancia_de_creacion
+		)
+
+		var derecha := (
+			centro.x
+			+ mitad_ancho
+			+ distancia_de_creacion
+		)
+
+		var arriba := (
+			centro.y
+			- mitad_alto
+			- distancia_de_creacion
+		)
+
+		var abajo := (
+			centro.y
+			+ mitad_alto
+			+ distancia_de_creacion
+		)
+
+
+		# =================================================
+		# COMPROBAR SI EL SPAWNER ESTÁ EN LA ZONA
+		# VISIBLE + MARGEN
+		# =================================================
+
+		var dentro_de_zona_visible := (
+
+			global_position.x >= izquierda
+			and global_position.x <= derecha
+
+			and
+
+			global_position.y >= arriba
+			and global_position.y <= abajo
+		)
+
+
+		if dentro_de_zona_visible:
+
 			return false
 
 
@@ -153,6 +236,7 @@ func puede_crear() -> bool:
 	# =====================================================
 
 	if hay_objeto_en_spawn():
+
 		return false
 
 
@@ -161,6 +245,7 @@ func puede_crear() -> bool:
 	# =====================================================
 
 	if hay_instancia_cerca():
+
 		return false
 
 
@@ -173,7 +258,9 @@ func puede_crear() -> bool:
 
 func hay_objeto_en_spawn() -> bool:
 
-	var espacio_fisico := get_world_2d().direct_space_state
+	var espacio_fisico := (
+		get_world_2d().direct_space_state
+	)
 
 
 	var forma := CircleShape2D.new()
@@ -181,7 +268,10 @@ func hay_objeto_en_spawn() -> bool:
 	forma.radius = radio_comprobacion_spawn
 
 
-	var parametros := PhysicsShapeQueryParameters2D.new()
+	var parametros := (
+		PhysicsShapeQueryParameters2D.new()
+	)
+
 
 	parametros.shape = forma
 
@@ -196,9 +286,11 @@ func hay_objeto_en_spawn() -> bool:
 	parametros.collide_with_areas = true
 
 
-	var resultados := espacio_fisico.intersect_shape(
-		parametros,
-		1
+	var resultados := (
+		espacio_fisico.intersect_shape(
+			parametros,
+			1
+		)
 	)
 
 
@@ -212,9 +304,15 @@ func hay_objeto_en_spawn() -> bool:
 func hay_instancia_cerca() -> bool:
 
 	# Eliminamos referencias a objetos que ya no existen.
-	for i in range(objetos_creados.size() - 1, -1, -1):
+	for i in range(
+		objetos_creados.size() - 1,
+		-1,
+		-1
+	):
 
-		if not is_instance_valid(objetos_creados[i]):
+		if not is_instance_valid(
+			objetos_creados[i]
+		):
 
 			objetos_creados.remove_at(i)
 
@@ -222,8 +320,10 @@ func hay_instancia_cerca() -> bool:
 	# Comprobamos las instancias restantes.
 	for objeto in objetos_creados:
 
-		var distancia := global_position.distance_to(
-			objeto.global_position
+		var distancia := (
+			global_position.distance_to(
+				objeto.global_position
+			)
 		)
 
 
@@ -245,7 +345,9 @@ func crear_objeto() -> void:
 	# CREAR INSTANCIA
 	# =====================================================
 
-	var objeto := escena_a_crear.instantiate()
+	var objeto := (
+		escena_a_crear.instantiate()
+	)
 
 
 	# =====================================================
@@ -261,7 +363,9 @@ func crear_objeto() -> void:
 	# AGREGAR AL ÁRBOL
 	# =====================================================
 
-	get_tree().current_scene.add_child(objeto)
+	get_tree().current_scene.add_child(
+		objeto
+	)
 
 
 	# =====================================================
@@ -270,7 +374,9 @@ func crear_objeto() -> void:
 
 	if objeto is Node2D:
 
-		objetos_creados.append(objeto)
+		objetos_creados.append(
+			objeto
+		)
 
 
 	# =====================================================

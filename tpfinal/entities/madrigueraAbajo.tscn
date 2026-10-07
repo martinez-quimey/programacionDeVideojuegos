@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://4s4o0gfrimwv" path="res://entities/abstract/madrigueraAbstract.tscn" id="1_a3ale"]
 
 [node name="Madriguera" unique_id=1249858680 instance=ExtResource("1_a3ale")]
-position = Vector2(36, 24)
+position = Vector2(36, 17)
 rotation = -3.1415927
 scale = Vector2(6, 6)
 

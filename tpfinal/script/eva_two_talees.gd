@@ -124,7 +124,7 @@ func _ready() -> void:
 
 		tiempo_recarga_fuego.timeout.connect(
 			_on_tiempo_recarga_fuego_timeout
-		)
+	)
 
 
 	# ==========================================
@@ -726,7 +726,6 @@ func salir_madriguera():
 # MOVIMIENTO FORZADO
 # ==========================================
 
-
 var impulsos_activos: Dictionary = {}
 
 
@@ -746,6 +745,14 @@ func movimiento_forzado(
 		direccion,
 		velocidad
 	)
+
+	# ==========================================
+	# ACTUALIZAR DIRECCIÓN VISUAL
+	# ==========================================
+
+	if direccion.x != 0:
+
+		establecer_direccion_visual(direccion.x)
 
 	reproducir_animacion("salto")
 
@@ -793,6 +800,14 @@ func actualizar_movimiento_forzado():
 		direccion_total,
 		velocidad_total
 	)
+
+	# ==========================================
+	# ACTUALIZAR DIRECCIÓN VISUAL
+	# ==========================================
+
+	if direccion_total.x != 0:
+
+		establecer_direccion_visual(direccion_total.x)
 
 	reproducir_animacion("salto")
 
