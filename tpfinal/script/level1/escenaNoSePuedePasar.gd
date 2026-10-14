@@ -1,5 +1,5 @@
-extends Area2D
 
+extends Area2D
 
 @export var dialogue_script: Script
 
@@ -7,146 +7,65 @@ extends Area2D
 @export var duracion_movimiento_camara := 0.8
 @export var tiempo_espera_camara := 1.7
 
+var secuencia_activa := false
+
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 
 func esperar_hasta_suelo(body: CharacterBody2D) -> void:
 
-	print(
-		"TRIGGER: esperar_hasta_suelo | is_on_floor = ",
-		body.is_on_floor()
-	)
-
 	while not body.is_on_floor():
-
 		await get_tree().physics_frame
-
-	print(
-		"TRIGGER: esperar_hasta_suelo TERMINADO | is_on_floor = ",
-		body.is_on_floor()
-	)
 
 
 func _on_escena_no_puedo_pasar_por_aqui_body_entered(body: Node2D) -> void:
 
-	print("========================================")
-	print("TRIGGER: BODY ENTERED")
-	print("TRIGGER: cuerpo = ", body.name)
-	print("TRIGGER: grupo jugador = ", body.is_in_group("jugador"))
-	print("TRIGGER: tipo = ", body.get_class())
-	print("TRIGGER: posición = ", body.position)
-	print("========================================")
-
-
-	# =====================================================
-	# COMPROBAR SI ES EL PLAYER
-	# =====================================================
+	if secuencia_activa:
+		return
 
 	if not body.is_in_group("jugador"):
-
-		print("TRIGGER: no es el jugador, ignorando")
-
 		return
-
-
-	print("TRIGGER: ES EL JUGADOR")
-
-
-	# =====================================================
-	# COMPROBAR ESTADO ACTUAL
-	# =====================================================
 
 	if body.estado_actual == null:
-
-		print("ERROR: estado_actual es null")
-
 		return
 
+	secuencia_activa = true
 
-	# =====================================================
-	# CAMBIAR A AUTOMÁTICO
-	# =====================================================
-
-	print("TRIGGER: cambiando a automático")
-
-	body.estado_actual.cambiar_a_automatico()
-
-
-	# =====================================================
-	# ESPERAR HASTA QUE ESTÉ EN EL SUELO
-	# =====================================================
-
-	print("TRIGGER: esperando hasta suelo")
-
-	await esperar_hasta_suelo(body)
-
-	print("TRIGGER: Player está en el suelo")
-
-
-	# =====================================================
-	# BUSCAR CÁMARA
-	# =====================================================
-
+	# Guardar la cámara antes de pausar.
 	var camara: Camera2D = body.get_node_or_null("Camera2D")
 
-
 	if camara == null:
-
-		print(
-			"ERROR: no se encontró Camera2D dentro de Player"
-		)
-
+		secuencia_activa = false
 		return
 
-
-	print("TRIGGER: Camera2D encontrada")
-
-
-	# =====================================================
-	# GUARDAR ESTADO ORIGINAL DE LA CÁMARA
-	# =====================================================
-
 	var posicion_original := camara.position
-
 	var zoom_original := camara.zoom
-
-	var zoom_reducido := zoom_original - Vector2(0.2, 0.2)
-
 
 	var posicion_derecha := (
 		posicion_original
-		+ Vector2(
-			desplazamiento_camara,
-			0
-		)
+		+ Vector2(desplazamiento_camara, 0)
 	)
 
+	var zoom_reducido := zoom_original - Vector2(0.2, 0.2)
 
-	print(
-		"TRIGGER: moviendo cámara de ",
-		posicion_original,
-		" a ",
-		posicion_derecha
-	)
+	# Cambiar a automático antes de pausar.
+	body.estado_actual.cambiar_a_automatico()
 
-	print(
-		"TRIGGER: zoom original = ",
-		zoom_original
-	)
+	await esperar_hasta_suelo(body)
 
-	print(
-		"TRIGGER: zoom reducido = ",
-		zoom_reducido
-	)
+	# Pausar el árbol entero.
+	get_tree().paused = true
 
+	# La cámara debe poder procesar durante la pausa.
+	camara.process_mode = Node.PROCESS_MODE_ALWAYS
 
-	# =====================================================
-	# MOVER CÁMARA Y REDUCIR ZOOM
-	# =====================================================
-
+	# Mover la cámara y reducir el zoom.
 	var tween := create_tween()
-
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.set_trans(Tween.TRANS_SINE)
 	tween.set_ease(Tween.EASE_IN_OUT)
-
 	tween.set_parallel(true)
 
 	tween.tween_property(
@@ -165,30 +84,17 @@ func _on_escena_no_puedo_pasar_por_aqui_body_entered(body: Node2D) -> void:
 
 	await tween.finished
 
-	print("TRIGGER: cámara llegó a la derecha")
-	print("TRIGGER: zoom reducido")
-
-
-	# =====================================================
-	# ESPERAR
-	# =====================================================
-
+	# Espera que funciona aunque el árbol esté pausado.
 	await get_tree().create_timer(
-		tiempo_espera_camara
+		tiempo_espera_camara,
+		true
 	).timeout
 
-	print("TRIGGER: terminó espera de cámara")
-
-
-	# =====================================================
-	# DEVOLVER CÁMARA Y ZOOM
-	# =====================================================
-
+	# Devolver la cámara y el zoom.
 	tween = create_tween()
-
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.set_trans(Tween.TRANS_SINE)
 	tween.set_ease(Tween.EASE_IN_OUT)
-
 	tween.set_parallel(true)
 
 	tween.tween_property(
@@ -207,60 +113,18 @@ func _on_escena_no_puedo_pasar_por_aqui_body_entered(body: Node2D) -> void:
 
 	await tween.finished
 
-	print("TRIGGER: cámara volvió")
-	print("TRIGGER: zoom volvió a ", zoom_original)
-
-
-	# =====================================================
-	# VOLVER A MANUAL
-	# =====================================================
+	# Reanudar el juego antes de cambiar de estado.
+	get_tree().paused = false
 
 	body.estado_actual.cambiar_a_manual()
 
-	print("TRIGGER: Player volvió a manual")
+	# Iniciar el diálogo.
+	if dialogue_script != null:
+		var dialogue: DialogueAbstract = dialogue_script.new()
 
+		if dialogue != null:
+			dialogue.create_dialogue()
+			DialogueManager.start_dialogue(dialogue)
 
-	# =====================================================
-	# DIÁLOGO
-	# =====================================================
-
-	if dialogue_script == null:
-
-		print(
-			"ERROR: dialogue_script no está asignado"
-		)
-
-		return
-
-
-	print("TRIGGER: creando diálogo")
-
-
-	var dialogue: DialogueAbstract = dialogue_script.new()
-
-
-	if dialogue == null:
-
-		print(
-			"ERROR: dialogue_script.new() devolvió null"
-		)
-
-		return
-
-
-	dialogue.create_dialogue()
-
-
-	print("TRIGGER: iniciando DialogueManager")
-
-
-	DialogueManager.start_dialogue(dialogue)
-
-	print("TRIGGER: diálogo iniciado")
-
-
-	# =====================================================
-	# ELIMINAR TRIGGER
-	# =====================================================
-
+	# Eliminar el trigger.
 	queue_free()

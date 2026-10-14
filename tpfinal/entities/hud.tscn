@@ -388,8 +388,10 @@ text = "Startt"
 [node name="Panel" type="Panel" parent="LanguageMenu" unique_id=649402937]
 z_index = -1
 layout_mode = 0
-offset_right = 1151.0
-offset_bottom = 633.0
+offset_left = -187.0
+offset_top = -148.0
+offset_right = 1555.0
+offset_bottom = 911.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 

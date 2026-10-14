@@ -3,7 +3,7 @@ extends CanvasLayer
 
 
 @onready var panel: Panel = $MarginContainer/Panel
-@onready var portrait: TextureRect = $MarginContainer/Panel/Portrait
+@onready var portrait: TextureRect = $MarginContainer/Panel/Portrait/marcointerior/marcointerior/Portrait
 @onready var name_label: Label = $MarginContainer/Panel/TextContainer/Name
 @onready var text_label: RichTextLabel = $MarginContainer/Panel/TextContainer/Text
 

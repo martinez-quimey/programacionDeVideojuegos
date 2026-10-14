@@ -157,7 +157,8 @@ func _ready() -> void:
 	# TRANSFORMACIÓN INICIAL
 	# ==========================================
 
-	rotation = 0.0
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 
 	scale = Vector2(1.0, 1.0)
 
@@ -235,6 +236,18 @@ func actualizar_animacion(
 
 		return
 
+	# ==========================================
+	# PENDIENTE DEMASIADO INCLINADA
+	# ==========================================
+
+	if estado_actual.deslizandose_pendiente:
+		animated_sprite.visible = true
+		animated_sprite_pared.visible = false
+		animated_sprite.flip_v = false
+
+		reproducir_animacion("quieta")
+		return
+
 
 	# ==========================================
 	# AIRE
@@ -292,37 +305,18 @@ func establecer_direccion_visual(
 
 func aplicar_direccion_visual() -> void:
 
-	# ==========================================
-	# ORIENTACIÓN NORMAL
-	# ==========================================
-
-	rotation = 0.0
-
-
-	# ==========================================
-	# MOSTRAR SPRITE NORMAL
-	# ==========================================
+	# No enderezar al personaje mientras sigue una pendiente.
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 
 	animated_sprite.visible = true
 	animated_sprite_pared.visible = false
 
-
-	# ==========================================
-	# ESPEJAR TODO EL PLAYER
-	# ==========================================
-
+	# Espejar el Player completo para conservar el comportamiento original.
 	if mirando_izquierda:
-
 		scale = Vector2(-1.0, 1.0)
-
 	else:
-
 		scale = Vector2(1.0, 1.0)
-
-
-	# ==========================================
-	# COLLISION SHAPE NORMAL
-	# ==========================================
 
 	collision_shape_player.scale = Vector2(1.0, 1.0)
 
@@ -333,8 +327,8 @@ func aplicar_direccion_visual() -> void:
 
 func animacion_salto() -> void:
 
-	rotation = 0.0
-
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 	animated_sprite.flip_v = false
 
 	aplicar_direccion_visual()
@@ -348,7 +342,8 @@ func animacion_salto() -> void:
 
 func animacion_turbo() -> void:
 
-	rotation = 0.0
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 
 	animated_sprite.flip_v = false
 
@@ -425,7 +420,8 @@ func animacion_pared(
 	# ROTACIÓN DEL PLAYER
 	# ==========================================
 
-	rotation = 0.0
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 
 
 # ==========================================
@@ -434,7 +430,8 @@ func animacion_pared(
 
 func restablecer_visual_suelo() -> void:
 
-	rotation = 0.0
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 
 	scale = Vector2(1.0, 1.0)
 
@@ -461,7 +458,8 @@ func restablecer_visual_suelo() -> void:
 
 func restablecer_animacion_vertical() -> void:
 
-	rotation = 0.0
+	if not estado_actual.deslizandose_pendiente:
+		rotation = 0.0
 
 	scale = Vector2(1.0, 1.0)
 

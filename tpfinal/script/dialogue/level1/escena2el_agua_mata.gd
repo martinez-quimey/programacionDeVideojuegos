@@ -1,7 +1,7 @@
 
 extends DialogueAbstract
 
-@export var imagenDeEvaAsustada: Texture2D
+@export var imagenDeEvaAsustada: Texture2D = preload("res://sprites/eva/expresiones/sorprendida.png")
 
 func create_dialogue() -> void:
 	if Settings.language == "es":

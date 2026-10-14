@@ -1,16 +1,18 @@
 
 extends DialogueAbstract
 
-
+@export var imagenDeEvaDecidida: Texture2D = preload("res://sprites/eva/expresiones/decidida.png")
 func create_dialogue() -> void:
 	if Settings.language == "es":
 		add_line(
 			"Eva",
-			"Con C puedo hacer un ataque muy genial y quemar a ese jabalí molesto",
+			"Un jabalí salvaje, son una molestia",
+			imagenDeEvaDecidida
 		)
 
 	elif Settings.language == "en":
 		add_line(
 			"Eva",
-			"With C I can perform a really cool attack and burn that annoying boar",
+			"A wild boar, they're a nuisance",
+			imagenDeEvaDecidida
 		)

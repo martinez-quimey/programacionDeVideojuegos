@@ -118,6 +118,25 @@ signal died
 const ANGULO_MAXIMO_PENDIENTE: float = 50.0
 const DISTANCIA_SNAP_SUELO: float = 12.0
 
+# Velocidad inicial del deslizamiento.
+@export var VELOCIDAD_DESLIZAMIENTO_PENDIENTE: float = 190.0
+
+# Aceleración mientras se desliza.
+@export var ACELERACION_DESLIZAMIENTO_PENDIENTE: float = 450.0
+
+# Rotación visual máxima para evitar inclinaciones absurdas.
+@export var ROTACION_MAXIMA_PENDIENTE: float = 65.0
+
+# Estado de deslizamiento.
+var deslizandose_pendiente: bool = false
+var velocidad_deslizamiento: float = 0.0
+var normal_pendiente: Vector2 = Vector2.ZERO
+
+var tiempo_sin_contacto_pendiente: float = 0.0
+const TOLERANCIA_CONTACTO_PENDIENTE: float = 0.1
+
+var tiempo_detectando_pendiente: float = 0.0
+const TIEMPO_CONFIRMACION_PENDIENTE: float = 0.08
 
 # ==========================================
 # PARED
@@ -193,6 +212,8 @@ var direccion: float = 0.0
 var mirando_izquierda: bool = false
 
 
+
+
 # ==========================================
 # ESTADO DE PARED
 # ==========================================
@@ -200,7 +221,7 @@ var mirando_izquierda: bool = false
 var agarrado_pared: bool = false
 var pared_normal: Vector2 = Vector2.ZERO
 var puede_agarrarse_pared: bool = true
-
+@export var FUERZA_HORIZONTAL_SALTO_PARED: float = 900.0
 
 # ==========================================
 # CONFIGURAR HITBOX DE ATAQUE
@@ -385,6 +406,149 @@ func cambiar_a_automatico() -> void:
 
 
 # ==========================================
+# PENDIENTES DEMASIADO INCLINADAS
+# ==========================================
+
+func esta_en_pendiente_demasiado_inclinada() -> bool:
+
+	if not player.is_on_floor():
+		return false
+
+	var angulo := rad_to_deg(
+		player.get_floor_angle()
+	)
+
+	return angulo > ANGULO_MAXIMO_PENDIENTE
+
+# ==========================================
+# ROTACIÓN POR PENDIENTE
+# ==========================================
+func actualizar_rotacion_pendiente(delta: float) -> void:
+
+	var pendiente_detectada := false
+	var normal_detectada := Vector2.ZERO
+
+	for i in range(player.get_slide_collision_count()):
+
+		var colision := player.get_slide_collision(i)
+		var normal := colision.get_normal().normalized()
+
+		# Ignorar paredes y superficies inferiores.
+		if normal.y >= -0.1:
+			continue
+
+		var angulo := rad_to_deg(
+			acos(clampf(-normal.y, -1.0, 1.0))
+		)
+
+		# Detectar únicamente superficies más inclinadas
+		# que el límite normal, pero no paredes verticales.
+		if angulo > ANGULO_MAXIMO_PENDIENTE and angulo < 89.0:
+
+			normal_detectada = normal
+			pendiente_detectada = true
+			break
+
+	if pendiente_detectada:
+
+		tiempo_sin_contacto_pendiente = 0.0
+
+		# Confirmar el contacto antes de activar la pendiente.
+		if not deslizandose_pendiente:
+
+			tiempo_detectando_pendiente += delta
+
+			if tiempo_detectando_pendiente < TIEMPO_CONFIRMACION_PENDIENTE:
+				return
+
+		# Activar o actualizar la pendiente.
+		normal_pendiente = normal_detectada
+		deslizandose_pendiente = true
+		tiempo_detectando_pendiente = 0.0
+
+		# Conservar la fórmula de rotación original.
+		var nueva_rotacion := clampf(
+			atan2(normal_pendiente.x, -normal_pendiente.y),
+			deg_to_rad(-ROTACION_MAXIMA_PENDIENTE),
+			deg_to_rad(ROTACION_MAXIMA_PENDIENTE)
+		)
+
+		rotar_manteniendo_apoyo(
+			nueva_rotacion,
+			normal_pendiente
+		)
+
+		return
+
+	# No se confirmó una pendiente.
+	tiempo_detectando_pendiente = 0.0
+
+	# Tolerar pequeñas interrupciones en las colisiones.
+	if deslizandose_pendiente:
+
+		tiempo_sin_contacto_pendiente += delta
+
+		if tiempo_sin_contacto_pendiente < TOLERANCIA_CONTACTO_PENDIENTE:
+			return
+
+	# Se perdió el contacto con la pendiente.
+	deslizandose_pendiente = false
+	normal_pendiente = Vector2.ZERO
+	velocidad_deslizamiento = 0.0
+	tiempo_sin_contacto_pendiente = 0.0
+	player.rotation = 0.0
+
+
+func rotar_manteniendo_apoyo(
+	nueva_rotacion: float,
+	normal: Vector2
+) -> void:
+
+	if collision_shape_player.shape == null:
+		player.rotation = nueva_rotacion
+		return
+
+	# Obtener los límites locales de la hitbox.
+	var rect := collision_shape_player.shape.get_rect()
+
+	# Elegir el extremo inferior que mira hacia la pendiente.
+	# Si la normal apunta a la izquierda, apoyarse con el pie derecho.
+	# Si apunta a la derecha, apoyarse con el pie izquierdo.
+	var punto_local: Vector2
+
+	if normal.x < 0.0:
+		punto_local = Vector2(rect.end.x, rect.end.y)
+	else:
+		punto_local = Vector2(rect.position.x, rect.end.y)
+
+	# Guardar la posición global del punto de apoyo.
+	var apoyo_global := (
+		collision_shape_player.global_transform
+		* punto_local
+	)
+
+	# Rotar el personaje.
+	player.rotation = nueva_rotacion
+
+	# Calcular dónde quedó el mismo punto tras la rotación.
+	var apoyo_nuevo := (
+		collision_shape_player.global_transform
+		* punto_local
+	)
+
+	# Desplazar el personaje para devolver el apoyo a su lugar.
+	player.global_position += apoyo_global - apoyo_nuevo
+
+
+func restaurar_rotacion() -> void:
+	if not deslizandose_pendiente:
+		player.rotation = 0.0
+
+	deslizandose_pendiente = false
+	normal_pendiente = Vector2.ZERO
+	velocidad_deslizamiento = 0.0
+
+# ==========================================
 # DIRECCIÓN
 # ==========================================
 func establecer_direccion(
@@ -444,9 +608,9 @@ func retroceso(
 ) -> void:
 	
 
-	if turbo_activo or tiempo_invulnerabilidad_turbo > 0.0:
-
+	if turbo_activo or tiempo_invulnerabilidad_turbo > 0.0 or not Invulnerabilidad.is_stopped():
 		return
+
 
 
 
@@ -654,7 +818,9 @@ func activar_tornado() -> void:
 	# ROTACIÓN NORMAL
 	# ==========================================
 
-	player.rotation = 0.0
+	if not deslizandose_pendiente:
+		player.rotation = 0.0
+
 
 
 	# ==========================================
@@ -1082,6 +1248,15 @@ func _physics_process(delta: float) -> void:
 
 	if esta_forzado:
 
+		# ==========================================
+		# MANTENER LA ROTACIÓN EN CERO
+		# SIN MODIFICAR LAS ESCALAS
+		# ==========================================
+
+		player.rotation = 0.0
+		player.animated_sprite.rotation = 0.0
+		player.animated_sprite_pared.rotation = 0.0
+
 		player.velocity = (
 			direccion_forzada
 			* velocidad_forzada
@@ -1089,6 +1264,19 @@ func _physics_process(delta: float) -> void:
 
 		player.move_and_slide()
 
+		# ==========================================
+		# RESTABLECER LAS ROTACIONES
+		# ==========================================
+
+		player.rotation = 0.0
+		player.animated_sprite.rotation = 0.0
+		player.animated_sprite_pared.rotation = 0.0
+
+		print(
+			"ROTACIÓN PLAYER: ", rad_to_deg(player.rotation),
+			" | SPRITE: ", rad_to_deg(player.animated_sprite.rotation),
+			" | SPRITE PARED: ", rad_to_deg(player.animated_sprite_pared.rotation)
+		)
 
 		# ==========================================
 		# COMPROBAR SI EL MOVIMIENTO FORZADO
@@ -1108,7 +1296,6 @@ func _physics_process(delta: float) -> void:
 
 			var normal := collision.get_normal()
 
-
 			print("========================================")
 			print("MOVIMIENTO FORZADO: COLISIÓN")
 			print("OBJETO = ", collider.name)
@@ -1117,7 +1304,6 @@ func _physics_process(delta: float) -> void:
 			print("DIRECCIÓN FORZADA = ", direccion_forzada)
 			print("VELOCIDAD FORZADA = ", velocidad_forzada)
 			print("========================================")
-
 
 			# ==========================================
 			# SI EL OBJETO ESTÁ FRENANDO EL MOVIMIENTO
@@ -1178,58 +1364,52 @@ func _physics_process(delta: float) -> void:
 			tiempo_invulnerabilidad_turbo = 0.0
 
 
-	# ==========================================
-	# MOVIMIENTO HORIZONTAL
-	# ==========================================
+# ==========================================
+# MOVIMIENTO Y GRAVEDAD
+# ==========================================
 
-	if not turbo_activo:
+	if deslizandose_pendiente and normal_pendiente != Vector2.ZERO:
+		procesar_pendiente_inclinada(delta)
 
-		if direccion != 0:
-
-			player.velocity.x = move_toward(
-				player.velocity.x,
-				direccion * MAX_SPEED,
-				ACCELERATION * delta
-			)
-
-		else:
-
-			player.velocity.x = move_toward(
-				player.velocity.x,
-				0.0,
-				FRICTION * delta
-			)
-
-
-	# ==========================================
-	# GRAVEDAD
-	# ==========================================
+	else:
+		if not turbo_activo:
+			if direccion != 0:
+				player.velocity.x = move_toward(
+					player.velocity.x,
+					direccion * MAX_SPEED,
+					ACCELERATION * delta
+				)
+			else:
+				player.velocity.x = move_toward(
+					player.velocity.x,
+					0.0,
+					FRICTION * delta
+				)
 
 	if not player.is_on_floor():
-
 		if agarrado_pared:
-
 			player.velocity.y = min(
 				player.velocity.y + GRAVITY * delta,
 				WALL_SLIDE_SPEED
 			)
-
 		elif not turbo_activo:
-
 			if player.velocity.y > 0:
-
 				player.velocity.y += GRAVITY_CAIDA * delta
-
 			else:
-
 				player.velocity.y += GRAVITY * delta
 
 
-	# ==========================================
-	# MOVIMIENTO FÍSICO
-	# ==========================================
+# ==========================================
+# MOVIMIENTO FÍSICO
+# ==========================================
 
 	player.move_and_slide()
+
+	actualizar_rotacion_pendiente(delta)
+
+	if comprobar_tile_mortal():
+		return
+
 
 
 	# ==========================================
@@ -1249,18 +1429,14 @@ func _physics_process(delta: float) -> void:
 
 		puede_agarrarse_pared = true
 
-
 	if not turbo_activo:
-
 		detectar_pared()
-
 
 	# ==========================================
 	# ESTADO DE SUELO
 	# ==========================================
 
-	if player.is_on_floor() and not turbo_activo:
-
+	if player.is_on_floor() and not turbo_activo and not deslizandose_pendiente:
 		seSalto = false
 		saltoFuego = false
 
@@ -1271,27 +1447,71 @@ func _physics_process(delta: float) -> void:
 
 		player.restablecer_visual_suelo()
 
-
-	# ==========================================
 	# ANIMACIÓN
-	# ==========================================
-
 	if not turbo_activo:
+		if deslizandose_pendiente:
+			player.animated_sprite.visible = true
+			player.animated_sprite_pared.visible = false
+			player.animated_sprite.flip_v = false
 
-		player.actualizar_animacion(direccion)
+			if player.animated_sprite.animation != "quieta":
+				player.animated_sprite.play("quieta")
+		else:
+			player.actualizar_animacion(direccion)
+		
 
+# ==========================================
+# MOVIMIENTO SOBRE PENDIENTE INCLINADA
+# ==========================================
 
-	var duracion = Time.get_ticks_msec() - inicio
+func procesar_pendiente_inclinada(delta: float) -> void:
+	if normal_pendiente == Vector2.ZERO:
+		return
 
-	if duracion >= 50:
+	# Dirección paralela a la pendiente, orientada cuesta abajo.
+	var tangente := Vector2(
+		normal_pendiente.y,
+		-normal_pendiente.x
+	).normalized()
 
-		print(
-			"⚠️ PROCESS LENTO | ",
-			get_path(),
-			" | ",
-			duracion,
-			" ms"
+	if tangente.y < 0.0:
+		tangente = -tangente
+
+	# La gravedad acelera el descenso.
+	var aceleracion := Vector2.DOWN.dot(tangente) * GRAVITY_CAIDA
+
+	velocidad_deslizamiento += aceleracion * delta
+
+	# Velocidad mínima de deslizamiento.
+	velocidad_deslizamiento = maxf(
+		velocidad_deslizamiento,
+		320.0
+	)
+
+	# Límite para que no alcance la velocidad de caída normal.
+	velocidad_deslizamiento = minf(
+		velocidad_deslizamiento,
+		850.0
+	)
+
+	# Intentar caminar contra la pendiente frena el descenso.
+	if direccion != 0.0:
+		var movimiento_deseado := Vector2(direccion, 0.0)
+		var componente_caminar := movimiento_deseado.dot(tangente)
+
+		velocidad_deslizamiento -= (
+			componente_caminar * ACCELERATION * delta
 		)
+
+		velocidad_deslizamiento = clampf(
+			velocidad_deslizamiento,
+			0.0,
+			850.0
+		)
+
+	player.velocity = tangente * velocidad_deslizamiento
+
+
 # ==========================================
 # SALTO
 # ==========================================
@@ -1317,35 +1537,33 @@ func saltar() -> void:
 
 	if agarrado_pared:
 
+		# Si pulsa salto, impulsarse hacia arriba
+		# y alejarse de la pared.
 		var direccion_salto := pared_normal.x
 
-
 		player.velocity.x = (
-			direccion_salto
-			* WALL_JUMP_FORCE
+			direccion_salto * FUERZA_HORIZONTAL_SALTO_PARED
 		)
 
 		player.velocity.y = JUMP_FORCE
-
-
-		seSalto = false
-		saltoFuego = false
-
 
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
 
 		puede_agarrarse_pared = false
 
+		seSalto = false
+		saltoFuego = false
 
-		player.rotation = 0.0
-
+		restaurar_rotacion()
 		player.restablecer_visual_suelo()
 
 		return
 
 
 	if player.is_on_floor():
+
+		restaurar_rotacion()
 
 		player.velocity.y = JUMP_FORCE
 
@@ -1413,7 +1631,9 @@ func salto_fuego() -> void:
 		pared_normal = Vector2.ZERO
 
 
-		player.rotation = 0.0
+		
+		if not deslizandose_pendiente:
+			player.rotation = 0.0
 
 		player.animated_sprite.flip_v = false
 
@@ -1486,7 +1706,9 @@ func activar_turbo() -> void:
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 
-	player.rotation = 0.0
+	if not deslizandose_pendiente:
+		player.rotation = 0.0
+
 
 	Invulnerabilidad.stop()
 
@@ -1890,7 +2112,15 @@ func detectar_pared() -> void:
 	# ==========================================
 	# PUEDE AGARRARSE A PARED
 	# ==========================================
+		# Una pendiente pronunciada NO debe tratarse como una pared.
+	if deslizandose_pendiente:
+		agarrado_pared = false
+		pared_normal = Vector2.ZERO
 
+		player.animated_sprite.visible = true
+		player.animated_sprite_pared.visible = false
+
+		return
 	
 	if not puede_agarrarse_pared:
 
@@ -1898,9 +2128,8 @@ func detectar_pared() -> void:
 
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
-
-		player.rotation = 0.0
-
+		if not deslizandose_pendiente:
+			player.rotation = 0.0
 		return
 
 
@@ -1915,7 +2144,9 @@ func detectar_pared() -> void:
 	
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
-		player.rotation = 0.0
+		if not deslizandose_pendiente:
+			player.rotation = 0.0
+
 
 		return
 
@@ -2064,14 +2295,13 @@ func detectar_pared() -> void:
 		return
 
 
-	# ==========================================
 	# NO ENCONTRÓ PARED VÁLIDA
-	# ==========================================
 
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 
-	player.rotation = 0.0
+	if not deslizandose_pendiente:
+		player.rotation = 0.0
 
 
 # ==========================================
@@ -2147,7 +2377,9 @@ func start(
 		projectile_container_nuevo
 	)
 
-	player.rotation = 0.0
+	if not deslizandose_pendiente:
+		player.rotation = 0.0
+
 
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO

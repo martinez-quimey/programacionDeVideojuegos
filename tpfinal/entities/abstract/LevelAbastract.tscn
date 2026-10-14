@@ -4846,9 +4846,6 @@ z_index = -2
 scale = Vector2(2, 2)
 tile_set = SubResource("TileSet_kdu4l")
 
-[node name="StartPosition" type="Marker2D" parent="." unique_id=62563420]
-position = Vector2(550, 487)
-
 [node name="Projectiles" type="Node2D" parent="." unique_id=146175065]
 
 [node name="DialogueBox" parent="." unique_id=1437922421 instance=ExtResource("5_e5dmo")]
@@ -4887,5 +4884,8 @@ tile_set = SubResource("TileSet_7rm4o")
 
 [node name="Rocas" type="TileMapLayer" parent="." unique_id=828749125]
 tile_set = SubResource("TileSet_h4vih")
+
+[node name="StartPosition" type="Marker2D" parent="." unique_id=442951874]
+position = Vector2(393, 629)
 
 [connection signal="game_paused" from="." to="." method="_on_game_paused"]

@@ -1,7 +1,6 @@
 
 extends DialogueAbstract
-
-@export var imagenDEEvaIdle: Texture2D
+@export var imagenDEEvaIdle: Texture2D = preload("res://sprites/eva/expresiones/idle.png")
 
 func create_dialogue() -> void:
 	print (Settings.language)
@@ -9,7 +8,8 @@ func create_dialogue() -> void:
 		print ("entro al if en español")
 		add_line(
 			"Eva",
-			"Explorar es divertido, pero ya quiero ir a casa"
+			"Explorar es divertido, pero ya quiero ir a casa",
+			imagenDEEvaIdle
 		)
 
 
@@ -17,5 +17,6 @@ func create_dialogue() -> void:
 		print ("entro al if en ingles")
 		add_line(
 			"Eva",
-			"Exploring is fun, but I already want to go home"
+			"Exploring is fun, but I already want to go home",
+			imagenDEEvaIdle
 		)

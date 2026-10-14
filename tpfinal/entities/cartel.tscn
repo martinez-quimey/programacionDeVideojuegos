@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://dxmyetoilsrv"]
+
+[ext_resource type="PackedScene" uid="uid://m2b170sodkps" path="res://entities/abstract/abstract_npc.tscn" id="1_uuypt"]
+[ext_resource type="Script" uid="uid://c23vbt8qm3ycc" path="res://entities/npc/ciervo_1.gd" id="2_s3wjb"]
+[ext_resource type="Texture2D" uid="uid://bldhn2hubvlxo" path="res://sprites/escenario/recursos/cartel.png" id="3_lbbbw"]
+
+[node name="Cartel" unique_id=1291660537 instance=ExtResource("1_uuypt")]
+scale = Vector2(2.3, 2.3)
+script = ExtResource("2_s3wjb")
+dialogue_script = null
+
+[node name="Sprite2D" type="Sprite2D" parent="." index="1" unique_id=1247118749]
+texture_filter = 1
+position = Vector2(0, -9.536743e-07)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("3_lbbbw")
+
+[connection signal="body_entered" from="InteractionArea" to="." method="_on_interaction_area_body_entered"]
+[connection signal="body_exited" from="InteractionArea" to="." method="_on_interaction_area_body_exited"]
