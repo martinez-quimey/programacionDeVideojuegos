@@ -198,14 +198,17 @@ sprite_frames = SubResource("SpriteFrames_nm73a")
 animation = &"pared"
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
+visible = false
 position = Vector2(7.5, -16.5)
 shape = SubResource("RectangleShape2D_uqenk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
+visible = false
 position = Vector2(17.5, -3)
 shape = SubResource("RectangleShape2D_l1ths")
 
 [node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
+visible = false
 position = Vector2(41.125, -32.75)
 shape = SubResource("RectangleShape2D_2fb44")
 

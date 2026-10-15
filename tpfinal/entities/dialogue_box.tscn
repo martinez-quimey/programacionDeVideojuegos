@@ -35,15 +35,15 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Panel" type="Panel" parent="MarginContainer" unique_id=1020383961]
-visible = false
 layout_mode = 2
 
 [node name="Portrait" type="Panel" parent="MarginContainer/Panel" unique_id=1041713054]
 layout_mode = 0
 offset_left = 15.0
-offset_top = -137.944
+offset_top = -270.944
 offset_right = 143.0
-offset_bottom = -9.944
+offset_bottom = -142.944
+scale = Vector2(2, 2)
 theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
 [node name="marcointerior" type="Panel" parent="MarginContainer/Panel/Portrait" unique_id=1881682187]

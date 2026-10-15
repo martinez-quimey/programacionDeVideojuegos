@@ -1,3 +1,4 @@
+
 # Baya.gd
 extends Node2D
 
@@ -33,22 +34,43 @@ enum TipoBaya {
 
 
 # =========================================================
+# OBTENER ID ÚNICO COMBINADO CON EL NIVEL
+# =========================================================
+
+func obtener_id_unico() -> String:
+
+	var padre := get_parent()
+
+	if padre == null:
+		push_warning("La baya no tiene un nodo padre.")
+		return ""
+
+	var nombre_nivel = padre.get("nombre_nivel")
+
+	if nombre_nivel == null or str(nombre_nivel).is_empty():
+		push_warning("No se encontró nombre_nivel en el padre de la baya.")
+		return ""
+
+	if id_baya.is_empty():
+		push_warning("Esta baya no tiene ID.")
+		return ""
+
+	return str(nombre_nivel) + "_" + id_baya
+
+
+# =========================================================
 # READY
 # =========================================================
 
 func _ready() -> void:
 
-	# Configurar qué sprite se muestra.
 	actualizar_sprite()
 
-	# Conectar el área de interacción.
 	interaction_area.body_entered.connect(_on_body_entered)
 
-	# Si esta baya ya fue obtenida anteriormente,
-	# directamente no debe existir.
 	if ya_fue_obtenida():
 
-		print("Baya ya obtenida: ", id_baya)
+		print("Baya ya obtenida: ", obtener_id_unico())
 
 		queue_free()
 
@@ -76,18 +98,18 @@ func actualizar_sprite() -> void:
 
 func ya_fue_obtenida() -> bool:
 
-	if id_baya == "":
-		print("ADVERTENCIA: esta baya no tiene ID")
+	var id_unico := obtener_id_unico()
 
+	if id_unico.is_empty():
 		return false
 
 	if tipo_baya == TipoBaya.VIDA:
 
-		return Settings.objetosVidaObtenidos.has(id_baya)
+		return Settings.objetosVidaObtenidos.has(id_unico)
 
 	elif tipo_baya == TipoBaya.ENERGIA:
 
-		return Settings.objetosEnergiaObtenidos.has(id_baya)
+		return Settings.objetosEnergiaObtenidos.has(id_unico)
 
 	return false
 
@@ -101,7 +123,7 @@ func _on_body_entered(body: Node) -> void:
 	if not body.is_in_group("jugador"):
 		return
 
-	print("BAYA RECOGIDA: ", id_baya)
+	print("BAYA RECOGIDA: ", obtener_id_unico())
 
 	recoger_baya(body)
 
@@ -112,7 +134,13 @@ func _on_body_entered(body: Node) -> void:
 
 func recoger_baya(player: Node) -> void:
 
-	# Evitar que se recoja dos veces.
+	var id_unico := obtener_id_unico()
+
+	# Evitar recoger una baya sin identificación válida.
+	if id_unico.is_empty():
+		return
+
+	# Evitar recogerla dos veces.
 	if ya_fue_obtenida():
 		return
 
@@ -125,9 +153,9 @@ func recoger_baya(player: Node) -> void:
 
 		aumentar_vidaMax(player)
 
-		if not Settings.objetosVidaObtenidos.has(id_baya):
+		if not Settings.objetosVidaObtenidos.has(id_unico):
 
-			Settings.objetosVidaObtenidos.append(id_baya)
+			Settings.objetosVidaObtenidos.append(id_unico)
 
 
 	# ==========================================
@@ -138,9 +166,9 @@ func recoger_baya(player: Node) -> void:
 
 		aumentar_energiaMax(player)
 
-		if not Settings.objetosEnergiaObtenidos.has(id_baya):
+		if not Settings.objetosEnergiaObtenidos.has(id_unico):
 
-			Settings.objetosEnergiaObtenidos.append(id_baya)
+			Settings.objetosEnergiaObtenidos.append(id_unico)
 
 
 	# ==========================================
@@ -149,9 +177,8 @@ func recoger_baya(player: Node) -> void:
 
 	Save.guardar_partida()
 
-	print("BAYA GUARDADA: ", id_baya)
+	print("BAYA GUARDADA: ", id_unico)
 
-	# La baya desaparece inmediatamente.
 	queue_free()
 
 
@@ -164,18 +191,14 @@ func aumentar_vidaMax(player: Node) -> void:
 	if cantidad <= 0:
 		return
 
-	# Aumentamos la vida del Player.
 	player.vida += cantidad
 
-	# Actualizamos Settings.
 	Settings.vidaActual = player.vida
 
-	# Actualizamos la barra de vida.
 	if player.barraVida != null:
 
 		player.barraVida.max_value = player.vida
 		player.barraVida.value = player.vida
-
 
 	print(
 		"VIDA AUMENTADA | Máximo: ",
@@ -192,7 +215,6 @@ func aumentar_energiaMax(player: Node) -> void:
 	if cantidad <= 0:
 		return
 
-	# Usamos el método que ya tenés en Player.
 	player.aumentarEnergiaMax(cantidad)
 
 	print(
