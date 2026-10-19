@@ -1,4 +1,3 @@
-
 # Baya.gd
 extends Node2D
 
@@ -31,6 +30,9 @@ enum TipoBaya {
 @onready var vida_sprite: Sprite2D = $Vida
 @onready var energia_sprite: Sprite2D = $Energia
 @onready var interaction_area: Area2D = $InteractionArea
+
+@onready var particula_roja: GPUParticles2D = $ParticulaRoja
+@onready var particula_amarilla: GPUParticles2D = $ParticulaAmarilla
 
 
 # =========================================================
@@ -65,6 +67,10 @@ func obtener_id_unico() -> String:
 func _ready() -> void:
 
 	actualizar_sprite()
+
+	# Las partículas solo se reproducen al recoger la baya.
+	particula_roja.emitting = false
+	particula_amarilla.emitting = false
 
 	interaction_area.body_entered.connect(_on_body_entered)
 
@@ -179,7 +185,44 @@ func recoger_baya(player: Node) -> void:
 
 	print("BAYA GUARDADA: ", id_unico)
 
+	# Reproducir las partículas antes de eliminar la baya.
+	reproducir_particulas()
+
 	queue_free()
+
+
+# =========================================================
+# REPRODUCIR PARTÍCULAS AL RECOGER LA BAYA
+# =========================================================
+
+func reproducir_particulas() -> void:
+
+	var particulas: GPUParticles2D
+
+	# Elegir las partículas según el tipo de baya.
+	if tipo_baya == TipoBaya.VIDA:
+		particulas = particula_roja
+	else:
+		particulas = particula_amarilla
+
+	# Guardar la transformación global para conservar
+	# la posición y la orientación del efecto.
+	var transformacion_global := particulas.global_transform
+
+	# Separar las partículas de la baya.
+	remove_child(particulas)
+
+	# Agregarlas a la escena actual para que sobrevivan
+	# cuando la baya sea eliminada.
+	var nivel := get_tree().current_scene
+	nivel.add_child(particulas)
+
+	# Restaurar su posición global.
+	particulas.global_transform = transformacion_global
+
+	# Reiniciar y reproducir el efecto.
+	particulas.restart()
+	particulas.emitting = true
 
 
 # =========================================================

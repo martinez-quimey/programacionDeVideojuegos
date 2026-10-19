@@ -267,56 +267,66 @@ func comprobar_colision_con_jugador():
 # EMPUJE POR CONTACTO
 # =========================================================
 
+# =========================================================
+# EMPUJE POR CONTACTO
+# =========================================================
+
 func aplicar_empuje_contacto(cuerpo: Node2D) -> void:
 
 	if cuerpo == null:
 		return
 
-
 	var diferencia_x: float = cuerpo.global_position.x - global_position.x
+	var diferencia_y: float = cuerpo.global_position.y - global_position.y
+
+	# =====================================================
+	# JUGADOR VIENE DESDE ARRIBA
+	# =====================================================
+
+	if diferencia_y < -20.0:
+
+		# El empuje vertical es un poco más fuerte.
+		# En Godot, Y negativa significa hacia arriba.
+		#
+		# El componente horizontal depende de la posición:
+		# izquierda del centro = empuja hacia la izquierda.
+		# derecha del centro = empuja hacia la derecha.
+		# exactamente en el centro = empuja hacia la izquierda.
+
+		var direccion_horizontal: float = -1.0
+
+		if diferencia_x > 0.0:
+			direccion_horizontal = 1.0
+
+		var direccion_empuje := Vector2(
+			direccion_horizontal * 0.35,
+			-1.0
+		).normalized()
+
+		cuerpo.retroceso(direccion_empuje, 500)
+
+		return
+
+	# =====================================================
+	# CONTACTO NORMAL POR LOS COSTADOS
+	# =====================================================
 
 	var direccion_empuje := Vector2.RIGHT
-
-
-	# =====================================================
-	# JUGADOR A LA IZQUIERDA
-	# =====================================================
 
 	if diferencia_x < -0.1:
 
 		direccion_empuje = Vector2.LEFT
 
-
-	# =====================================================
-	# JUGADOR A LA DERECHA
-	# =====================================================
-
 	elif diferencia_x > 0.1:
 
 		direccion_empuje = Vector2.RIGHT
 
-
-	# =====================================================
-	# JUGADOR PRÁCTICAMENTE ENCIMA
-	# =====================================================
-
 	else:
 
-		# Si están prácticamente en la misma posición
-		# horizontal, usamos la dirección del jabalí.
-
 		if direccion < 0:
-
 			direccion_empuje = Vector2.LEFT
-
 		else:
-
 			direccion_empuje = Vector2.RIGHT
-
-
-	# =====================================================
-	# APLICAR EMPUJE
-	# =====================================================
 
 	cuerpo.retroceso(direccion_empuje, 400)
 
@@ -580,8 +590,7 @@ func comenzar_ataque():
 
 		if cuerpo.is_in_group("jugador"):
 
-			# Ataque = 2 de daño.
-			cuerpo.herir(2)
+			
 
 			# El ataque SIEMPRE empuja en la dirección
 			# en la que está mirando el jabalí.
@@ -589,7 +598,8 @@ func comenzar_ataque():
 			# direccion = 1  -> derecha
 			# direccion = -1 -> izquierda
 			cuerpo.retroceso(Vector2(direccion, 0), 600)
-
+			# Ataque = 2 de daño.
+			cuerpo.herir(2)
 			break
 
 

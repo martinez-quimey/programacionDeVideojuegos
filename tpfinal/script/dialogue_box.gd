@@ -1,8 +1,8 @@
 class_name DialogueBox
 extends CanvasLayer
 
-
 @onready var panel: Panel = $MarginContainer/Panel
+@onready var portrait_container: Control = $MarginContainer/Panel/Portrait
 @onready var portrait: TextureRect = $MarginContainer/Panel/Portrait/marcointerior/marcointerior/Portrait
 @onready var name_label: Label = $MarginContainer/Panel/TextContainer/Name
 @onready var text_label: RichTextLabel = $MarginContainer/Panel/TextContainer/Text
@@ -13,7 +13,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	panel.visible = false
-	portrait.visible = false
+	portrait_container.visible = false
 
 
 func show_line(line: DialogueLine) -> void:
@@ -27,12 +27,8 @@ func show_line(line: DialogueLine) -> void:
 	name_label.text = line.speaker
 	text_label.text = line.text
 
-	if line.portrait != null:
-		portrait.texture = line.portrait
-		portrait.visible = true
-	else:
-		portrait.texture = null
-		portrait.visible = false
+	portrait.texture = line.portrait
+	portrait_container.visible = line.portrait != null
 
 
 func hide_dialogue() -> void:

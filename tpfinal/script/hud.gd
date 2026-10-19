@@ -803,16 +803,23 @@ func actualizar_estado_botones() -> void:
 
 	var hay_partida = Save.existe_partida()
 
-
-	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton.disabled = (
-		not hay_partida
+	var boton_continuar = (
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton
 	)
 
+	var boton_selector = (
+		$MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles
+	)
 
-	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles.disabled = (
+	# Continuar solamente funciona si la partida sigue activa.
+	boton_continuar.disabled = not hay_partida
+
+	# El selector también queda deshabilitado si la partida terminó.
+	boton_selector.disabled = (
 		not hay_partida
 		or Settings.nivelesCompletados.is_empty()
 	)
+
 
 
 # =========================================================
@@ -890,19 +897,25 @@ func _on_quit_game_button_pressed() -> void:
 
 func _on_continuar_partida_pressed() -> void:
 
-	if not Save.cargar_partida():
-
+	if not Save.existe_partida():
+		actualizar_estado_botones()
 		return
 
+	if not Save.cargar_partida():
+		return
+
+	if Save.partidaFinalizada:
+		actualizar_estado_botones()
+		return
 
 	if Settings.nivelActual == "":
-
+		actualizar_estado_botones()
 		return
-
 
 	$MainMenu.hide()
 
 	continue_game.emit()
+
 
 
 # =========================================================
@@ -912,13 +925,18 @@ func _on_continuar_partida_pressed() -> void:
 func _on_selector_niveles_pressed() -> void:
 
 	if not Save.existe_partida():
-
+		actualizar_estado_botones()
 		return
 
+	if not Save.cargar_partida():
+		return
 
-	Save.cargar_partida()
+	if Save.partidaFinalizada:
+		actualizar_estado_botones()
+		return
 
 	show_selector_niveles()
+
 
 
 # =========================================================

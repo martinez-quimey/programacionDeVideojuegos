@@ -212,8 +212,6 @@ var direccion: float = 0.0
 var mirando_izquierda: bool = false
 
 
-
-
 # ==========================================
 # ESTADO DE PARED
 # ==========================================
@@ -221,6 +219,7 @@ var mirando_izquierda: bool = false
 var agarrado_pared: bool = false
 var pared_normal: Vector2 = Vector2.ZERO
 var puede_agarrarse_pared: bool = true
+
 @export var FUERZA_HORIZONTAL_SALTO_PARED: float = 900.0
 
 # ==========================================
@@ -418,12 +417,27 @@ func esta_en_pendiente_demasiado_inclinada() -> bool:
 		player.get_floor_angle()
 	)
 
-	return angulo > ANGULO_MAXIMO_PENDIENTE
-
-# ==========================================
+	return angulo > ANGULO_MAXIMO_PENDIENTE# ==========================================
 # ROTACIÓN POR PENDIENTE
 # ==========================================
 func actualizar_rotacion_pendiente(delta: float) -> void:
+
+	# No detectar pendientes mientras se salta hacia arriba
+	# o el personaje está agarrado a una pared.
+	if agarrado_pared or (
+		not player.is_on_floor()
+		and player.velocity.y < 0.0
+	):
+		tiempo_detectando_pendiente = 0.0
+
+		if not agarrado_pared:
+			deslizandose_pendiente = false
+			normal_pendiente = Vector2.ZERO
+			velocidad_deslizamiento = 0.0
+			tiempo_sin_contacto_pendiente = 0.0
+
+		player.rotation = 0.0
+		return
 
 	var pendiente_detectada := false
 	var normal_detectada := Vector2.ZERO
@@ -497,8 +511,6 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 	velocidad_deslizamiento = 0.0
 	tiempo_sin_contacto_pendiente = 0.0
 	player.rotation = 0.0
-
-
 func rotar_manteniendo_apoyo(
 	nueva_rotacion: float,
 	normal: Vector2
@@ -567,9 +579,12 @@ func establecer_direccion(
 
 		mirando_izquierda = direccion < 0
 
-		player.establecer_direccion_visual(
-			direccion
-		)
+		# No modificar la escala ni los sprites
+		# mientras el personaje está agarrado a la pared.
+		if not agarrado_pared:
+			player.establecer_direccion_visual(
+				direccion
+			)
 
 
 # ==========================================
@@ -606,43 +621,59 @@ func retroceso(
 	direccion_empuje: Vector2,
 	fuerza: float
 ) -> void:
-	
+
+	print("\n========== INICIO RETROCESO ==========")
+	print("[RETROCESO] Dirección recibida: ", direccion_empuje)
+	print("[RETROCESO] Fuerza recibida: ", fuerza)
+	print("[RETROCESO] PESO: ", PESO)
+	print("[RETROCESO] turbo_activo: ", turbo_activo)
+	print("[RETROCESO] tiempo_invulnerabilidad_turbo: ", tiempo_invulnerabilidad_turbo)
+	print("[RETROCESO] Invulnerabilidad detenida: ", Invulnerabilidad.is_stopped())
+	print("[RETROCESO] retroceso_activo: ", retroceso_activo)
+
+	# ==========================================
+	# COMPROBAR BLOQUEOS
+	# ==========================================
 
 	if turbo_activo or tiempo_invulnerabilidad_turbo > 0.0 or not Invulnerabilidad.is_stopped():
+
+		print("[RETROCESO CANCELADO] Turbo o invulnerabilidad activos.")
+		print("========================================\n")
 		return
-
-
-
 
 
 	if retroceso_activo:
 
-
+		print("[RETROCESO CANCELADO] Ya hay un retroceso activo.")
+		print("========================================\n")
 		return
 
 
 	if PESO <= 0:
 
-		
-
+		print("[RETROCESO CANCELADO] PESO es menor o igual a cero.")
+		print("========================================\n")
 		return
 
 
 	if direccion_empuje.length() == 0:
 
-	
-
+		print("[RETROCESO CANCELADO] La dirección es cero.")
+		print("========================================\n")
 		return
 
+
+	# ==========================================
+	# ACTIVAR RETROCESO
+	# ==========================================
 
 	retroceso_activo = true
 	tiempo_retroceso = DURACION_RETROCESO
 
 	estado_anterior_retroceso = player.estado_actual
 
-
-	
-
+	print("[RETROCESO] Estado anterior: ", estado_anterior_retroceso)
+	print("[RETROCESO] Duración: ", DURACION_RETROCESO)
 
 	direccion = 0.0
 
@@ -650,26 +681,31 @@ func retroceso(
 	direccion_forzada = Vector2.ZERO
 	velocidad_forzada = 0.0
 
+	# ==========================================
+	# CALCULAR VELOCIDAD
+	# ==========================================
 
-	var direccion_normalizada := (
-		direccion_empuje.normalized()
-	)
+	var direccion_normalizada := direccion_empuje.normalized()
+	var velocidad_retroceso: float = fuerza / PESO
 
-	var velocidad_retroceso := (
-		fuerza / PESO
-	)
+	print("[RETROCESO] Dirección normalizada: ", direccion_normalizada)
+	print("[RETROCESO] Velocidad calculada: ", velocidad_retroceso)
 
+	# ==========================================
+	# APLICAR VELOCIDAD
+	# ==========================================
 
-	player.velocity.x = (
-		direccion_normalizada.x
-		* velocidad_retroceso
-	)
+	var velocidad_anterior: Vector2 = player.velocity
 
-	player.velocity.y = (
-		direccion_normalizada.y
-		* velocidad_retroceso
-	)
+	player.velocity.x = direccion_normalizada.x * velocidad_retroceso
+	player.velocity.y = direccion_normalizada.y * velocidad_retroceso
 
+	print("[RETROCESO] Velocidad anterior: ", velocidad_anterior)
+	print("[RETROCESO] Velocidad X aplicada: ", player.velocity.x)
+	print("[RETROCESO] Velocidad Y aplicada: ", player.velocity.y)
+	print("[RETROCESO] Velocidad final aplicada: ", player.velocity)
+	print("[RETROCESO] Retroceso activado correctamente.")
+	print("=========== FIN INICIO RETROCESO ===========\n")
 
 
 # ==========================================
@@ -679,37 +715,68 @@ func retroceso(
 func procesar_retroceso(delta: float) -> void:
 
 	if not retroceso_activo:
-
 		return
+
+	print("\n---------- PROCESAR RETROCESO ----------")
+	print("[PROCESAR] Delta: ", delta)
+	print("[PROCESAR] Tiempo restante antes: ", tiempo_retroceso)
+	print("[PROCESAR] Velocidad al entrar: ", player.velocity)
+	print("[PROCESAR] Está en el suelo: ", player.is_on_floor())
 
 	tiempo_retroceso -= delta
 
+	# ==========================================
+	# GRAVEDAD
+	# ==========================================
 
 	if not player.is_on_floor():
 
 		player.velocity.y += GRAVITY * delta
-			
+
+		print("[PROCESAR] Aplicando gravedad: ", GRAVITY * delta)
+		print("[PROCESAR] Velocidad Y tras gravedad: ", player.velocity.y)
+
 		print(
-			"Ángulo del suelo: ",
+			"[PROCESAR] Ángulo del suelo: ",
 			rad_to_deg(player.get_floor_angle())
 		)
 
+	# ==========================================
+	# MOVIMIENTO
+	# ==========================================
+
+	var velocidad_antes_move: Vector2 = player.velocity
+
 	player.move_and_slide()
 
-
+	print("[PROCESAR] Velocidad antes de move_and_slide: ", velocidad_antes_move)
+	print("[PROCESAR] Velocidad después de move_and_slide: ", player.velocity)
+	print("[PROCESAR] Posición actual: ", player.global_position)
+	print("[PROCESAR] Está en el suelo después del movimiento: ", player.is_on_floor())
 
 	# ==========================================
-	# MUERTE POR TILE MORTAL DURANTE RETROCESO
+	# MUERTE POR TILE MORTAL
 	# ==========================================
 
 	if comprobar_tile_mortal():
 
+		print("[PROCESAR] Retroceso interrumpido por tile mortal.")
 		return
 
+	# ==========================================
+	# TERMINAR RETROCESO
+	# ==========================================
 
 	if tiempo_retroceso <= 0.0:
 
+		print("[PROCESAR] Tiempo agotado. Terminando retroceso.")
 		terminar_retroceso()
+
+	else:
+
+		print("[PROCESAR] Tiempo restante: ", tiempo_retroceso)
+
+	print("-------- FIN PROCESAR RETROCESO --------\n")
 
 
 # ==========================================
@@ -718,7 +785,10 @@ func procesar_retroceso(delta: float) -> void:
 
 func terminar_retroceso() -> void:
 
-
+	print("\n========== TERMINAR RETROCESO ==========")
+	print("[FIN] Velocidad antes de terminar: ", player.velocity)
+	print("[FIN] Estado anterior: ", estado_anterior_retroceso)
+	print("[FIN] Tiempo restante: ", tiempo_retroceso)
 
 	retroceso_activo = false
 	tiempo_retroceso = 0.0
@@ -727,7 +797,9 @@ func terminar_retroceso() -> void:
 
 	estado_anterior_retroceso = null
 
-
+	print("[FIN] Velocidad después de terminar: ", player.velocity)
+	print("[FIN] retroceso_activo: ", retroceso_activo)
+	print("========================================\n")
 
 
 # ==========================================
@@ -1366,26 +1438,28 @@ func _physics_process(delta: float) -> void:
 
 # ==========================================
 # MOVIMIENTO Y GRAVEDAD
-# ==========================================
+# ===================================
+	if agarrado_pared:
+		# Mantener el contacto con la pared sin bloquear la caída.
+		# La normal apunta desde la pared hacia el personaje.
+		player.velocity.x = -pared_normal.x * 20.0
 
-	if deslizandose_pendiente and normal_pendiente != Vector2.ZERO:
+	elif deslizandose_pendiente and normal_pendiente != Vector2.ZERO:
 		procesar_pendiente_inclinada(delta)
 
-	else:
-		if not turbo_activo:
-			if direccion != 0:
-				player.velocity.x = move_toward(
-					player.velocity.x,
-					direccion * MAX_SPEED,
-					ACCELERATION * delta
-				)
-			else:
-				player.velocity.x = move_toward(
-					player.velocity.x,
-					0.0,
-					FRICTION * delta
-				)
-
+	elif not turbo_activo:
+		if direccion != 0:
+			player.velocity.x = move_toward(
+				player.velocity.x,
+				direccion * MAX_SPEED,
+				ACCELERATION * delta
+			)
+		else:
+			player.velocity.x = move_toward(
+				player.velocity.x,
+				0.0,
+				FRICTION * delta
+			)
 	if not player.is_on_floor():
 		if agarrado_pared:
 			player.velocity.y = min(
@@ -1511,34 +1585,30 @@ func procesar_pendiente_inclinada(delta: float) -> void:
 
 	player.velocity = tangente * velocidad_deslizamiento
 
-
 # ==========================================
+# SALTO
+# ==========================================
+# ==========================================
+# SALTO
+# ==========================================# ==========================================
 # SALTO
 # ==========================================
 func saltar() -> void:
 
 	if retroceso_activo:
-
-
-
 		return
 
 	if esta_forzado:
 		return
+
 	if tornado_activo:
-
 		return
-
 
 	if turbo_activo:
-
 		return
-
 
 	if agarrado_pared:
 
-		# Si pulsa salto, impulsarse hacia arriba
-		# y alejarse de la pared.
 		var direccion_salto := pared_normal.x
 
 		player.velocity.x = (
@@ -1549,7 +1619,6 @@ func saltar() -> void:
 
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
-
 		puede_agarrarse_pared = false
 
 		seSalto = false
@@ -1560,27 +1629,42 @@ func saltar() -> void:
 
 		return
 
+	if player.is_on_floor() or deslizandose_pendiente:
 
-	if player.is_on_floor():
+		# Cancelar el deslizamiento.
+		deslizandose_pendiente = false
+		normal_pendiente = Vector2.ZERO
+		velocidad_deslizamiento = 0.0
+		tiempo_sin_contacto_pendiente = 0.0
+		tiempo_detectando_pendiente = 0.0
 
-		restaurar_rotacion()
+		player.rotation = 0.0
 
+		# Aplicar el salto original.
 		player.velocity.y = JUMP_FORCE
 
+		# Esperar antes de comprobar si soltó el botón.
+		await get_tree().create_timer(0.12).timeout
+
+		# Usar el nombre correcto de la acción: "salto".
+		if not Input.is_action_pressed("salto"):
+			if player.velocity.y < 0.0:
+				player.velocity.y *= 0.80
+
 		seSalto = false
+		saltoFuego = false
 
 		return
-
 
 	if not seSalto:
 
 		if player.poseeDobleSalto:
+
 			player.velocity.y = JUMP_FORCE
 
 			seSalto = true
 
 			player.animacion_salto()
-
 
 # ==========================================
 # SALTO FUEGO
@@ -2107,202 +2191,62 @@ func _on_hitbox_turbo_body_entered(
 # ==========================================
 # PARED
 # ==========================================
+# ==========================================
+# PARED
+# ==========================================
+
 func detectar_pared() -> void:
 
-	# ==========================================
-	# PUEDE AGARRARSE A PARED
-	# ==========================================
-		# Una pendiente pronunciada NO debe tratarse como una pared.
 	if deslizandose_pendiente:
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
-
 		player.animated_sprite.visible = true
 		player.animated_sprite_pared.visible = false
-
 		return
-	
-	if not puede_agarrarse_pared:
 
-	
-
+	if not puede_agarrarse_pared or tornado_activo:
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
+
 		if not deslizandose_pendiente:
 			player.rotation = 0.0
 		return
-
-
-
-	# ==========================================
-	# TORNADO
-	# ==========================================
-
-
-	if tornado_activo:
-
-	
-		agarrado_pared = false
-		pared_normal = Vector2.ZERO
-		if not deslizandose_pendiente:
-			player.rotation = 0.0
-
-
-		return
-
-
-
-
-	# ==========================================
-	# SUELO
-	# ==========================================
-
 
 	if player.is_on_floor():
-
-	
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
-
 		return
-
-
-	# ==========================================
-	# PARED
-	# ==========================================
-
-
 
 	if not player.is_on_wall():
-
 		agarrado_pared = false
 		pared_normal = Vector2.ZERO
-
 		return
 
-
-	# ==========================================
-	# INFORMACIÓN GENERAL
-	# ==========================================
-
-
-
-
-	# ==========================================
-	# BUSCAR LA COLISIÓN DE LA PARED
-	# ==========================================
-
-	
 	for i in range(player.get_slide_collision_count()):
 
-	
-
-		var collision := (
-			player.get_slide_collision(i)
-		)
-
-		var collider := collision.get_collider()
-
-
-
-
-
-		# ==========================================
-		# COMPROBAR SI ES REALMENTE UNA PARED
-		# ==========================================
+		var collision := player.get_slide_collision(i)
 
 		if abs(collision.get_normal().x) < 0.8:
-
-
 			continue
 
-
-		# ==========================================
-		# COMPROBAR LAYER
-		# ==========================================
-
-	
-
-
-		var tiene_layer_pared := colision_tiene_layer(
-			collision,
-			WALL_LAYER
-		)
-
-
-
-		if collider != null:
-
-			if collider is CollisionObject2D:
-
-				print(
-					"[9] collision_layer del collider = ",
-					collider.collision_layer
-				)
-
-				print(
-					"[9] collider tiene layer 1: ",
-					collider.get_collision_layer_value(1)
-				)
-
-		
-
-
-		if not tiene_layer_pared:
-
-
+		if not colision_tiene_layer(collision, WALL_LAYER):
 			continue
-
-
-
-
-		# ==========================================
-		# ENCONTRÓ PARED VÁLIDA
-		# ==========================================
-
-
-
 
 		agarrado_pared = true
-
-
-		
-
-		pared_normal = (
-			collision.get_normal()
-		)
-
-
-	
-
+		pared_normal = collision.get_normal()
 		player.velocity.x = 0.0
-
-
-	
 
 		seSalto = false
 		saltoFuego = false
 
-
-
-
-		
-
-		player.animacion_pared(
-			pared_normal
-		)
-
+		player.animacion_pared(pared_normal)
 		return
-
-
-	# NO ENCONTRÓ PARED VÁLIDA
 
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 
 	if not deslizandose_pendiente:
 		player.rotation = 0.0
-
 
 # ==========================================
 # OTROS

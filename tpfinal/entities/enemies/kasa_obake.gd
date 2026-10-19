@@ -1,5 +1,6 @@
 extends "res://entities/abstract/abstract_enemy.gd"
 
+@onready var particulas: GPUParticles2D = $Particulas
 
 # ==========================================
 # VELOCIDADES
@@ -83,7 +84,23 @@ func _physics_process(delta):
 
 
 
+# ==========================================
+# PARTÍCULAS AL MORIR
+# ==========================================
 
+func reproducir_particulas() -> void:
+
+	var transformacion_global := particulas.global_transform
+
+	remove_child(particulas)
+
+	var nivel := get_tree().current_scene
+	nivel.add_child(particulas)
+
+	particulas.global_transform = transformacion_global
+
+	particulas.restart()
+	particulas.emitting = true
 
 # ==========================================
 # JUGADOR ENTRA EN DETECTION AREA
@@ -134,10 +151,10 @@ func _on_damage_area_body_entered(body: Node2D) -> void:
 
 	if body.is_in_group("jugador"):
 
-	
-		body.herir(1)
-	
+			
 		aplicar_empuje_contacto(body)
+
+		body.herir(1)
 
 
 

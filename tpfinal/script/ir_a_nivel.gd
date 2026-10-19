@@ -1,3 +1,4 @@
+
 # IrANivel.gd
 extends Area2D
 
@@ -6,7 +7,6 @@ extends Area2D
 
 
 func _ready() -> void:
-
 	body_entered.connect(_on_body_entered)
 
 
@@ -17,41 +17,38 @@ func _on_body_entered(body: Node) -> void:
 
 	print("ENTRÓ AL IR A NIVEL")
 
+	# Evitar completar el nivel varias veces.
+	set_deferred("monitoring", false)
 
-	# ==========================================
-	# NIVEL QUE ACABAMOS DE TERMINAR
-	# ==========================================
-
+	# Nivel que acabamos de terminar.
 	var nivel_terminado := get_tree().current_scene.scene_file_path
 
 	completar_nivel(nivel_terminado)
 
-
-	# ==========================================
-	# COMPROBAR SIGUIENTE NIVEL
-	# ==========================================
-
+	# Si no hay siguiente nivel, termina la beta.
 	if levelSiguiente == null:
 
-		print("No hay nivel siguiente.")
+		print("FIN DE LA BETA: NIVEL COMPLETADO")
+
+		Save.partidaFinalizada = true
+		Settings.nivelActual = ""
+
+		# Guardar el nivel completado y el estado final.
+		Save.guardar_partida()
+
+		# Volver al menú principal.
+		var main = Settings.getMain()
+
+		if main != null:
+			main.volver_menu_principal()
+		else:
+			push_error("No se encontró Main para volver al menú.")
 
 		return
 
-
-	# ==========================================
-	# GUARDAR EL SIGUIENTE NIVEL COMO ACTUAL
-	# ==========================================
-
+	# Hay otro nivel: guardar su ruta como nivel actual.
 	Settings.nivelActual = levelSiguiente.resource_path
-
-
-	# Guardamos antes de cambiar de escena.
 	Save.guardar_partida()
-
-
-	# ==========================================
-	# CARGAR SIGUIENTE NIVEL
-	# ==========================================
 
 	load_level(levelSiguiente)
 
@@ -62,13 +59,9 @@ func _on_body_entered(body: Node) -> void:
 
 func completar_nivel(nombreNivel: String) -> void:
 
-	# Si ya estaba completado, no lo vuelve a agregar.
 	if Settings.nivelesCompletados.has(nombreNivel):
-
 		print("NIVEL YA COMPLETADO: ", nombreNivel)
-
 		return
-
 
 	Settings.nivelesCompletados.append(nombreNivel)
 
@@ -80,12 +73,11 @@ func completar_nivel(nombreNivel: String) -> void:
 # =========================================================
 
 func load_level(nivel: PackedScene) -> void:
+
 	Settings.checkpoint = 0
+
 	if nivel == null:
-
 		print("ERROR: levelSiguiente está vacío")
-
 		return
-
 
 	Settings.getMain().load_level(nivel)

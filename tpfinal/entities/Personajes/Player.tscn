@@ -128,10 +128,10 @@ animations = [{
 size = Vector2(143, 129)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
-size = Vector2(153, 92)
+size = Vector2(109, 92)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2fb44"]
-size = Vector2(97.75, 155.5)
+size = Vector2(97.75, 110)
 
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
 collision_mask = 15
@@ -153,6 +153,7 @@ script = ExtResource("1_utwpb")
 PESO = 0.5
 projectile_scene = ExtResource("2_bqvfx")
 GRAVITY = 660.0
+GRAVITY_CAIDA = 1700.0
 JUMP_FORCE = -500.0
 JUMP_FIRE_FORCE = -600.0
 FRICTION = 2000.0
@@ -162,6 +163,7 @@ script = ExtResource("17_jkysx")
 PESO = 0.5
 projectile_scene = ExtResource("2_bqvfx")
 GRAVITY = 660.0
+GRAVITY_CAIDA = 1700.0
 JUMP_FORCE = -500.0
 JUMP_FIRE_FORCE = -600.0
 
@@ -204,12 +206,11 @@ shape = SubResource("RectangleShape2D_uqenk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
 visible = false
-position = Vector2(17.5, -3)
+position = Vector2(39.5, -3)
 shape = SubResource("RectangleShape2D_l1ths")
 
 [node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
-visible = false
-position = Vector2(41.125, -32.75)
+position = Vector2(41.125, -43)
 shape = SubResource("RectangleShape2D_2fb44")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]

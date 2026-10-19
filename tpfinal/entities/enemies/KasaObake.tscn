@@ -40,6 +40,16 @@ size = Vector2(104, 405)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vowfh"]
 size = Vector2(110, 83)
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vowfh"]
+load_path = "res://.godot/imported/particula amariilla.png-c7a0a25cbf4899117600e93883362726.ctex"
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_m5g7d"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = -6.0
+initial_velocity_max = 146.0
+gravity = Vector3(0, 98, 0)
+
 [node name="CharacterBody2D" unique_id=86738375 instance=ExtResource("1_1g1o7")]
 script = ExtResource("2_vowfh")
 VELOCIDAD_CAIDA_LENTA = 80.0
@@ -64,3 +74,12 @@ shape = SubResource("RectangleShape2D_go41v")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" index="0" unique_id=2002301746]
 position = Vector2(0, 22.5)
 shape = SubResource("RectangleShape2D_vowfh")
+
+[node name="Particulas" type="GPUParticles2D" parent="." index="4" unique_id=1374871314]
+texture_filter = 1
+emitting = false
+texture = SubResource("CompressedTexture2D_vowfh")
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_m5g7d")

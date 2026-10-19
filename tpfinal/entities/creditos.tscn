@@ -1,22 +1,23 @@
 [gd_scene format=3 uid="uid://bhi7hqr80xnkv"]
 
-[node name="Creditos" type="Control"]
+[node name="Creditos" type="Control" unique_id=2051821688]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=890020703]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=388258585]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=473337871]
 layout_mode = 2
-text = "Gracias a Crafpix por el asset de disparo de fuego
+text = "Gracias a Crafpix por los assets de disparo de fuego y de jabali.
+El resto del arte es propio (Quimey Adonai Martinez)
 "
