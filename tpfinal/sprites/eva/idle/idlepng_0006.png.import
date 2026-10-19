@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bu3go3q454wpk"
-path="res://.godot/imported/eva two tales kitsuneSalto.png-cc4612a13ef83d845a9827e3730627da.ctex"
+uid="uid://c0qwx01r07fe3"
+path="res://.godot/imported/idlepng_0006.png-b5f8c7bb24368759a4baa2084f90346e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/eva/eva two tales kitsuneSalto.png"
-dest_files=["res://.godot/imported/eva two tales kitsuneSalto.png-cc4612a13ef83d845a9827e3730627da.ctex"]
+source_file="res://sprites/eva/idle/idlepng_0006.png"
+dest_files=["res://.godot/imported/idlepng_0006.png-b5f8c7bb24368759a4baa2084f90346e.ctex"]
 
 [params]
 
@@ -37,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

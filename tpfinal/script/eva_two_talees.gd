@@ -23,7 +23,7 @@ var poseeDobleSalto: bool = false
 var vida_maxima: int
 var vida: int
 
-@onready var barraVida = $"../CanvasLayer2/barraDeVida"
+@onready var barraVida = $"../Interfaz/CanvasLayer/Control/InterfazVida"
 
 
 # ==========================================
@@ -56,7 +56,7 @@ var energia_fuego: int
 
 @onready var tiempo_recarga_fuego: Timer = $TiempoRecargaFuego
 
-@onready var barra = $"../CanvasLayer/barraDeFuego"
+@onready var barra = $"../Interfaz/CanvasLayer/Control/InterfazEnergia"
 
 
 # ==========================================
@@ -100,7 +100,6 @@ func _ready() -> void:
 	vida_maxima = Settings.getVidaActual()
 	vida = Settings.getVidaActual()
 
-	barraVida.min_value = 0
 	barraVida.max_value = vida_maxima
 	barraVida.value = vida
 
@@ -112,7 +111,6 @@ func _ready() -> void:
 	energia_maxima = Settings.getEnergiaActual()
 	energia_fuego = Settings.getEnergiaActual()
 
-	barra.min_value = 0
 	barra.max_value = energia_maxima
 	barra.value = energia_fuego
 

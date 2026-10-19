@@ -2,23 +2,24 @@
 
 [ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
 [ext_resource type="Script" uid="uid://dan4lcfk622wr" path="res://script/estadoManual.gd" id="1_utwpb"]
-[ext_resource type="Texture2D" uid="uid://cpo2ylm6clocq" path="res://sprites/eva/correr/eva two tales kitsuneCorrer2.png" id="2_a1f57"]
 [ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="2_bqvfx"]
-[ext_resource type="Texture2D" uid="uid://ctywnma7c8gtt" path="res://sprites/eva/caminar/eva two tales kitsune_0002.png" id="3_25mxy"]
-[ext_resource type="Texture2D" uid="uid://b5ihn2547exqm" path="res://sprites/eva/caminar/eva two tales kitsunecaminar.png" id="3_ar323"]
-[ext_resource type="Texture2D" uid="uid://bofs15gio8lny" path="res://sprites/eva/caminar/eva two tales kitsune_0003.png" id="4_dv4ir"]
-[ext_resource type="Texture2D" uid="uid://47fueng3tmld" path="res://sprites/eva/caminar/eva two tales kitsune_0004.png" id="5_idcse"]
-[ext_resource type="Texture2D" uid="uid://bflvfvfm6fhby" path="res://sprites/eva/correr/eva two tales kitsune4,5.png" id="6_e6e86"]
-[ext_resource type="Texture2D" uid="uid://daw5cio0pbybd" path="res://sprites/eva/correr/eva two tales kitsuneCorrer.png" id="7_tr6hg"]
-[ext_resource type="Texture2D" uid="uid://cdtdtiaf6ipdo" path="res://sprites/eva/correr/eva two tales kitsuneCorrer3.png" id="8_ar323"]
-[ext_resource type="Texture2D" uid="uid://doi2ffw4rwqbc" path="res://sprites/eva/correr/eva two tales kitsuneCorrer4.png" id="9_e6e86"]
-[ext_resource type="Texture2D" uid="uid://bu3go3q454wpk" path="res://sprites/eva/eva two tales kitsuneSalto.png" id="12_5p1bl"]
+[ext_resource type="Texture2D" uid="uid://ciqh36oxbpkfy" path="res://sprites/eva/correr/correr_0001.png" id="5_2fb44"]
+[ext_resource type="Texture2D" uid="uid://mgsqc4scawya" path="res://sprites/eva/correr/correr_0002.png" id="6_2oybu"]
+[ext_resource type="Texture2D" uid="uid://mnh32v0ycddy" path="res://sprites/eva/correr/correr_0003.png" id="7_nglq2"]
+[ext_resource type="Texture2D" uid="uid://xckanmu34ult" path="res://sprites/eva/correr/correr_0004.png" id="8_tkdp0"]
+[ext_resource type="Texture2D" uid="uid://ct0kg7hmxta7p" path="res://sprites/eva/idle/idlepng_0001.png" id="9_fq88h"]
+[ext_resource type="Texture2D" uid="uid://nm63mfxfwfaa" path="res://sprites/eva/idle/idlepng_0002.png" id="10_8k4me"]
+[ext_resource type="Texture2D" uid="uid://2yiwdmp4ag65" path="res://sprites/eva/idle/idlepng_0003.png" id="11_ukjk6"]
+[ext_resource type="Texture2D" uid="uid://uprrxu2sldgt" path="res://sprites/eva/idle/idlepng_0004.png" id="12_0a5kr"]
 [ext_resource type="Texture2D" uid="uid://h4uif4lojobs" path="res://sprites/eva/tornado1.png" id="12_uqenk"]
+[ext_resource type="Texture2D" uid="uid://bkn8of2mnxcou" path="res://sprites/eva/idle/idlepng_0005.png" id="13_ehcps"]
 [ext_resource type="Texture2D" uid="uid://d4lpi7603csb6" path="res://sprites/eva/tornado2.png" id="13_nm73a"]
 [ext_resource type="Texture2D" uid="uid://bng1g4uxk2b1m" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo.png" id="13_uq2ph"]
 [ext_resource type="Texture2D" uid="uid://cvob2ecmp77v7" path="res://sprites/eva/tornado3.png" id="14_2fb44"]
 [ext_resource type="Texture2D" uid="uid://dysrk804eu5xd" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo2.png" id="14_3c5qw"]
-[ext_resource type="Texture2D" uid="uid://bp5k5x52foybv" path="res://sprites/eva/pared.png" id="14_nm73a"]
+[ext_resource type="Texture2D" uid="uid://c0qwx01r07fe3" path="res://sprites/eva/idle/idlepng_0006.png" id="14_nfh3g"]
+[ext_resource type="Texture2D" uid="uid://b0ir1vfka54gn" path="res://sprites/eva/pared.png" id="14_nm73a"]
+[ext_resource type="Texture2D" uid="uid://bv4d8008f5vrb" path="res://sprites/eva/salto.png" id="15_jkdnt"]
 [ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
 [ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
 
@@ -33,36 +34,16 @@ height = 187.914
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_ar323")
+"texture": ExtResource("5_2fb44")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_25mxy")
+"texture": ExtResource("6_2oybu")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_dv4ir")
+"texture": ExtResource("7_nglq2")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_e6e86")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_idcse")
-}],
-"loop": 1,
-"name": &"caminar",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("7_tr6hg")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_a1f57")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_ar323")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_e6e86")
+"texture": ExtResource("8_tkdp0")
 }],
 "loop": 1,
 "name": &"correr",
@@ -70,7 +51,22 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_a1f57")
+"texture": ExtResource("9_fq88h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_8k4me")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_ukjk6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_0a5kr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_ehcps")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_nfh3g")
 }],
 "loop": 1,
 "name": &"quieta",
@@ -78,7 +74,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("12_5p1bl")
+"texture": ExtResource("15_jkdnt")
 }],
 "loop": 1,
 "name": &"salto",
@@ -132,6 +128,16 @@ size = Vector2(109, 92)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2fb44"]
 size = Vector2(97.75, 110)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_2fb44"]
+load_path = "res://.godot/imported/particula roja.png-1b390b90bfa7d6833ed63898afd37e71.ctex"
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_2oybu"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = -6.69
+initial_velocity_max = 146.69
+gravity = Vector3(0, 98, 0)
 
 [node name="Player" type="CharacterBody2D" unique_id=1818771140 groups=["jugador"]]
 collision_mask = 15
@@ -190,7 +196,7 @@ position = Vector2(27, 39)
 texture_filter = 3
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"caminar"
+animation = &"quieta"
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=2109890388]
 texture_filter = 3
@@ -215,6 +221,14 @@ shape = SubResource("RectangleShape2D_2fb44")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]
 zoom = Vector2(0.8, 0.8)
+
+[node name="Particulas" type="GPUParticles2D" parent="." unique_id=1816044435]
+texture_filter = 1
+emitting = false
+texture = SubResource("CompressedTexture2D_2fb44")
+lifetime = 0.6
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_2oybu")
 
 [connection signal="timeout" from="TiempoRecargaFuego" to="." method="_on_tiempo_recarga_fuego_timeout"]
 [connection signal="died" from="estadoManual" to="." method="_on_estado_manual_died"]

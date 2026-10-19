@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://6qlppk75b2ee" path="res://entities/madriguera_derecha.tscn" id="20_5cf6w"]
 [ext_resource type="PackedScene" uid="uid://jocxgcatpy43" path="res://entities/madriguera_izquierda.tscn" id="21_87rbd"]
 [ext_resource type="PackedScene" uid="uid://cv78gsq2jrhn5" path="res://entities/escenario/Roca.tscn" id="23_0gjq2"]
+[ext_resource type="PackedScene" uid="uid://cjsocy4o8vnfr" path="res://entities/interfaz.tscn" id="24_5cf6w"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x8ioc"]
 texture = ExtResource("2_x8ioc")
@@ -4698,12 +4699,6 @@ physics_layer_0/collision_layer = 8
 physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_fgnli")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvnwp"]
-bg_color = Color(0.755235, 0.566486, 0.092648, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x8ioc"]
-bg_color = Color(0.921644, 0.430204, 0.338873, 1)
-
 [sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_t3kn7"]
 resource_name = "impulsos"
 scenes/1/scene = ExtResource("12_6smf7")
@@ -4850,33 +4845,6 @@ tile_set = SubResource("TileSet_kdu4l")
 
 [node name="DialogueBox" parent="." unique_id=1437922421 instance=ExtResource("5_e5dmo")]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=63716219]
-scale = Vector2(0.5, 0.5)
-transform = Transform2D(0.5, 0, 0, 0.5, 0, 0)
-
-[node name="barraDeFuego" type="ProgressBar" parent="CanvasLayer" unique_id=343379632]
-offset_left = 22.0
-offset_top = 28.0
-offset_right = 406.0
-offset_bottom = 116.0
-theme_override_colors/font_outline_color = Color(0.634865, 0.559779, 0.0531301, 1)
-theme_override_styles/fill = SubResource("StyleBoxFlat_qvnwp")
-max_value = 5.0
-step = 1.0
-show_percentage = false
-
-[node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=527640400]
-scale = Vector2(0.5, 0.5)
-transform = Transform2D(0.5, 0, 0, 0.5, 0, 0)
-
-[node name="barraDeVida" type="ProgressBar" parent="CanvasLayer2" unique_id=153578316]
-offset_left = 22.0
-offset_top = 126.0
-offset_right = 410.0
-offset_bottom = 220.0
-theme_override_colors/font_outline_color = Color(0.688424, 0.233111, 0.197215, 1)
-theme_override_styles/fill = SubResource("StyleBoxFlat_x8ioc")
-
 [node name="tilesEscenas" type="TileMapLayer" parent="." unique_id=1643824485]
 tile_set = SubResource("TileSet_7rm4o")
 
@@ -4887,5 +4855,7 @@ tile_set = SubResource("TileSet_h4vih")
 
 [node name="StartPosition" type="Marker2D" parent="." unique_id=442951874]
 position = Vector2(393, 629)
+
+[node name="Interfaz" parent="." unique_id=1313228786 instance=ExtResource("24_5cf6w")]
 
 [connection signal="game_paused" from="." to="." method="_on_game_paused"]

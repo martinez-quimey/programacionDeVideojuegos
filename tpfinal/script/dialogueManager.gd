@@ -19,7 +19,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	timer_automatico = Timer.new()
-	timer_automatico.wait_time = 2.0
+	timer_automatico.wait_time = 3.0
 	timer_automatico.one_shot = true
 	timer_automatico.timeout.connect(_on_timer_automatico_timeout)
 

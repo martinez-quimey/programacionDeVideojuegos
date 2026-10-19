@@ -4,7 +4,7 @@ extends Node
 class_name EstadoPlayer
 
 
-
+@onready var particulasTornado: GPUParticles2D = $"..//Particulas"
 
 # ==========================================
 # PLAYER
@@ -285,6 +285,7 @@ func configurar_hitbox_ataque(
 # ==========================================
 
 func _ready() -> void:
+	particulasTornado.emitting = false
 	ultimo_physics_diagnostic = Time.get_ticks_msec()
 	screen_size = player.get_viewport_rect().size
 
@@ -480,11 +481,25 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 		deslizandose_pendiente = true
 		tiempo_detectando_pendiente = 0.0
 
-		# Conservar la fórmula de rotación original.
-		var nueva_rotacion := clampf(
-			atan2(normal_pendiente.x, -normal_pendiente.y),
+		var ROTACION_MAXIMA_PENDIENTE: float = 65.0
+				# Conservar la fórmula de rotación original.
+		var nueva_rotacion := atan2(
+			normal_pendiente.x,
+			-normal_pendiente.y
+		)
+
+		# Limitar la rotación a un máximo de 90 grados.
+		nueva_rotacion = clampf(
+			nueva_rotacion,
+			deg_to_rad(-90.0),
+			deg_to_rad(90.0)
+		)
+
+		# Mantener también el límite visual configurado.
+		nueva_rotacion = clampf(
+			 nueva_rotacion,
 			deg_to_rad(-ROTACION_MAXIMA_PENDIENTE),
-			deg_to_rad(ROTACION_MAXIMA_PENDIENTE)
+			 deg_to_rad(ROTACION_MAXIMA_PENDIENTE)
 		)
 
 		rotar_manteniendo_apoyo(
@@ -854,6 +869,7 @@ func activar_tornado() -> void:
 
 	tornado_activo = true
 	tiempo_tornado = DURACION_TORNADO
+	particulasTornado.emitting = true
 	# Desactivar colisión principal del Player
 	collision_tornado.set_deferred(
 		"disabled",
@@ -1116,7 +1132,7 @@ func desactivar_tornado() -> void:
 
 	tornado_activo = false
 	tiempo_tornado = 0.0
-
+	particulasTornado.emitting = false
 
 	# ==========================================
 	# DESACTIVAR HITBOX

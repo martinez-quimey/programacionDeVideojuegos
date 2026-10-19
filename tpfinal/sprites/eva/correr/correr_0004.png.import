@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5ihn2547exqm"
-path="res://.godot/imported/eva two tales kitsunecaminar.png-1b7fd68c4dfc3621a59adb1ddbfabe78.ctex"
+uid="uid://xckanmu34ult"
+path="res://.godot/imported/correr_0004.png-51e4951d74eccdfa079043ba739f0ea5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/eva/caminar/eva two tales kitsunecaminar.png"
-dest_files=["res://.godot/imported/eva two tales kitsunecaminar.png-1b7fd68c4dfc3621a59adb1ddbfabe78.ctex"]
+source_file="res://sprites/eva/correr/correr_0004.png"
+dest_files=["res://.godot/imported/correr_0004.png-51e4951d74eccdfa079043ba739f0ea5.ctex"]
 
 [params]
 
@@ -37,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

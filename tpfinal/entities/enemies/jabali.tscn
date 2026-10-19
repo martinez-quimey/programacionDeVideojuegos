@@ -215,7 +215,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(13.161459, 21.11111)
+size = Vector2(15.33793, 21.11111)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kwkry"]
 size = Vector2(61.222225, 22.5)
@@ -244,7 +244,7 @@ animation = &"atacar"
 collision_layer = 0
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="OrientacionEnemy/CollisionAtaque" index="0" unique_id=1834044500]
-position = Vector2(4.419271, -0.77777755)
+position = Vector2(5.5075064, -0.77777755)
 shape = SubResource("RectangleShape2D_4jn62")
 
 [node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://daw5cio0pbybd"
-path="res://.godot/imported/eva two tales kitsuneCorrer.png-ec6db72dec282785ba1880a408445401.ctex"
+uid="uid://mnh32v0ycddy"
+path="res://.godot/imported/correr_0003.png-a6eee6762bef8fc033c94a888726618c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/eva/correr/eva two tales kitsuneCorrer.png"
-dest_files=["res://.godot/imported/eva two tales kitsuneCorrer.png-ec6db72dec282785ba1880a408445401.ctex"]
+source_file="res://sprites/eva/correr/correr_0003.png"
+dest_files=["res://.godot/imported/correr_0003.png-a6eee6762bef8fc033c94a888726618c.ctex"]
 
 [params]
 
@@ -37,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

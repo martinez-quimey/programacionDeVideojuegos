@@ -253,12 +253,13 @@ func comprobar_colision_con_jugador():
 
 		if cuerpo.is_in_group("jugador"):
 
+			aplicar_empuje_contacto(cuerpo) 
 			# Contacto físico normal = 1 de daño.
 			cuerpo.herir(1)
 
 			# El contacto físico calcula desde qué lado
 			# viene el jugador.
-			aplicar_empuje_contacto(cuerpo)
+			
 
 			return
 
