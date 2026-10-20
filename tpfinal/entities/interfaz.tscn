@@ -23,15 +23,15 @@ texture_filter = 1
 layout_mode = 0
 script = ExtResource("1_788sk")
 textura_cola = ExtResource("2_sxyae")
-tamano_cola = Vector2(64, 64)
+tamano_cola = Vector2(96, 96)
 separacion = 1
 
 [node name="InterfazEnergia" type="HBoxContainer" parent="CanvasLayer/Control" unique_id=337773368]
 texture_filter = 1
 layout_mode = 0
-offset_top = 60.0
-offset_bottom = 60.0
+offset_top = 100.0
+offset_bottom = 100.0
 script = ExtResource("3_sxyae")
 textura_cola = ExtResource("4_2afea")
-tamano_cola = Vector2(64, 64)
+tamano_cola = Vector2(96, 96)
 separacion = 2

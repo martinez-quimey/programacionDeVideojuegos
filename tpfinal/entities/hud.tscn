@@ -222,6 +222,21 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
+[node name="Sonido" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=1366092450]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
 [node name="QuitGameButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=593025086]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
@@ -240,6 +255,70 @@ text = "Startt"
 [node name="Panel" type="Panel" parent="MainMenu/MarginContainer" unique_id=436122633]
 z_index = -1
 layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
+
+[node name="Sonido" type="Control" parent="." unique_id=1831351426]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="Sonido" unique_id=763469133]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Sonido/CenterContainer" unique_id=1459538644]
+layout_mode = 2
+
+[node name="LabelSonido" type="Label" parent="Sonido/CenterContainer/VBoxContainer" unique_id=879782236]
+layout_mode = 2
+
+[node name="SonidoSlider" type="HSlider" parent="Sonido/CenterContainer/VBoxContainer" unique_id=747968794]
+layout_mode = 2
+
+[node name="LabelMusica" type="Label" parent="Sonido/CenterContainer/VBoxContainer" unique_id=962517015]
+layout_mode = 2
+
+[node name="MusicaSlider" type="HSlider" parent="Sonido/CenterContainer/VBoxContainer" unique_id=239391581]
+layout_mode = 2
+
+[node name="LabelVoces" type="Label" parent="Sonido/CenterContainer/VBoxContainer" unique_id=1759323259]
+layout_mode = 2
+
+[node name="VocesSlider" type="HSlider" parent="Sonido/CenterContainer/VBoxContainer" unique_id=1807360056]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Sonido/CenterContainer/VBoxContainer" unique_id=1390493710]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="Panel" type="Panel" parent="Sonido" unique_id=1889746923]
+z_index = -1
+layout_mode = 0
+offset_left = -353.0
+offset_top = -238.0
+offset_right = 1929.0
+offset_bottom = 1028.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
@@ -542,6 +621,8 @@ text = "Exit"
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles" to="." method="_on_selector_niveles_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/Sonido" to="." method="_on_sonido_button_pressed"]
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton" to="." method="_on_quit_game_button_pressed"]
+[connection signal="pressed" from="Sonido/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/YesButton" to="." method="_on_yes_button_pressed"]
 [connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/NoButton" to="." method="_on_no_button_pressed"]

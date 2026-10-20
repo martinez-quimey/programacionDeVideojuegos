@@ -46,7 +46,7 @@ const DURACION_RETROCESO: float = 0.5
 var retroceso_activo: bool = false
 var tiempo_retroceso: float = 0.0
 var estado_anterior_retroceso: EstadoPlayer = null
-
+@export var sonido_saltoFuego: AudioStream
 
 # ==========================================
 # TORNADO
@@ -1601,12 +1601,7 @@ func procesar_pendiente_inclinada(delta: float) -> void:
 
 	player.velocity = tangente * velocidad_deslizamiento
 
-# ==========================================
-# SALTO
-# ==========================================
-# ==========================================
-# SALTO
-# ==========================================# ==========================================
+
 # SALTO
 # ==========================================
 func saltar() -> void:
@@ -1719,7 +1714,7 @@ func salto_fuego() -> void:
 			player.obtener_energia_fuego()
 		)
 
-
+		player._reproducir_sonido(sonido_saltoFuego)
 		player.velocity.y = JUMP_FIRE_FORCE
 
 		fire()

@@ -1,6 +1,7 @@
 # Player.gd
 extends CharacterBody2D
 
+@onready var sonidos: AudioStreamPlayer2D = $Sonidos
 
 # ==========================================
 # ESTADOS
@@ -868,3 +869,32 @@ func _physics_process(delta):
 			print("NORMAL DE COLISIÓN = ", colision.get_normal())
 			print("POSICIÓN PLAYER = ", global_position)
 			print("========================================")
+
+# Reproduce un sonido una sola vez.
+func _reproducir_sonido(sonido: AudioStream) -> void:
+	if sonido == null:
+		return
+	sonidos.stop()
+	sonidos.stream = sonido
+	sonidos.play()
+
+
+# Reproduce un sonido en loop hasta que se lo frene o se reproduzca otro.
+func _reproducir_sonido_loop(sonido: AudioStream) -> void:
+	if sonido == null:
+		return
+	sonidos.stop()
+	sonidos.stream = sonido
+	sonidos.play()
+	sonidos.finished.connect(_repetir_sonido_loop, CONNECT_ONE_SHOT)
+
+
+# Detiene el sonido actual.
+func _frenar_sonido() -> void:
+	sonidos.stop()
+
+
+func _repetir_sonido_loop() -> void:
+	if sonidos.stream != null:
+		sonidos.play()
+		sonidos.finished.connect(_repetir_sonido_loop, CONNECT_ONE_SHOT)
