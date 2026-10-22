@@ -1,3 +1,4 @@
+
 extends CharacterBody2D
 
 
@@ -12,12 +13,14 @@ extends CharacterBody2D
 
 @export var GRAVITY: float = 600.0
 
-# Peso del enemigo.
-# Cuanto mayor sea, menor será el retroceso.
+# Cuanto mayor sea el peso, menor será el retroceso.
 @export var PESO: float = 1.0
 
-
 @export var vida: int = 1
+
+# Inmunidades ambientales.
+@export var esInmuneALaLava: bool = false
+@export var esInmuneAlAgua: bool = false
 
 
 # ==========================================
@@ -35,7 +38,6 @@ var enemigo_activo: bool = true
 # ==========================================
 
 const isBoss = false
-
 
 var player_in_range: bool = false
 
@@ -83,12 +85,72 @@ func comprobar_distancia_al_player() -> void:
 func aplicar_gravedad(delta: float) -> void:
 
 	if not is_on_floor():
-
 		velocity.y += GRAVITY * delta
-
 	else:
-
 		velocity.y = 0
+
+
+# ==========================================
+# AGUA
+# ==========================================
+
+func comprobar_tile_agua() -> bool:
+
+	if esInmuneAlAgua:
+		return false
+
+	for i in range(get_slide_collision_count()):
+
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+
+		if collider is TileMapLayer:
+			if collision_tiene_layer(collision, 4):
+				morir()
+				return true
+
+	return false
+
+
+# ==========================================
+# LAVA
+# ==========================================
+
+func comprobar_tile_lava() -> bool:
+
+	if esInmuneALaLava:
+		return false
+
+	for i in range(get_slide_collision_count()):
+
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+
+		if collider is TileMapLayer:
+			if collision_tiene_layer(collision, 5):
+				morir()
+				return true
+
+	return false
+
+
+# ==========================================
+# COMPROBAR CAPA DE COLISIÓN
+# ==========================================
+
+func collision_tiene_layer(
+	collision: KinematicCollision2D,
+	layer: int
+) -> bool:
+
+	var collider = collision.get_collider()
+
+	if not collider is CollisionObject2D:
+		return false
+
+	var collision_layer_actual: int = collider.collision_layer
+
+	return (collision_layer_actual & (1 << (layer - 1))) != 0
 
 
 # ==========================================
@@ -121,6 +183,7 @@ func frenarCaminatas():
 # ==========================================
 # DETECCIÓN DEL JUGADOR
 # ==========================================
+
 func _on_body_entered(body):
 
 	if body.is_in_group("jugador"):

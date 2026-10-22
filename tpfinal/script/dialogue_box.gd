@@ -1,15 +1,18 @@
+
 class_name DialogueBox
 extends CanvasLayer
+
 
 @onready var panel: Panel = $MarginContainer/Panel
 @onready var portrait_container: Control = $MarginContainer/Panel/Portrait
 @onready var portrait: TextureRect = $MarginContainer/Panel/Portrait/marcointerior/marcointerior/Portrait
 @onready var name_label: Label = $MarginContainer/Panel/TextContainer/Name
 @onready var text_label: RichTextLabel = $MarginContainer/Panel/TextContainer/Text
+@onready var audio_dialogo: AudioStreamPlayer = $AudioStreamPlayer
 
 
 func _ready() -> void:
-	print("ready de dialogue box")
+
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	panel.visible = false
@@ -17,10 +20,6 @@ func _ready() -> void:
 
 
 func show_line(line: DialogueLine) -> void:
-	print("SHOW LINE")
-	print("speaker = ", line.speaker)
-	print("text = ", line.text)
-	print("portrait = ", line.portrait)
 
 	panel.visible = true
 
@@ -30,6 +29,16 @@ func show_line(line: DialogueLine) -> void:
 	portrait.texture = line.portrait
 	portrait_container.visible = line.portrait != null
 
+	# Detener el audio de la línea anterior.
+	audio_dialogo.stop()
+	audio_dialogo.stream = line.audio
+
+	# Reproducir solamente si esta línea tiene audio.
+	if line.audio != null:
+		audio_dialogo.play()
+
 
 func hide_dialogue() -> void:
+
 	panel.visible = false
+	audio_dialogo.stop()

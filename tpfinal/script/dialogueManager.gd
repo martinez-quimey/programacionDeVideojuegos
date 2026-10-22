@@ -1,3 +1,4 @@
+
 # DialogueManager
 extends Node
 class_name DialogueManagerScript
@@ -14,8 +15,8 @@ var current_dialogue_es_automatico := false
 
 
 func _ready() -> void:
-	# El DialogueManager debe seguir funcionando
-	# aunque el juego esté pausado.
+
+	# El DialogueManager sigue funcionando durante la pausa.
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	timer_automatico = Timer.new()
@@ -29,9 +30,10 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 
 	if Input.is_action_just_pressed("avanzarDialogo"):
+
 		if current_dialogue != null:
 
-			# Los diálogos automáticos no avanzan con el botón.
+			# Los diálogos automáticos no avanzan manualmente.
 			if current_dialogue.esAutomatico:
 				return
 
@@ -48,6 +50,18 @@ func start_dialogue(dialogue: DialogueAbstract) -> void:
 	if dialogue_box == null:
 		return
 
+	# Conectar una sola vez la señal de finalización del audio.
+	if not dialogue_box.audio_dialogo.finished.is_connected(
+		_on_audio_dialogo_finished
+	):
+		dialogue_box.audio_dialogo.finished.connect(
+			_on_audio_dialogo_finished
+		)
+
+	# Detener cualquier temporizador o audio anterior.
+	timer_automatico.stop()
+	dialogue_box.audio_dialogo.stop()
+
 	current_dialogue = dialogue
 	current_line = 0
 
@@ -60,12 +74,9 @@ func start_dialogue(dialogue: DialogueAbstract) -> void:
 
 	show_current_line()
 
-	# Los diálogos automáticos empiezan su temporizador.
-	if current_dialogue_es_automatico:
-		iniciar_timer_automatico()
-
 
 func show_current_line() -> void:
+
 	if current_dialogue == null:
 		return
 
@@ -79,12 +90,25 @@ func show_current_line() -> void:
 
 	var line: DialogueLine = current_dialogue.lines[current_line]
 
+	# Mostrar la línea y reproducir su audio si existe.
 	dialogue_box.show_line(line)
+
+	if current_dialogue.esAutomatico:
+
+		if line.audio != null:
+			# Esperar a que termine el audio.
+			timer_automatico.stop()
+		else:
+			# Sin audio, avanzar después de 3 segundos.
+			iniciar_timer_automatico()
 
 
 func next_line() -> void:
+
 	if current_dialogue == null:
 		return
+
+	timer_automatico.stop()
 
 	current_line += 1
 
@@ -94,12 +118,9 @@ func next_line() -> void:
 
 	show_current_line()
 
-	# Si es automático, volvemos a esperar 2 segundos.
-	if current_dialogue.esAutomatico:
-		iniciar_timer_automatico()
-
 
 func iniciar_timer_automatico() -> void:
+
 	if timer_automatico == null:
 		return
 
@@ -107,6 +128,7 @@ func iniciar_timer_automatico() -> void:
 
 
 func _on_timer_automatico_timeout() -> void:
+
 	if current_dialogue == null:
 		return
 
@@ -116,11 +138,29 @@ func _on_timer_automatico_timeout() -> void:
 	next_line()
 
 
+func _on_audio_dialogo_finished() -> void:
+
+	if current_dialogue == null:
+		return
+
+	if not current_dialogue.esAutomatico:
+		return
+
+	if current_line < 0 or current_line >= current_dialogue.lines.size():
+		return
+
+	var line: DialogueLine = current_dialogue.lines[current_line]
+
+	# Solo avanzar por audio si la línea actual tiene uno.
+	if line.audio == null:
+		return
+
+	next_line()
+
+
 func end_dialogue() -> void:
 
-	# Detener el temporizador por si estaba funcionando.
-	if timer_automatico != null:
-		timer_automatico.stop()
+	timer_automatico.stop()
 
 	if dialogue_box != null:
 		dialogue_box.hide_dialogue()

@@ -178,7 +178,7 @@ const ENERGIA_TURBO = 3
 # LOS ATAQUES NO USAN ESTA LAYER.
 
 const Letal_layer = 4
-
+const Lava_layer = 5
 var turbo_activo: bool = false
 var tiempo_invulnerabilidad_turbo: float = 0.0
 
@@ -243,11 +243,6 @@ var puede_agarrarse_pared: bool = true
 
 
 
-##esta var y este const deben borrarse
-var ultimo_physics_diagnostic: int = 0
-
-const UMBRAL_PHYSICS_LENTO: int = 100
-
 func configurar_hitbox_ataque(
 	hitbox: Area2D
 ) -> void:
@@ -286,7 +281,7 @@ func configurar_hitbox_ataque(
 
 func _ready() -> void:
 	particulasTornado.emitting = false
-	ultimo_physics_diagnostic = Time.get_ticks_msec()
+
 	screen_size = player.get_viewport_rect().size
 
 
@@ -422,6 +417,9 @@ func esta_en_pendiente_demasiado_inclinada() -> bool:
 # ROTACIÓN POR PENDIENTE
 # ==========================================
 func actualizar_rotacion_pendiente(delta: float) -> void:
+	if turbo_activo:
+		player.rotation = 0.0
+		return
 
 	# No detectar pendientes mientras se salta hacia arriba
 	# o el personaje está agarrado a una pared.
@@ -777,6 +775,8 @@ func procesar_retroceso(delta: float) -> void:
 
 		print("[PROCESAR] Retroceso interrumpido por tile mortal.")
 		return
+	if comprobar_tile_lava():
+		return
 
 	# ==========================================
 	# TERMINAR RETROCESO
@@ -1001,7 +1001,8 @@ func procesar_tornado(delta: float) -> void:
 	if comprobar_tile_mortal():
 
 		return
-
+	if comprobar_tile_lava():
+		return
 
 	# ==========================================
 	# TERMINAR
@@ -1276,34 +1277,31 @@ func comprobar_tile_mortal() -> bool:
 	return false
 
 
+func comprobar_tile_lava() -> bool:
+	for i in range(player.get_slide_collision_count()):
+		var collision = player.get_slide_collision(i)
+		var collider = collision.get_collider()
+
+		if collider is TileMapLayer:
+			if colision_tiene_layer(collision, Lava_layer):
+				var es_inmune: bool = player.get("esInmuneALaLava")
+
+				if not es_inmune:
+					morir()
+					return true
+
+	return false
 # ==========================================
 # PROCESO FÍSICO
 # ==========================================
 func _physics_process(delta: float) -> void:
 
-	var inicio = Time.get_ticks_msec()
 
 	# ==========================================
 	# RETROCESO
 	# ==========================================
 
-	var ahora = Time.get_ticks_msec()
 
-	var tiempo_desde_ultimo = (
-		ahora - ultimo_physics_diagnostic
-	)
-
-	ultimo_physics_diagnostic = ahora
-
-	if tiempo_desde_ultimo >= UMBRAL_PHYSICS_LENTO:
-
-		print(
-			"⚠️ INTERVALO PHYSICS LENTO (este print fue hecho desde estado player) | ",
-			get_path(),
-			" | ",
-			tiempo_desde_ultimo,
-			" ms desde el último physics"
-		)
 
 	if retroceso_activo:
 
@@ -1351,6 +1349,9 @@ func _physics_process(delta: float) -> void:
 		)
 
 		player.move_and_slide()
+
+		if turbo_activo and player.get_slide_collision_count() > 0:
+			comprobar_colision_turbo_diferida()
 
 		# ==========================================
 		# RESTABLECER LAS ROTACIONES
@@ -1420,7 +1421,8 @@ func _physics_process(delta: float) -> void:
 
 			return
 
-
+		if comprobar_tile_lava():
+			return
 		# ==========================================
 		# NO EJECUTAR EL MOVIMIENTO NORMAL
 		# ==========================================
@@ -1500,7 +1502,8 @@ func _physics_process(delta: float) -> void:
 	if comprobar_tile_mortal():
 		return
 
-
+	if comprobar_tile_lava():
+		return
 
 	# ==========================================
 	# MUERTE AL TOCAR TILE MORTAL
@@ -1509,7 +1512,8 @@ func _physics_process(delta: float) -> void:
 	if comprobar_tile_mortal():
 
 		return
-
+	if comprobar_tile_lava():
+		return
 
 	# ==========================================
 	# PARED
@@ -1549,6 +1553,48 @@ func _physics_process(delta: float) -> void:
 		else:
 			player.actualizar_animacion(direccion)
 		
+func comprobar_colision_turbo_diferida() -> void:
+	if not turbo_activo:
+		return
+
+	await get_tree().create_timer(0.05).timeout
+
+	if not turbo_activo:
+		return
+
+	# Crear una consulta con la forma actual del jugador.
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = collision_shape_player.shape
+	query.transform = collision_shape_player.global_transform
+	query.collision_mask = player.collision_mask
+	query.collide_with_bodies = true
+	query.collide_with_areas = false
+
+	# Ignorar al propio jugador.
+	query.exclude = [player.get_rid()]
+
+	# Consultar el estado físico ACTUAL del espacio.
+	var espacio := player.get_world_2d().direct_space_state
+	var resultados := espacio.intersect_shape(query, 32)
+
+	# Si todavía hay un cuerpo bloqueando al jugador,
+	# no restaurar la velocidad.
+	for resultado in resultados:
+		var collider = resultado.get("collider")
+
+		if collider == null or not is_instance_valid(collider):
+			continue
+
+		if collider is PhysicsBody2D:
+			if not collider.is_queued_for_deletion():
+				return
+
+	# Ya no hay cuerpos bloqueando al jugador.
+	# Recuperar la velocidad horizontal del turbo.
+	if mirando_izquierda:
+		player.velocity.x = -FUERZA_TURBO
+	else:
+		player.velocity.x = FUERZA_TURBO
 
 # ==========================================
 # MOVIMIENTO SOBRE PENDIENTE INCLINADA
@@ -1569,7 +1615,6 @@ func procesar_pendiente_inclinada(delta: float) -> void:
 
 	# La gravedad acelera el descenso.
 	var aceleracion := Vector2.DOWN.dot(tangente) * GRAVITY_CAIDA
-
 	velocidad_deslizamiento += aceleracion * delta
 
 	# Velocidad mínima de deslizamiento.
@@ -1578,26 +1623,34 @@ func procesar_pendiente_inclinada(delta: float) -> void:
 		320.0
 	)
 
-	# Límite para que no alcance la velocidad de caída normal.
+	# Reducir la velocidad máxima para evitar movimientos excesivos.
 	velocidad_deslizamiento = minf(
 		velocidad_deslizamiento,
-		850.0
+		450.0
 	)
 
-	# Intentar caminar contra la pendiente frena el descenso.
+	# Ajustar el deslizamiento según la dirección del movimiento.
 	if direccion != 0.0:
 		var movimiento_deseado := Vector2(direccion, 0.0)
 		var componente_caminar := movimiento_deseado.dot(tangente)
 
-		velocidad_deslizamiento -= (
-			componente_caminar * ACCELERATION * delta
-		)
+		if componente_caminar > 0.0:
+			# Cuesta abajo: aplicar el frenado normal,
+			# en lugar de reducirlo al 15 %.
+			velocidad_deslizamiento -= (
+				componente_caminar * ACCELERATION * delta
+			)
+		else:
+			# Cuesta arriba: conservar el comportamiento original.
+			velocidad_deslizamiento -= (
+				componente_caminar * ACCELERATION * delta
+			)
 
-		velocidad_deslizamiento = clampf(
-			velocidad_deslizamiento,
-			0.0,
-			850.0
-		)
+	velocidad_deslizamiento = clampf(
+		velocidad_deslizamiento,
+		0.0,
+		450.0
+	)
 
 	player.velocity = tangente * velocidad_deslizamiento
 

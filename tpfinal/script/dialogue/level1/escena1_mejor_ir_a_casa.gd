@@ -1,22 +1,27 @@
 
 extends DialogueAbstract
+
 @export var imagenDEEvaIdle: Texture2D = preload("res://sprites/eva/expresiones/idle.png")
 
+var audioExplorar: AudioStream = preload("res://sonidos/diálogos_de_eva/nv1/dialogo1explorar.ogg")
+
 func create_dialogue() -> void:
-	print (Settings.language)
+	print(Settings.language)
+
 	if Settings.language == "es":
-		print ("entro al if en español")
+		print("entro al if en español")
 		add_line(
 			"Eva",
 			"Explorar es divertido, pero ya quiero ir a casa",
-			imagenDEEvaIdle
+			imagenDEEvaIdle,
+			audioExplorar
 		)
 
-
 	elif Settings.language == "en":
-		print ("entro al if en ingles")
+		print("entro al if en ingles")
 		add_line(
 			"Eva",
 			"Exploring is fun, but I already want to go home",
-			imagenDEEvaIdle
+			imagenDEEvaIdle,
+			audioExplorar
 		)

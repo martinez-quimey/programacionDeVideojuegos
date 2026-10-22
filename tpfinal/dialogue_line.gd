@@ -1,5 +1,6 @@
 class_name DialogueLine
 extends Resource
+@export var audio: AudioStream
 
 
 var speaker: String = ""

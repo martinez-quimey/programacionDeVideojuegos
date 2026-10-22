@@ -224,11 +224,11 @@ size = Vector2(61.222225, 22.5)
 scale = Vector2(8.5, 8.5)
 script = ExtResource("2_kwkry")
 SPEEDCAMINANDO = 200.0
-SPEEDCORRIENDO = 400.0
+SPEEDCORRIENDO = 600.0
 CAMINATA = 400.0
 DISTANCIA_BORDE = 20.0
 DISTANCIA_PIES = 100.0
-PESO = 0.1
+PESO = 30.0
 vida = 5
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]

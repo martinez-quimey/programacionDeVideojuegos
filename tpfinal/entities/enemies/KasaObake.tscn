@@ -7,11 +7,11 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_to83a"]
 size = Vector2(109, 30)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_a0wsy"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_vowfh"]
 atlas = ExtResource("3_m5g7d")
 region = Rect2(32, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_bnr6u"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_m5g7d"]
 atlas = ExtResource("3_m5g7d")
 region = Rect2(0, 0, 32, 32)
 
@@ -19,7 +19,7 @@ region = Rect2(0, 0, 32, 32)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_a0wsy")
+"texture": SubResource("AtlasTexture_vowfh")
 }],
 "loop": 1,
 "name": &"abierto",
@@ -27,7 +27,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_bnr6u")
+"texture": SubResource("AtlasTexture_m5g7d")
 }],
 "loop": 1,
 "name": &"cerrado",
@@ -63,7 +63,7 @@ shape = SubResource("RectangleShape2D_to83a")
 texture_filter = 1
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_4jn62")
-animation = &"abierto"
+animation = &"cerrado"
 
 [node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
 position = Vector2(0, 201.5)

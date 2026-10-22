@@ -46,16 +46,15 @@ material = SubResource("ShaderMaterial_3oyy8")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -15.299999
-offset_top = -14.899995
-offset_right = 16.699997
-offset_bottom = 17.10001
+offset_left = -18.5
+offset_top = -17.800001
+offset_right = 17.5
+offset_bottom = 18.199999
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Energia" type="Sprite2D" parent="." unique_id=1678430101]
 texture_filter = 1
-material = SubResource("ShaderMaterial_3oyy8")
 position = Vector2(-3, 7)
 texture = ExtResource("2_j62ur")
 

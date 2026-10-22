@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
 [ext_resource type="Script" uid="uid://dan4lcfk622wr" path="res://script/estadoManual.gd" id="1_utwpb"]
 [ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="2_bqvfx"]
-[ext_resource type="AudioStream" uid="uid://docd8y1pch7sb" path="res://sonidos/eva/disparoFuego_1.wav" id="3_2oybu"]
+[ext_resource type="AudioStream" uid="uid://bdu5caft8pp7" path="res://sonidos/eva/disparoFuego_1.ogg" id="3_2oybu"]
 [ext_resource type="Texture2D" uid="uid://ciqh36oxbpkfy" path="res://sprites/eva/correr/correr_0001.png" id="5_2fb44"]
 [ext_resource type="Texture2D" uid="uid://mgsqc4scawya" path="res://sprites/eva/correr/correr_0002.png" id="6_2oybu"]
 [ext_resource type="Texture2D" uid="uid://mnh32v0ycddy" path="res://sprites/eva/correr/correr_0003.png" id="7_nglq2"]
@@ -165,6 +165,7 @@ GRAVITY_CAIDA = 1700.0
 JUMP_FORCE = -500.0
 JUMP_FIRE_FORCE = -600.0
 FRICTION = 2000.0
+ACELERACION_DESLIZAMIENTO_PENDIENTE = 400.0
 
 [node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
 script = ExtResource("17_jkysx")
@@ -175,6 +176,7 @@ GRAVITY = 660.0
 GRAVITY_CAIDA = 1700.0
 JUMP_FORCE = -500.0
 JUMP_FIRE_FORCE = -600.0
+ACELERACION_DESLIZAMIENTO_PENDIENTE = 400.0
 
 [node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
 visible = false

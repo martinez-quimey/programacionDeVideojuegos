@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://ba5vbhvbyadlr"]
+
+[ext_resource type="PackedScene" uid="uid://d1rwpr237uskv" path="res://entities/abstract/abstractEnemy.tscn" id="1_8wmoa"]
+[ext_resource type="Script" uid="uid://yhgbp1gh2bfm" path="res://script/Tsuchigumo.gd" id="2_020b2"]
+[ext_resource type="Texture2D" uid="uid://bdesw0d1tv463" path="res://sprites/enemigos/araña.png" id="3_ayacp"]
+[ext_resource type="PackedScene" uid="uid://c0mpbkd5vhumm" path="res://entities/explosion_nube.tscn" id="8_5rgbr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3oyy8"]
+size = Vector2(37.882355, 26.941177)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fgaqd"]
+atlas = ExtResource("3_ayacp")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_og0yq"]
+atlas = ExtResource("3_ayacp")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8wmoa"]
+atlas = ExtResource("3_ayacp")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_020b2"]
+atlas = ExtResource("3_ayacp")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kwkry"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fgaqd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_og0yq")
+}],
+"loop": 1,
+"name": &"caminar",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8wmoa")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_020b2")
+}],
+"loop": 1,
+"name": &"saltar",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
+size = Vector2(117.220276, 21.11111)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kwkry"]
+size = Vector2(10.529411, 50.988564)
+
+[node name="Tsuchigumo" unique_id=2131858162 instance=ExtResource("1_8wmoa")]
+scale = Vector2(8.5, 8.5)
+script = ExtResource("2_020b2")
+modo_inicial = 0
+SPEEDCAMINANDO = 100.0
+CAMINATA = 200.0
+DISTANCIA_BORDE = 20.0
+DISTANCIA_PIES = 100.0
+DISTANCIA_BORDE_TECHO = 20.0
+DISTANCIA_TECHO = 100.0
+VELOCIDAD_CAIDA_HORIZONTAL = 100.0
+DISTANCIA_SALTO = 40.0
+ALTURA_SALTO = 90.0
+DURACION_SALTO = 0.0
+PESO = 0.1
+vida = 5
+
+[node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]
+position = Vector2(4.8235292, -3.4705892)
+shape = SubResource("RectangleShape2D_3oyy8")
+
+[node name="AnimatedSprite2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
+texture_filter = 1
+position = Vector2(14.235294, -1.0588236)
+sprite_frames = SubResource("SpriteFrames_kwkry")
+animation = &"caminar"
+
+[node name="CollisionAtaque" type="Area2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="1" unique_id=1104407440]
+collision_layer = 0
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="OrientacionEnemy/CollisionAtaque" index="0" unique_id=1834044500]
+position = Vector2(56.44868, -0.77777755)
+shape = SubResource("RectangleShape2D_4jn62")
+
+[node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
+position = Vector2(-1.47059, -41.599674)
+scale = Vector2(2, 2)
+shape = SubResource("RectangleShape2D_kwkry")
+
+[node name="ExplosionNube" parent="." index="3" unique_id=1050899421 instance=ExtResource("8_5rgbr")]
+visible = false
+
+[connection signal="body_entered" from="OrientacionEnemy/CollisionAtaque" to="." method="_on_area_ataque_body_entered"]

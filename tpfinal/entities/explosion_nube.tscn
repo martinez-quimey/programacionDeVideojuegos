@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c0mpbkd5vhumm"]
+
+[ext_resource type="Script" uid="uid://bhlg0bhuworey" path="res://entities/explosion_nube.gd" id="1_lukof"]
+[ext_resource type="Texture2D" uid="uid://tfee4y4bhuag" path="res://sprites/otros/nubeExplosion.png" id="2_62dvh"]
+
+[node name="ExplosionNube" type="Node2D" unique_id=1050899421]
+script = ExtResource("1_lukof")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1740904228]
+texture_filter = 1
+texture = ExtResource("2_62dvh")

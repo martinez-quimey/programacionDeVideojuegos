@@ -3,6 +3,8 @@ extends CharacterBody2D
 
 @onready var sonidos: AudioStreamPlayer2D = $Sonidos
 
+
+@export var esInmuneALaLava: bool = false
 # ==========================================
 # ESTADOS
 # ==========================================

@@ -36,13 +36,13 @@ func _on_body_entered(body: Node) -> void:
 		# Guardar el nivel completado y el estado final.
 		Save.guardar_partida()
 
-		# Volver al menú principal.
-		var main = Settings.getMain()
+	# Volver al menú principal.
+	var main = Settings.getMain()
 
-		if main != null:
-			main.volver_menu_principal()
-		else:
-			push_error("No se encontró Main para volver al menú.")
+	if main != null:
+		main.volver_menu_principal()
+	else:
+		push_error("No se encontró Main para volver al menú.")
 
 		return
 
