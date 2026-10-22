@@ -114,7 +114,7 @@ signal died
 # ==========================================
 # PENDIENTES
 # ==========================================
-
+@export var ACELERACION_CONTROL_PENDIENTE: float = 180.0
 const ANGULO_MAXIMO_PENDIENTE: float = 50.0
 const DISTANCIA_SNAP_SUELO: float = 12.0
 
@@ -576,6 +576,7 @@ func restaurar_rotacion() -> void:
 # ==========================================
 # DIRECCIÓN
 # ==========================================
+
 func establecer_direccion(
 	nueva_direccion: float
 ) -> void:
@@ -586,14 +587,39 @@ func establecer_direccion(
 	if esta_forzado:
 		return
 
+	# En una pendiente inclinada, permitir cambiar
+	# la dirección visual sin modificar el movimiento.
+	if deslizandose_pendiente and normal_pendiente != Vector2.ZERO:
+
+		var tangente := Vector2(
+			normal_pendiente.y,
+			-normal_pendiente.x
+		).normalized()
+
+		if tangente.y < 0.0:
+			tangente = -tangente
+
+		var direccion_cuesta_abajo := signf(tangente.x)
+
+		if (
+			nueva_direccion != 0.0
+			and signf(nueva_direccion) == direccion_cuesta_abajo
+		):
+			mirando_izquierda = nueva_direccion < 0.0
+
+			if not agarrado_pared:
+				player.establecer_direccion_visual(
+					nueva_direccion
+				)
+
+			return
+
 	direccion = nueva_direccion
 
-	if direccion != 0:
+	if direccion != 0.0:
 
-		mirando_izquierda = direccion < 0
+		mirando_izquierda = direccion < 0.0
 
-		# No modificar la escala ni los sprites
-		# mientras el personaje está agarrado a la pared.
 		if not agarrado_pared:
 			player.establecer_direccion_visual(
 				direccion
@@ -1601,57 +1627,44 @@ func comprobar_colision_turbo_diferida() -> void:
 # ==========================================
 
 func procesar_pendiente_inclinada(delta: float) -> void:
+
 	if normal_pendiente == Vector2.ZERO:
 		return
 
-	# Dirección paralela a la pendiente, orientada cuesta abajo.
 	var tangente := Vector2(
 		normal_pendiente.y,
 		-normal_pendiente.x
 	).normalized()
 
+	# Orientar la tangente hacia abajo.
 	if tangente.y < 0.0:
 		tangente = -tangente
 
-	# La gravedad acelera el descenso.
+	# Mantener el deslizamiento natural.
 	var aceleracion := Vector2.DOWN.dot(tangente) * GRAVITY_CAIDA
 	velocidad_deslizamiento += aceleracion * delta
 
-	# Velocidad mínima de deslizamiento.
-	velocidad_deslizamiento = maxf(
-		velocidad_deslizamiento,
-		320.0
-	)
-
-	# Reducir la velocidad máxima para evitar movimientos excesivos.
-	velocidad_deslizamiento = minf(
-		velocidad_deslizamiento,
-		450.0
-	)
-
-	# Ajustar el deslizamiento según la dirección del movimiento.
-	if direccion != 0.0:
-		var movimiento_deseado := Vector2(direccion, 0.0)
-		var componente_caminar := movimiento_deseado.dot(tangente)
-
-		if componente_caminar > 0.0:
-			# Cuesta abajo: aplicar el frenado normal,
-			# en lugar de reducirlo al 15 %.
-			velocidad_deslizamiento -= (
-				componente_caminar * ACCELERATION * delta
-			)
-		else:
-			# Cuesta arriba: conservar el comportamiento original.
-			velocidad_deslizamiento -= (
-				componente_caminar * ACCELERATION * delta
-			)
-
 	velocidad_deslizamiento = clampf(
 		velocidad_deslizamiento,
-		0.0,
+		320.0,
 		450.0
 	)
 
+	# Reducir la velocidad solamente al presionar cuesta arriba.
+	var direccion_cuesta_arriba := -signf(tangente.x)
+
+	if (
+		direccion != 0.0
+		and signf(direccion) == direccion_cuesta_arriba
+	):
+		var frenado := ACELERACION_CONTROL_PENDIENTE * delta
+
+		velocidad_deslizamiento = maxf(
+			velocidad_deslizamiento - frenado,
+			0.0
+		)
+
+	# Aplicar el movimiento paralelo a la pendiente.
 	player.velocity = tangente * velocidad_deslizamiento
 
 

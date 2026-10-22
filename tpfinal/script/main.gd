@@ -406,7 +406,8 @@ func continue_game() -> void:
 	)
 
 	await colocar_player_en_checkpoint()
-
+	if game != null and game.has_method("cargar_spawners_diferidos"):
+		await game.call("cargar_spawners_diferidos")
 	print(
 		"MAIN CONTINUE: después de colocar checkpoint | ",
 		Time.get_ticks_msec() - tiempo_inicio,
@@ -1000,7 +1001,8 @@ func retry_game() -> void:
 	)
 
 	await colocar_player_en_checkpoint()
-
+	if game != null and game.has_method("cargar_spawners_diferidos"):
+		await game.call("cargar_spawners_diferidos")
 	print(
 		"RETRY: después de colocar_player_en_checkpoint() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
@@ -1048,145 +1050,111 @@ func retry_game() -> void:
 # CARGAR NIVEL
 # =========================================================
 
-func load_level(
-	level_scene: PackedScene
-) -> void:
-
-	var tiempo_inicio = Time.get_ticks_msec()
+func load_level(level_scene: PackedScene) -> void:
+	var tiempo_inicio := Time.get_ticks_msec()
 
 	print("")
-	print("====================================")
+	print("========================================")
 	print("CARGANDO NIVEL")
-	print("====================================")
+	print("========================================")
 
 	if level_scene == null:
-
-		print(
-			"ERROR: level_scene es null"
-		)
-
+		push_error("LOAD_LEVEL: level_scene es null")
 		return
 
-	ruta_nivel_actual = (
-		level_scene.resource_path
-	)
+	ruta_nivel_actual = level_scene.resource_path
 
+	# Borrar el nivel anterior, si existe.
 	if game != null:
-
-		print(
-			"LOAD_LEVEL: antes de queue_free() | ",
-			Time.get_ticks_msec() - tiempo_inicio,
-			" ms"
-		)
+		print("LOAD_LEVEL: antes de queue_free | ",
+			Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 		game.queue_free()
 		game = null
 
-		print(
-			"LOAD_LEVEL: antes de await process_frame por nivel anterior | ",
-			Time.get_ticks_msec() - tiempo_inicio,
-			" ms"
-		)
-
-		var antes_frame_borrado = Time.get_ticks_msec()
+		var antes_frame_borrado := Time.get_ticks_msec()
+		print("LOAD_LEVEL: esperando eliminación del nivel anterior")
 
 		await get_tree().process_frame
 
-		var despues_frame_borrado = Time.get_ticks_msec()
+		print("LOAD_LEVEL: espera de eliminación = ",
+			Time.get_ticks_msec() - antes_frame_borrado, " ms")
 
-		print(
-			"LOAD_LEVEL: después de await process_frame por nivel anterior | ",
-			Time.get_ticks_msec() - tiempo_inicio,
-			" ms"
-		)
+	# Instanciar la escena.
+	var antes_instantiate := Time.get_ticks_msec()
 
-		print(
-			"LOAD_LEVEL: solo frame de borrado = ",
-			despues_frame_borrado - antes_frame_borrado,
-			" ms"
-		)
-
-	print(
-		"LOAD_LEVEL: antes de instantiate() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("LOAD_LEVEL: antes de instantiate | ",
+		antes_instantiate - tiempo_inicio, " ms")
 
 	game = level_scene.instantiate()
 
-	print(
-		"LOAD_LEVEL: después de instantiate() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("LOAD_LEVEL: instantiate tardó ",
+		Time.get_ticks_msec() - antes_instantiate, " ms")
 
 	if game == null:
-
-		print(
-			"ERROR: no se pudo instanciar nivel"
-		)
-
+		push_error("LOAD_LEVEL: no se pudo instanciar el nivel")
 		return
 
-	print(
-		"LOAD_LEVEL: antes de add_child() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	# Comprobar el estado del nivel antes de agregarlo al árbol.
+	print("LOAD_LEVEL: antes de add_child")
+	print("LOAD_LEVEL: hijos directos de la escena = ",
+		game.get_child_count())
 
-	var antes_add_child = Time.get_ticks_msec()
+	# Mantener el comportamiento original.
+	Settings.sePuedePausar = true
+	Settings.checkpoint = 0
+
+	# Agregar el nivel al árbol.
+	# Esto ejecuta _enter_tree() y _ready() de sus nodos.
+	var antes_add_child := Time.get_ticks_msec()
 
 	game_container.add_child(game)
 
-	var despues_add_child = Time.get_ticks_msec()
+	print("LOAD_LEVEL: add_child tardó ",
+		Time.get_ticks_msec() - antes_add_child, " ms")
 
-	print(
-		"LOAD_LEVEL: después de add_child() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("LOAD_LEVEL: tiempo acumulado tras add_child = ",
+		Time.get_ticks_msec() - tiempo_inicio, " ms")
 
-	print(
-		"LOAD_LEVEL: SOLO add_child() = ",
-		despues_add_child - antes_add_child,
-		" ms"
-	)
+	# Comprobar cuánto tarda el primer fotograma con el nivel añadido.
+	var antes_frame := Time.get_ticks_msec()
 
-	Settings.sePuedePausar = true
+	print("LOAD_LEVEL: antes de esperar process_frame")
 
-	Settings.checkpoint = 0
+	await get_tree().process_frame
 
-	print(
-		"LOAD_LEVEL: antes de colocar_player_en_checkpoint() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("LOAD_LEVEL: process_frame tardó ",
+		Time.get_ticks_msec() - antes_frame, " ms")
+
+	print("LOAD_LEVEL: tiempo acumulado tras process_frame = ",
+		Time.get_ticks_msec() - tiempo_inicio, " ms")
+
+	# Conectar la señal de muerte.
+	if game.has_signal("player_died"):
+		if not game.player_died.is_connected(_on_player_died):
+			game.player_died.connect(_on_player_died)
+
+	# Colocar al jugador sin alterar la lógica existente.
+	var antes_checkpoint := Time.get_ticks_msec()
+
+	print("LOAD_LEVEL: antes de colocar_player_en_checkpoint")
 
 	await colocar_player_en_checkpoint()
+	if game != null and game.has_method("cargar_spawners_diferidos"):
+		await game.call("cargar_spawners_diferidos")
 
-	print(
-		"LOAD_LEVEL: después de colocar_player_en_checkpoint() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("LOAD_LEVEL: colocar_player_en_checkpoint tardó ",
+		Time.get_ticks_msec() - antes_checkpoint, " ms")
 
-	if game.has_signal("player_died"):
+	print("LOAD_LEVEL: tiempo acumulado tras checkpoint = ",
+		Time.get_ticks_msec() - tiempo_inicio, " ms")
 
-		if not game.player_died.is_connected(
-			_on_player_died
-		):
+	print("LOAD_LEVEL: FIN | TOTAL = ",
+		Time.get_ticks_msec() - tiempo_inicio, " ms")
 
-			game.player_died.connect(
-				_on_player_died
-			)
-
-	print(
-		"LOAD_LEVEL: FIN | ",
-		Time.get_ticks_msec()
-		- tiempo_inicio,
-		" ms"
-	)
-
+	print("========================================")
+	print("FIN CARGANDO NIVEL")
+	print("========================================")
 
 # =========================================================
 # PLAYER MUERE

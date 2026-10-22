@@ -305,21 +305,21 @@ func establecer_direccion_visual(
 
 
 func aplicar_direccion_visual() -> void:
-
-	# No enderezar al personaje mientras sigue una pendiente.
 	if not estado_actual.deslizandose_pendiente:
 		rotation = 0.0
+
+	# No espejar el CharacterBody2D completo.
+	# Evita alterar las transformaciones de sus hijos.
+	scale = Vector2.ONE
 
 	animated_sprite.visible = true
 	animated_sprite_pared.visible = false
 
-	# Espejar el Player completo para conservar el comportamiento original.
-	if mirando_izquierda:
-		scale = Vector2(-1.0, 1.0)
-	else:
-		scale = Vector2(1.0, 1.0)
+	# Espejar solamente el dibujo.
+	# El sprite conserva la rotación heredada del Player.
+	animated_sprite.flip_h = mirando_izquierda
 
-	collision_shape_player.scale = Vector2(1.0, 1.0)
+	collision_shape_player.scale = Vector2.ONE
 
 
 # ==========================================
