@@ -29,7 +29,6 @@ extends "res://entities/abstract/abstract_enemy.gd"
 
 var pausado_caminata: bool = false
 
-var direccion: float = 1.0
 var distancia_caminada: float = 0.0
 
 var jugador_detectado: Node2D = null
@@ -237,99 +236,6 @@ func hay_suelo_delante() -> bool:
 # =========================================================
 # DAÑO POR CONTACTO FÍSICO
 # =========================================================
-
-func comprobar_colision_con_jugador():
-
-	for i in get_slide_collision_count():
-
-		var collision = get_slide_collision(i)
-
-		var cuerpo = collision.get_collider()
-
-
-		if cuerpo == null:
-			continue
-
-
-		if cuerpo.is_in_group("jugador"):
-
-			aplicar_empuje_contacto(cuerpo) 
-			# Contacto físico normal = 1 de daño.
-			cuerpo.herir(1)
-
-			# El contacto físico calcula desde qué lado
-			# viene el jugador.
-			
-
-			return
-
-
-# =========================================================
-# EMPUJE POR CONTACTO
-# =========================================================
-
-# =========================================================
-# EMPUJE POR CONTACTO
-# =========================================================
-
-func aplicar_empuje_contacto(cuerpo: Node2D) -> void:
-
-	if cuerpo == null:
-		return
-
-	var diferencia_x: float = cuerpo.global_position.x - global_position.x
-	var diferencia_y: float = cuerpo.global_position.y - global_position.y
-
-	# =====================================================
-	# JUGADOR VIENE DESDE ARRIBA
-	# =====================================================
-
-	if diferencia_y < -20.0:
-
-		# El empuje vertical es un poco más fuerte.
-		# En Godot, Y negativa significa hacia arriba.
-		#
-		# El componente horizontal depende de la posición:
-		# izquierda del centro = empuja hacia la izquierda.
-		# derecha del centro = empuja hacia la derecha.
-		# exactamente en el centro = empuja hacia la izquierda.
-
-		var direccion_horizontal: float = -1.0
-
-		if diferencia_x > 0.0:
-			direccion_horizontal = 1.0
-
-		var direccion_empuje := Vector2(
-			direccion_horizontal * 0.35,
-			-1.0
-		).normalized()
-
-		cuerpo.retroceso(direccion_empuje, 500)
-
-		return
-
-	# =====================================================
-	# CONTACTO NORMAL POR LOS COSTADOS
-	# =====================================================
-
-	var direccion_empuje := Vector2.RIGHT
-
-	if diferencia_x < -0.1:
-
-		direccion_empuje = Vector2.LEFT
-
-	elif diferencia_x > 0.1:
-
-		direccion_empuje = Vector2.RIGHT
-
-	else:
-
-		if direccion < 0:
-			direccion_empuje = Vector2.LEFT
-		else:
-			direccion_empuje = Vector2.RIGHT
-
-	cuerpo.retroceso(direccion_empuje, 400)
 
 
 # =========================================================
@@ -598,7 +504,7 @@ func comenzar_ataque():
 			#
 			# direccion = 1  -> derecha
 			# direccion = -1 -> izquierda
-			cuerpo.retroceso(Vector2(direccion, 0), 600)
+			cuerpo.retroceso(Vector2(direccion, 0), 500)
 			# Ataque = 2 de daño.
 			cuerpo.herir(2)
 			break
@@ -677,68 +583,69 @@ func comprobar_ataque():
 # ANIMACIONES
 # =========================================================
 
-func animationPlay(string: String):
-
-	if muerto and string != "muerte":
+func animationPlay(nombre: String) -> void:
+	if muerto and nombre != "muerte" and nombre != "morir":
 		return
 
+	if not is_instance_valid(animated_sprite):
+		return
 
-	match string:
-
+	match nombre:
 		"idle":
-
 			animated_sprite.play("idle")
 
-
 		"caminar":
-
 			animated_sprite.play("caminar")
 
-
 		"correr":
-
 			animated_sprite.play("correr")
 
-
 		"atacar":
-
 			animated_sprite.play("atacar")
 
-
-		"muerte":
-
-			muerto = true
-
-			atacando = false
-
-			velocity = Vector2.ZERO
-
-			animated_sprite.play("morir")
-
-			await animated_sprite.animation_finished
-
-			queue_free()
+		"muerte", "morir":
+			morir()
 
 
-		"morir":
+func morir() -> void:
+	if muerto:
+		return
 
-			muerto = true
+	muerto = true
+	DANIO_CONTACTO = 0
+	atacando = false
+	pausado_caminata = true
+	velocity = Vector2.ZERO
 
-			atacando = false
+	set_physics_process(false)
 
-			velocity = Vector2.ZERO
+	if is_instance_valid(Invulnerabilidad):
+		Invulnerabilidad.stop()
 
-			animated_sprite.play("morir")
+	if is_instance_valid(area_ataque):
+		area_ataque.set_deferred("monitoring", false)
+		area_ataque.set_deferred("monitorable", false)
 
-			await animated_sprite.animation_finished
+	if is_instance_valid(animated_sprite):
+		var frames: SpriteFrames = animated_sprite.sprite_frames
 
-			queue_free()
+		if frames != null and frames.has_animation("morir"):
+			var cantidad_frames: int = frames.get_frame_count("morir")
+			var velocidad: float = frames.get_animation_speed("morir")
 
+			if cantidad_frames > 0 and velocidad > 0.0:
+				frames.set_animation_loop("morir", false)
+				animated_sprite.play("morir")
 
-func morir():
+				var duracion: float = (
+					float(cantidad_frames) / velocidad
+				) + 0.1
 
-	animationPlay("muerte")
+				await get_tree().create_timer(duracion).timeout
 
-	await get_tree().create_timer(1.0).timeout
+				if is_instance_valid(self):
+					queue_free()
+
+				return
 
 	queue_free()

@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
 [ext_resource type="Script" uid="uid://dan4lcfk622wr" path="res://script/estadoManual.gd" id="1_utwpb"]
-[ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="2_bqvfx"]
 [ext_resource type="AudioStream" uid="uid://bdu5caft8pp7" path="res://sonidos/eva/disparoFuego_1.ogg" id="3_2oybu"]
+[ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="4_nglq2"]
 [ext_resource type="Texture2D" uid="uid://ciqh36oxbpkfy" path="res://sprites/eva/correr/correr_0001.png" id="5_2fb44"]
 [ext_resource type="Texture2D" uid="uid://mgsqc4scawya" path="res://sprites/eva/correr/correr_0002.png" id="6_2oybu"]
 [ext_resource type="Texture2D" uid="uid://mnh32v0ycddy" path="res://sprites/eva/correr/correr_0003.png" id="7_nglq2"]
@@ -25,11 +25,11 @@
 [ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(130.13062, 143.02948)
+size = Vector2(130.13062, 153)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
 radius = 73.0695
-height = 187.914
+height = 205.84895
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lderi"]
 animations = [{
@@ -122,13 +122,16 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uqenk"]
-size = Vector2(143, 129)
+size = Vector2(161, 129)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
-size = Vector2(109, 92)
+size = Vector2(101, 94)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nglq2"]
+size = Vector2(103.5, 96)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2fb44"]
-size = Vector2(97.75, 110)
+size = Vector2(86, 123)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_2fb44"]
 load_path = "res://.godot/imported/particula roja.png-1b390b90bfa7d6833ed63898afd37e71.ctex"
@@ -157,33 +160,20 @@ one_shot = true
 
 [node name="estadoManual" type="Node2D" parent="." unique_id=395898327 groups=["jugador"]]
 script = ExtResource("1_utwpb")
-PESO = 0.5
 sonido_saltoFuego = ExtResource("3_2oybu")
-projectile_scene = ExtResource("2_bqvfx")
-GRAVITY = 660.0
-GRAVITY_CAIDA = 1700.0
+projectile_scene = ExtResource("4_nglq2")
 JUMP_FORCE = -500.0
-JUMP_FIRE_FORCE = -600.0
-FRICTION = 2000.0
-VELOCIDAD_DESLIZAMIENTO_PENDIENTE = 100.0
-ACELERACION_DESLIZAMIENTO_PENDIENTE = 250.0
+JUMP_FIRE_FORCE = -680.0
 
 [node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
 script = ExtResource("17_jkysx")
-PESO = 0.5
 sonido_saltoFuego = ExtResource("3_2oybu")
-projectile_scene = ExtResource("2_bqvfx")
-GRAVITY = 660.0
-GRAVITY_CAIDA = 1700.0
-JUMP_FORCE = -500.0
-JUMP_FIRE_FORCE = -600.0
-ACELERACION_DESLIZAMIENTO_PENDIENTE = 400.0
+projectile_scene = ExtResource("4_nglq2")
 
 [node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTornado" unique_id=225583521]
-position = Vector2(14.527819, -15.934088)
+position = Vector2(12.500002, -15.934088)
 rotation = 1.5707964
 shape = SubResource("RectangleShape2D_4jn62")
 
@@ -191,7 +181,7 @@ shape = SubResource("RectangleShape2D_4jn62")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTurbo" unique_id=1166951105]
-position = Vector2(22, -10)
+position = Vector2(1.0000019, -7)
 rotation = -1.55509
 shape = SubResource("CapsuleShape2D_5p1bl")
 
@@ -202,7 +192,7 @@ position = Vector2(27, 39)
 texture_filter = 3
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"quieta"
+animation = &"correr"
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=2109890388]
 texture_filter = 3
@@ -212,17 +202,19 @@ sprite_frames = SubResource("SpriteFrames_nm73a")
 animation = &"pared"
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
-visible = false
-position = Vector2(7.5, -16.5)
+position = Vector2(9.5, -16.5)
 shape = SubResource("RectangleShape2D_uqenk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
-visible = false
-position = Vector2(39.5, -3)
+position = Vector2(35.5, -4)
 shape = SubResource("RectangleShape2D_l1ths")
 
+[node name="CollisionShape2DInvertida" type="CollisionShape2D" parent="." unique_id=824254369]
+position = Vector2(-40.25, -3)
+shape = SubResource("RectangleShape2D_nglq2")
+
 [node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
-position = Vector2(41.125, -43)
+position = Vector2(47, -49.5)
 shape = SubResource("RectangleShape2D_2fb44")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=503791996]

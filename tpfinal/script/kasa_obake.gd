@@ -210,3 +210,6 @@ func aplicar_empuje_contacto(cuerpo: Node2D) -> void:
 func animationPlay(nombre: String):
 
 	animated_sprite.play(nombre)
+
+func comprobar_colision_con_jugador():
+	pass

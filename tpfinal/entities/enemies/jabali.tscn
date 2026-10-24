@@ -247,7 +247,9 @@ collision_layer = 0
 position = Vector2(5.5075064, -0.77777755)
 shape = SubResource("RectangleShape2D_4jn62")
 
-[node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
+[node name="DetectionArea" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="2" unique_id=1040540624 groups=["enemigos"]]
+
+[node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" index="0" unique_id=1132004423]
 position = Vector2(12.444445, -13.111112)
 scale = Vector2(2, 2)
 shape = SubResource("RectangleShape2D_kwkry")

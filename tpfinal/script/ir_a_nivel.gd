@@ -11,7 +11,6 @@ func _ready() -> void:
 
 
 func _on_body_entered(body: Node) -> void:
-
 	if not body.is_in_group("jugador"):
 		return
 
@@ -22,27 +21,22 @@ func _on_body_entered(body: Node) -> void:
 
 	# Nivel que acabamos de terminar.
 	var nivel_terminado := get_tree().current_scene.scene_file_path
-
 	completar_nivel(nivel_terminado)
 
-	# Si no hay siguiente nivel, termina la beta.
+	# Si no hay siguiente nivel, termina la beta y vuelve al menú.
 	if levelSiguiente == null:
-
 		print("FIN DE LA BETA: NIVEL COMPLETADO")
 
 		Save.partidaFinalizada = true
 		Settings.nivelActual = ""
-
-		# Guardar el nivel completado y el estado final.
 		Save.guardar_partida()
 
-	# Volver al menú principal.
-	var main = Settings.getMain()
+		var main = Settings.getMain()
 
-	if main != null:
-		main.volver_menu_principal()
-	else:
-		push_error("No se encontró Main para volver al menú.")
+		if main != null:
+			main._on_main_menu()
+		else:
+			push_error("No se encontró Main para volver al menú.")
 
 		return
 
@@ -51,7 +45,6 @@ func _on_body_entered(body: Node) -> void:
 	Save.guardar_partida()
 
 	load_level(levelSiguiente)
-
 
 # =========================================================
 # COMPLETAR NIVEL

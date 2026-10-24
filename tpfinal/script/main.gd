@@ -1,3 +1,4 @@
+
 extends Node2D
 
 
@@ -17,7 +18,6 @@ extends Node2D
 # =========================================================
 
 var game: Node2D = null
-
 var ruta_nivel_actual: String = ""
 
 
@@ -114,15 +114,11 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 
 	var ahora = Time.get_ticks_msec()
-
-	var tiempo_desde_ultimo = (
-		ahora - ultimo_process_diagnostic
-	)
+	var tiempo_desde_ultimo = ahora - ultimo_process_diagnostic
 
 	ultimo_process_diagnostic = ahora
 
 	if tiempo_desde_ultimo >= UMBRAL_FRAME_LENTO:
-
 		print(
 			"⚠️ FRAME MUY LENTO | Main | ",
 			tiempo_desde_ultimo,
@@ -137,15 +133,11 @@ func _process(_delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 
 	var ahora = Time.get_ticks_msec()
-
-	var tiempo_desde_ultimo = (
-		ahora - ultimo_physics_diagnostic
-	)
+	var tiempo_desde_ultimo = ahora - ultimo_physics_diagnostic
 
 	ultimo_physics_diagnostic = ahora
 
 	if tiempo_desde_ultimo >= UMBRAL_FRAME_LENTO:
-
 		print(
 			"⚠️ PHYSICS MUY LENTO | Main | ",
 			tiempo_desde_ultimo,
@@ -172,19 +164,13 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if not Settings.sePuedePausar:
-
-		print(
-			"PAUSA BLOQUEADA: Settings.sePuedePausar = false"
-		)
-
+		print("PAUSA BLOQUEADA: Settings.sePuedePausar = false")
 		return
 
 	print("MAIN: PAUSANDO JUEGO")
 
 	Settings.sePuedePausar = false
-
 	hud.show_pause_menu()
-
 	get_tree().paused = true
 
 	get_viewport().set_input_as_handled()
@@ -197,11 +183,7 @@ func _input(event: InputEvent) -> void:
 func obtener_ruta_nivel_actual() -> String:
 
 	if ruta_nivel_actual == "":
-
-		print(
-			"ERROR: no hay ninguna ruta de nivel guardada"
-		)
-
+		print("ERROR: no hay ninguna ruta de nivel guardada")
 		return ""
 
 	return ruta_nivel_actual
@@ -226,32 +208,15 @@ func continue_game() -> void:
 		" ms"
 	)
 
-	print(
-		"Nivel guardado: ",
-		Settings.nivelActual
-	)
+	print("Nivel guardado: ", Settings.nivelActual)
 
 	if Settings.nivelActual == "":
-
-		print(
-			"ERROR 1: nivelActual está vacío"
-		)
-
+		print("ERROR 1: nivelActual está vacío")
 		return
 
-	if not ResourceLoader.exists(
-		Settings.nivelActual
-	):
-
-		print(
-			"ERROR 2: el recurso NO existe"
-		)
-
-		print(
-			"Ruta buscada: ",
-			Settings.nivelActual
-		)
-
+	if not ResourceLoader.exists(Settings.nivelActual):
+		print("ERROR 2: el recurso NO existe")
+		print("Ruta buscada: ", Settings.nivelActual)
 		return
 
 	print(
@@ -260,9 +225,7 @@ func continue_game() -> void:
 		" ms"
 	)
 
-	var escena_nivel = load(
-		Settings.nivelActual
-	)
+	var escena_nivel = load(Settings.nivelActual)
 
 	print(
 		"MAIN CONTINUE: después de load() | ",
@@ -271,19 +234,11 @@ func continue_game() -> void:
 	)
 
 	if escena_nivel == null:
-
-		print(
-			"ERROR 3: load() devolvió null"
-		)
-
+		print("ERROR 3: load() devolvió null")
 		return
 
 	if not escena_nivel is PackedScene:
-
-		print(
-			"ERROR 4: el recurso NO es una PackedScene"
-		)
-
+		print("ERROR 4: el recurso NO es una PackedScene")
 		return
 
 	print(
@@ -301,25 +256,15 @@ func continue_game() -> void:
 	)
 
 	if nuevo_game == null:
-
-		print(
-			"ERROR 5: instantiate() devolvió null"
-		)
-
+		print("ERROR 5: instantiate() devolvió null")
 		return
 
 	if not nuevo_game is Node2D:
-
-		print(
-			"ERROR 6: el nivel no es Node2D"
-		)
-
+		print("ERROR 6: el nivel no es Node2D")
 		nuevo_game.queue_free()
-
 		return
 
 	if game != null:
-
 		print(
 			"MAIN CONTINUE: antes de queue_free() nivel anterior | ",
 			Time.get_ticks_msec() - tiempo_inicio,
@@ -336,7 +281,6 @@ func continue_game() -> void:
 		)
 
 	game = nuevo_game
-
 	ruta_nivel_actual = Settings.nivelActual
 
 	print(
@@ -346,9 +290,7 @@ func continue_game() -> void:
 	)
 
 	var antes_add_child = Time.get_ticks_msec()
-
 	game_container.add_child(game)
-
 	var despues_add_child = Time.get_ticks_msec()
 
 	print(
@@ -372,9 +314,7 @@ func continue_game() -> void:
 	)
 
 	var antes_frame = Time.get_ticks_msec()
-
 	await get_tree().process_frame
-
 	var despues_frame = Time.get_ticks_msec()
 
 	print(
@@ -390,14 +330,8 @@ func continue_game() -> void:
 	)
 
 	if game.has_signal("player_died"):
-
-		if not game.player_died.is_connected(
-			_on_player_died
-		):
-
-			game.player_died.connect(
-				_on_player_died
-			)
+		if not game.player_died.is_connected(_on_player_died):
+			game.player_died.connect(_on_player_died)
 
 	print(
 		"MAIN CONTINUE: antes de colocar checkpoint | ",
@@ -406,17 +340,17 @@ func continue_game() -> void:
 	)
 
 	await colocar_player_en_checkpoint()
+
 	if game != null and game.has_method("cargar_spawners_diferidos"):
 		await game.call("cargar_spawners_diferidos")
+
 	print(
 		"MAIN CONTINUE: después de colocar checkpoint | ",
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
 
-	print(
-		"NIVEL CARGADO CORRECTAMENTE"
-	)
+	print("NIVEL CARGADO CORRECTAMENTE")
 
 	print(
 		"MAIN CONTINUE: FIN | TOTAL = ",
@@ -439,11 +373,7 @@ func new_game() -> void:
 	print("====================================")
 
 	if level1 == null:
-
-		print(
-			"ERROR: level1 no está asignado en Main"
-		)
-
+		print("ERROR: level1 no está asignado en Main")
 		return
 
 	Settings.checkpoint = 0
@@ -473,17 +403,10 @@ func obtener_projectile_container() -> Node:
 	if game == null:
 		return null
 
-	var container = game.get_node_or_null(
-		"Projectiles"
-	)
+	var container = game.get_node_or_null("Projectiles")
 
 	if container == null:
-
-		container = game.find_child(
-			"Projectiles",
-			true,
-			false
-		)
+		container = game.find_child("Projectiles", true, false)
 
 	return container
 
@@ -502,48 +425,25 @@ func reiniciar_player() -> void:
 	if game == null:
 		return
 
-	var nuevo_player = (
-		game.get_node_or_null("Player")
-	)
+	var nuevo_player = game.get_node_or_null("Player")
 
 	if nuevo_player == null:
-
-		print(
-			"ERROR: no se encontró Player"
-		)
-
+		print("ERROR: no se encontró Player")
 		return
 
-	var projectile_container = (
-		obtener_projectile_container()
-	)
+	var projectile_container = obtener_projectile_container()
 
 	if projectile_container == null:
-
-		print(
-			"ERROR: no existe Projectiles"
-		)
-
+		print("ERROR: no existe Projectiles")
 		return
 
-	var estado_manual: EstadoPlayer = (
-		nuevo_player.get_node_or_null(
-			"estadoManual"
-		)
-	)
-
-	var estado_automatico: EstadoPlayer = (
-		nuevo_player.get_node_or_null(
-			"estadoAutomatico"
-		)
-	)
+	# ARREGLO: quitar el tipo EstadoPlayer de las declaraciones.
+	# Así Main no necesita resolver la clase global para analizarlas.
+	var estado_manual = nuevo_player.get_node_or_null("estadoManual")
+	var estado_automatico = nuevo_player.get_node_or_null("estadoAutomatico")
 
 	if estado_manual == null:
-
-		print(
-			"ERROR: Player no tiene estadoManual"
-		)
-
+		print("ERROR: Player no tiene estadoManual")
 		return
 
 	if estado_automatico != null:
@@ -554,17 +454,13 @@ func reiniciar_player() -> void:
 	nuevo_player.vida = nuevo_player.vida_maxima
 	nuevo_player.actualizar_barra_vida()
 
-	nuevo_player.energia_fuego = (
-		nuevo_player.energia_maxima
-	)
-
+	nuevo_player.energia_fuego = nuevo_player.energia_maxima
 	nuevo_player.actualizar_barra_energia()
 
 	nuevo_player.tiempo_recarga_fuego.stop()
 
 	nuevo_player.show()
 	nuevo_player.animated_sprite.visible = true
-
 	nuevo_player.velocity = Vector2.ZERO
 
 	estado_manual.activo = true
@@ -599,40 +495,21 @@ func reiniciar_player() -> void:
 	estado_manual.saltoFuego = false
 
 	nuevo_player.esta_en_madriguera = false
+	nuevo_player.set_collision_mask_value(2, true)
 
-	nuevo_player.set_collision_mask_value(
-		2,
-		true
-	)
-
-	estado_manual.collision_shape_player.set_deferred(
-		"disabled",
-		false
-	)
-
-	estado_manual.collision_tornado.set_deferred(
-		"disabled",
-		true
-	)
+	estado_manual.collision_shape_player.set_deferred("disabled", false)
+	estado_manual.collision_tornado.set_deferred("disabled", true)
 
 	estado_manual.hitbox_tornado.monitoring = false
 	estado_manual.hitbox_turbo.monitoring = false
 
-	nuevo_player.get_node(
-		"Invulnerabilidad"
-	).stop()
+	nuevo_player.get_node("Invulnerabilidad").stop()
 
-	if not estado_manual.died.is_connected(
-		_on_player_died
-	):
-
+	if not estado_manual.died.is_connected(_on_player_died):
 		estado_manual.died.connect(_on_player_died)
 
 	nuevo_player.restablecer_visual_suelo()
-
-	nuevo_player.reproducir_animacion(
-		"quieta"
-	)
+	nuevo_player.reproducir_animacion("quieta")
 
 	print(
 		"PLAYER REINICIADO SIN CAMBIAR POSICIÓN: ",
@@ -660,13 +537,11 @@ func colocar_player_en_checkpoint() -> void:
 	print("========================================")
 
 	if game == null:
-
 		print(
 			"CHECKPOINT: game == null | ",
 			Time.get_ticks_msec() - tiempo_inicio,
 			" ms"
 		)
-
 		return
 
 	print(
@@ -684,11 +559,7 @@ func colocar_player_en_checkpoint() -> void:
 	)
 
 	if player == null:
-
-		print(
-			"ERROR: no se encontró Player para colocar checkpoint"
-		)
-
+		print("ERROR: no se encontró Player para colocar checkpoint")
 		return
 
 	print(
@@ -697,11 +568,7 @@ func colocar_player_en_checkpoint() -> void:
 		" ms"
 	)
 
-	var posicion_checkpoint = (
-		game.posicionDeCheckpoint(
-			Settings.checkpoint
-		)
-	)
+	var posicion_checkpoint = game.posicionDeCheckpoint(Settings.checkpoint)
 
 	print(
 		"CHECKPOINT: después de posicionDeCheckpoint() | ",
@@ -709,20 +576,9 @@ func colocar_player_en_checkpoint() -> void:
 		" ms"
 	)
 
-	print(
-		"CHECKPOINT: posición obtenida = ",
-		posicion_checkpoint
-	)
-
-	print(
-		"CHECKPOINT: posición actual Player LOCAL = ",
-		player.position
-	)
-
-	print(
-		"CHECKPOINT: posición actual Player GLOBAL = ",
-		player.global_position
-	)
+	print("CHECKPOINT: posición obtenida = ", posicion_checkpoint)
+	print("CHECKPOINT: posición actual Player LOCAL = ", player.position)
+	print("CHECKPOINT: posición actual Player GLOBAL = ", player.global_position)
 
 	print(
 		"CHECKPOINT: ANTES DE CAMBIAR POSICIÓN | ",
@@ -730,12 +586,7 @@ func colocar_player_en_checkpoint() -> void:
 		" ms"
 	)
 
-	# =====================================================
-	# CAMBIO IMPORTANTE:
-	# La posición obtenida del checkpoint se interpreta
-	# como posición GLOBAL.
-	# =====================================================
-
+	# La posición obtenida del checkpoint se interpreta como GLOBAL.
 	player.global_position = posicion_checkpoint
 
 	print(
@@ -744,15 +595,8 @@ func colocar_player_en_checkpoint() -> void:
 		" ms"
 	)
 
-	print(
-		"PLAYER: teletransportado al checkpoint GLOBAL = ",
-		player.global_position
-	)
-
-	print(
-		"PLAYER: posición LOCAL después del teletransporte = ",
-		player.position
-	)
+	print("PLAYER: teletransportado al checkpoint GLOBAL = ", player.global_position)
+	print("PLAYER: posición LOCAL después del teletransporte = ", player.position)
 
 	print(
 		"CHECKPOINT: ANTES DE await process_frame | ",
@@ -761,9 +605,7 @@ func colocar_player_en_checkpoint() -> void:
 	)
 
 	var antes_frame = Time.get_ticks_msec()
-
 	await get_tree().process_frame
-
 	var despues_frame = Time.get_ticks_msec()
 
 	print(
@@ -812,29 +654,17 @@ func retry_game() -> void:
 	print("########## REINTENTAR NIVEL ########")
 	print("####################################")
 
-	print(
-		"RETRY: inicio | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: inicio | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	if game == null:
-
-		print(
-			"ERROR: no existe nivel cargado"
-		)
-
+		print("ERROR: no existe nivel cargado")
 		return
 
 	var checkpoint_guardado = Settings.checkpoint
 
-	print(
-		"CHECKPOINT ANTES DE REINICIAR: ",
-		checkpoint_guardado
-	)
+	print("CHECKPOINT ANTES DE REINICIAR: ", checkpoint_guardado)
 
 	get_tree().paused = false
-
 	Settings.sePuedePausar = true
 
 	var ruta_nivel = game.scene_file_path
@@ -843,61 +673,31 @@ func retry_game() -> void:
 		ruta_nivel = ruta_nivel_actual
 
 	if ruta_nivel == "":
-
-		print(
-			"ERROR: no se pudo obtener la ruta del nivel"
-		)
-
+		print("ERROR: no se pudo obtener la ruta del nivel")
 		return
 
-	print(
-		"Nivel que se va a recargar: ",
-		ruta_nivel
-	)
+	print("Nivel que se va a recargar: ", ruta_nivel)
 
-	print(
-		"RETRY: antes de load() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: antes de load() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
-	var escena_nivel = load(
-		ruta_nivel
-	)
+	var escena_nivel = load(ruta_nivel)
 
-	print(
-		"RETRY: después de load() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: después de load() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	if escena_nivel == null:
-
-		print(
-			"ERROR: no se pudo cargar nuevamente el nivel"
-		)
-
+		print("ERROR: no se pudo cargar nuevamente el nivel")
 		return
 
 	if not escena_nivel is PackedScene:
-
-		print(
-			"ERROR: la escena del nivel no es PackedScene"
-		)
-
+		print("ERROR: la escena del nivel no es PackedScene")
 		return
 
-	print(
-		"BORRANDO NIVEL COMPLETO"
-	)
+	print("BORRANDO NIVEL COMPLETO")
 
 	game.queue_free()
 	game = null
 
-	# =====================================================
-	# RESTAURAR CHECKPOINT ANTES DE CREAR EL NIVEL NUEVO
-	# =====================================================
-
+	# Restaurar el checkpoint antes de crear el nivel nuevo.
 	Settings.checkpoint = checkpoint_guardado
 
 	print(
@@ -912,9 +712,7 @@ func retry_game() -> void:
 	)
 
 	var antes_frame_borrado = Time.get_ticks_msec()
-
 	await get_tree().process_frame
-
 	var despues_frame_borrado = Time.get_ticks_msec()
 
 	print(
@@ -929,117 +727,54 @@ func retry_game() -> void:
 		" ms"
 	)
 
-	print(
-		"CREANDO NIVEL NUEVO"
-	)
+	print("CREANDO NIVEL NUEVO")
 
-	print(
-		"RETRY: antes de instantiate() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: antes de instantiate() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	game = escena_nivel.instantiate()
 
-	print(
-		"RETRY: después de instantiate() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: después de instantiate() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	if game == null:
-
-		print(
-			"ERROR: no se pudo instanciar nuevamente el nivel"
-		)
-
+		print("ERROR: no se pudo instanciar nuevamente el nivel")
 		return
 
 	if not game is Node2D:
-
-		print(
-			"ERROR: el nivel nuevo no es Node2D"
-		)
-
+		print("ERROR: el nivel nuevo no es Node2D")
 		game.queue_free()
 		game = null
-
 		return
 
-	print(
-		"RETRY: antes de add_child() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: antes de add_child() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	var antes_add_child = Time.get_ticks_msec()
-
 	game_container.add_child(game)
-
 	var despues_add_child = Time.get_ticks_msec()
 
-	print(
-		"RETRY: después de add_child() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
-
-	print(
-		"RETRY: SOLO add_child() = ",
-		despues_add_child - antes_add_child,
-		" ms"
-	)
+	print("RETRY: después de add_child() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
+	print("RETRY: SOLO add_child() = ", despues_add_child - antes_add_child, " ms")
 
 	ruta_nivel_actual = ruta_nivel
-
 	Settings.sePuedePausar = true
 
-	print(
-		"RETRY: antes de colocar_player_en_checkpoint() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+	print("RETRY: antes de colocar_player_en_checkpoint() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	await colocar_player_en_checkpoint()
+
 	if game != null and game.has_method("cargar_spawners_diferidos"):
 		await game.call("cargar_spawners_diferidos")
-	print(
-		"RETRY: después de colocar_player_en_checkpoint() | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
+
+	print("RETRY: después de colocar_player_en_checkpoint() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	if game.has_signal("player_died"):
+		if not game.player_died.is_connected(_on_player_died):
+			game.player_died.connect(_on_player_died)
 
-		if not game.player_died.is_connected(
-			_on_player_died
-		):
+	print("CHECKPOINT FINAL: ", Settings.checkpoint)
+	print("POSICIÓN FINAL PLAYER LOCAL: ", game.get_node("Player").position)
+	print("POSICIÓN FINAL PLAYER GLOBAL: ", game.get_node("Player").global_position)
 
-			game.player_died.connect(
-				_on_player_died
-			)
-
-	print(
-		"CHECKPOINT FINAL: ",
-		Settings.checkpoint
-	)
-
-	print(
-		"POSICIÓN FINAL PLAYER LOCAL: ",
-		game.get_node("Player").position
-	)
-
-	print(
-		"POSICIÓN FINAL PLAYER GLOBAL: ",
-		game.get_node("Player").global_position
-	)
-
-	print(
-		"REINTENTAR FINALIZADO | ",
-		Time.get_ticks_msec()
-		- tiempo_inicio,
-		" ms"
-	)
+	print("REINTENTAR FINALIZADO | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	print("####################################")
 	print("######## FIN REINTENTAR NIVEL #######")
@@ -1051,6 +786,7 @@ func retry_game() -> void:
 # =========================================================
 
 func load_level(level_scene: PackedScene) -> void:
+
 	var tiempo_inicio := Time.get_ticks_msec()
 
 	print("")
@@ -1066,95 +802,119 @@ func load_level(level_scene: PackedScene) -> void:
 
 	# Borrar el nivel anterior, si existe.
 	if game != null:
-		print("LOAD_LEVEL: antes de queue_free | ",
-			Time.get_ticks_msec() - tiempo_inicio, " ms")
+		print(
+			"LOAD_LEVEL: antes de queue_free | ",
+			Time.get_ticks_msec() - tiempo_inicio,
+			" ms"
+		)
 
 		game.queue_free()
 		game = null
 
 		var antes_frame_borrado := Time.get_ticks_msec()
+
 		print("LOAD_LEVEL: esperando eliminación del nivel anterior")
 
 		await get_tree().process_frame
 
-		print("LOAD_LEVEL: espera de eliminación = ",
-			Time.get_ticks_msec() - antes_frame_borrado, " ms")
+		print(
+			"LOAD_LEVEL: espera de eliminación = ",
+			Time.get_ticks_msec() - antes_frame_borrado,
+			" ms"
+		)
 
 	# Instanciar la escena.
 	var antes_instantiate := Time.get_ticks_msec()
 
-	print("LOAD_LEVEL: antes de instantiate | ",
-		antes_instantiate - tiempo_inicio, " ms")
+	print(
+		"LOAD_LEVEL: antes de instantiate | ",
+		antes_instantiate - tiempo_inicio,
+		" ms"
+	)
 
 	game = level_scene.instantiate()
 
-	print("LOAD_LEVEL: instantiate tardó ",
-		Time.get_ticks_msec() - antes_instantiate, " ms")
+	print(
+		"LOAD_LEVEL: instantiate tardó ",
+		Time.get_ticks_msec() - antes_instantiate,
+		" ms"
+	)
 
 	if game == null:
 		push_error("LOAD_LEVEL: no se pudo instanciar el nivel")
 		return
 
-	# Comprobar el estado del nivel antes de agregarlo al árbol.
 	print("LOAD_LEVEL: antes de add_child")
-	print("LOAD_LEVEL: hijos directos de la escena = ",
-		game.get_child_count())
+	print("LOAD_LEVEL: hijos directos de la escena = ", game.get_child_count())
 
-	# Mantener el comportamiento original.
 	Settings.sePuedePausar = true
 	Settings.checkpoint = 0
 
-	# Agregar el nivel al árbol.
-	# Esto ejecuta _enter_tree() y _ready() de sus nodos.
 	var antes_add_child := Time.get_ticks_msec()
 
 	game_container.add_child(game)
 
-	print("LOAD_LEVEL: add_child tardó ",
-		Time.get_ticks_msec() - antes_add_child, " ms")
+	print(
+		"LOAD_LEVEL: add_child tardó ",
+		Time.get_ticks_msec() - antes_add_child,
+		" ms"
+	)
 
-	print("LOAD_LEVEL: tiempo acumulado tras add_child = ",
-		Time.get_ticks_msec() - tiempo_inicio, " ms")
+	print(
+		"LOAD_LEVEL: tiempo acumulado tras add_child = ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
 
-	# Comprobar cuánto tarda el primer fotograma con el nivel añadido.
 	var antes_frame := Time.get_ticks_msec()
 
 	print("LOAD_LEVEL: antes de esperar process_frame")
 
 	await get_tree().process_frame
 
-	print("LOAD_LEVEL: process_frame tardó ",
-		Time.get_ticks_msec() - antes_frame, " ms")
+	print(
+		"LOAD_LEVEL: process_frame tardó ",
+		Time.get_ticks_msec() - antes_frame,
+		" ms"
+	)
 
-	print("LOAD_LEVEL: tiempo acumulado tras process_frame = ",
-		Time.get_ticks_msec() - tiempo_inicio, " ms")
+	print(
+		"LOAD_LEVEL: tiempo acumulado tras process_frame = ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
 
-	# Conectar la señal de muerte.
 	if game.has_signal("player_died"):
 		if not game.player_died.is_connected(_on_player_died):
 			game.player_died.connect(_on_player_died)
 
-	# Colocar al jugador sin alterar la lógica existente.
 	var antes_checkpoint := Time.get_ticks_msec()
 
 	print("LOAD_LEVEL: antes de colocar_player_en_checkpoint")
 
 	await colocar_player_en_checkpoint()
+
 	if game != null and game.has_method("cargar_spawners_diferidos"):
 		await game.call("cargar_spawners_diferidos")
 
-	print("LOAD_LEVEL: colocar_player_en_checkpoint tardó ",
-		Time.get_ticks_msec() - antes_checkpoint, " ms")
+	print(
+		"LOAD_LEVEL: colocar_player_en_checkpoint tardó ",
+		Time.get_ticks_msec() - antes_checkpoint,
+		" ms"
+	)
 
-	print("LOAD_LEVEL: tiempo acumulado tras checkpoint = ",
-		Time.get_ticks_msec() - tiempo_inicio, " ms")
+	print(
+		"LOAD_LEVEL: tiempo acumulado tras checkpoint = ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
 
-	print("LOAD_LEVEL: FIN | TOTAL = ",
-		Time.get_ticks_msec() - tiempo_inicio, " ms")
+	print("LOAD_LEVEL: FIN | TOTAL = ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	print("========================================")
 	print("FIN CARGANDO NIVEL")
 	print("========================================")
+
 
 # =========================================================
 # PLAYER MUERE
@@ -1162,12 +922,9 @@ func load_level(level_scene: PackedScene) -> void:
 
 func _on_player_died() -> void:
 
-	print(
-		"MAIN: PLAYER MURIÓ"
-	)
+	print("MAIN: PLAYER MURIÓ")
 
 	Settings.sePuedePausar = false
-
 	hud.show_game_over()
 
 
@@ -1177,9 +934,7 @@ func _on_player_died() -> void:
 
 func _on_game_paused() -> void:
 
-	print(
-		"MAIN: game_paused recibido"
-	)
+	print("MAIN: game_paused recibido")
 
 	if get_tree().paused:
 		return
@@ -1190,7 +945,6 @@ func _on_game_paused() -> void:
 	Settings.sePuedePausar = false
 
 	hud.show_pause_menu()
-
 	get_tree().paused = true
 
 
@@ -1200,20 +954,14 @@ func _on_game_paused() -> void:
 
 func _on_main_menu() -> void:
 
-	print(
-		"MAIN: VOLVIENDO AL MENÚ"
-	)
+	print("MAIN: VOLVIENDO AL MENÚ")
 
 	get_tree().paused = false
-
 	Settings.sePuedePausar = false
 
 	if game != null:
-
 		game.queue_free()
-
 		game = null
 
 	ruta_nivel_actual = ""
-
 	hud.show_main_menu()

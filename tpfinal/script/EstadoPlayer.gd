@@ -17,7 +17,9 @@ class_name EstadoPlayer
 @onready var player: CharacterBody2D = get_parent()
 
 @onready var collision_shape_player: CollisionShape2D = $"..//CollisionShape2D"
+@onready var collision_shape_player_invertida: CollisionShape2D = $"../CollisionShape2DInvertida"
 @onready var collision_tornado: CollisionShape2D = $"../CollisionShapeTornado"
+
 # ==========================================
 # ESTADO
 # ==========================================
@@ -215,7 +217,11 @@ var mirando_izquierda: bool = false
 # ==========================================
 # ESTADO DE PARED
 # ==========================================
+var tiempo_contacto_suelo_pared: float = 0.0
+var tiempo_sin_contacto_pared: float = 0.0
 
+const TIEMPO_CONFIRMACION_SUELO_PARED: float = 0.06
+const TOLERANCIA_PERDIDA_PARED: float = 0.15
 var agarrado_pared: bool = false
 var pared_normal: Vector2 = Vector2.ZERO
 var puede_agarrarse_pared: bool = true
@@ -305,6 +311,7 @@ func _ready() -> void:
 	configurar_hitbox_ataque(
 		hitbox_tornado
 	)
+
 	collision_tornado.set_deferred(
 	"disabled",
 	true
@@ -335,7 +342,10 @@ func _ready() -> void:
 
 	player.floor_stop_on_slope = true
 
+	collision_shape_player.disabled = false
+	collision_shape_player_invertida.disabled = true
 
+	actualizar_hitbox_direccion()
 	# ==========================================
 	# DEBUG DEL HITBOX
 	# ==========================================
@@ -413,7 +423,8 @@ func esta_en_pendiente_demasiado_inclinada() -> bool:
 		player.get_floor_angle()
 	)
 
-	return angulo > ANGULO_MAXIMO_PENDIENTE# ==========================================
+	return angulo > ANGULO_MAXIMO_PENDIENTE
+	# ==========================================
 # ROTACIÓN POR PENDIENTE
 # ==========================================
 func actualizar_rotacion_pendiente(delta: float) -> void:
@@ -421,15 +432,16 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 		player.rotation = 0.0
 		return
 
-	# No detectar pendientes mientras se salta hacia arriba
-	# o el personaje está agarrado a una pared.
-	if agarrado_pared or (
+	# No detectar pendientes mientras se salta hacia arriba,
+	# Eva está agarrada a una pared o se está transfiriendo la hitbox.
+	if agarrado_pared or player.transfiriendo_hitbox_pared or (
 		not player.is_on_floor()
 		and player.velocity.y < 0.0
+		and not deslizandose_pendiente
 	):
 		tiempo_detectando_pendiente = 0.0
 
-		if not agarrado_pared:
+		if not agarrado_pared and not player.transfiriendo_hitbox_pared:
 			deslizandose_pendiente = false
 			normal_pendiente = Vector2.ZERO
 			velocidad_deslizamiento = 0.0
@@ -442,7 +454,6 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 	var normal_detectada := Vector2.ZERO
 
 	for i in range(player.get_slide_collision_count()):
-
 		var colision := player.get_slide_collision(i)
 		var normal := colision.get_normal().normalized()
 
@@ -457,18 +468,15 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 		# Detectar únicamente superficies más inclinadas
 		# que el límite normal, pero no paredes verticales.
 		if angulo > ANGULO_MAXIMO_PENDIENTE and angulo < 89.0:
-
 			normal_detectada = normal
 			pendiente_detectada = true
 			break
 
 	if pendiente_detectada:
-
 		tiempo_sin_contacto_pendiente = 0.0
 
 		# Confirmar el contacto antes de activar la pendiente.
 		if not deslizandose_pendiente:
-
 			tiempo_detectando_pendiente += delta
 
 			if tiempo_detectando_pendiente < TIEMPO_CONFIRMACION_PENDIENTE:
@@ -480,7 +488,8 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 		tiempo_detectando_pendiente = 0.0
 
 		var ROTACION_MAXIMA_PENDIENTE: float = 65.0
-				# Conservar la fórmula de rotación original.
+
+		# Conservar la fórmula de rotación original.
 		var nueva_rotacion := atan2(
 			normal_pendiente.x,
 			-normal_pendiente.y
@@ -495,9 +504,9 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 
 		# Mantener también el límite visual configurado.
 		nueva_rotacion = clampf(
-			 nueva_rotacion,
+			nueva_rotacion,
 			deg_to_rad(-ROTACION_MAXIMA_PENDIENTE),
-			 deg_to_rad(ROTACION_MAXIMA_PENDIENTE)
+			deg_to_rad(ROTACION_MAXIMA_PENDIENTE)
 		)
 
 		rotar_manteniendo_apoyo(
@@ -512,7 +521,6 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 
 	# Tolerar pequeñas interrupciones en las colisiones.
 	if deslizandose_pendiente:
-
 		tiempo_sin_contacto_pendiente += delta
 
 		if tiempo_sin_contacto_pendiente < TOLERANCIA_CONTACTO_PENDIENTE:
@@ -524,21 +532,25 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 	velocidad_deslizamiento = 0.0
 	tiempo_sin_contacto_pendiente = 0.0
 	player.rotation = 0.0
+
 func rotar_manteniendo_apoyo(
 	nueva_rotacion: float,
 	normal: Vector2
 ) -> void:
 
-	if collision_shape_player.shape == null:
+	var hitbox_actual: CollisionShape2D
+
+	if mirando_izquierda:
+		hitbox_actual = collision_shape_player_invertida
+	else:
+		hitbox_actual = collision_shape_player
+
+	if hitbox_actual.shape == null:
 		player.rotation = nueva_rotacion
 		return
 
-	# Obtener los límites locales de la hitbox.
-	var rect := collision_shape_player.shape.get_rect()
+	var rect := hitbox_actual.shape.get_rect()
 
-	# Elegir el extremo inferior que mira hacia la pendiente.
-	# Si la normal apunta a la izquierda, apoyarse con el pie derecho.
-	# Si apunta a la derecha, apoyarse con el pie izquierdo.
 	var punto_local: Vector2
 
 	if normal.x < 0.0:
@@ -546,23 +558,20 @@ func rotar_manteniendo_apoyo(
 	else:
 		punto_local = Vector2(rect.position.x, rect.end.y)
 
-	# Guardar la posición global del punto de apoyo.
 	var apoyo_global := (
-		collision_shape_player.global_transform
+		hitbox_actual.global_transform
 		* punto_local
 	)
 
-	# Rotar el personaje.
 	player.rotation = nueva_rotacion
 
-	# Calcular dónde quedó el mismo punto tras la rotación.
 	var apoyo_nuevo := (
-		collision_shape_player.global_transform
+		hitbox_actual.global_transform
 		* punto_local
 	)
 
-	# Desplazar el personaje para devolver el apoyo a su lugar.
 	player.global_position += apoyo_global - apoyo_nuevo
+
 
 
 func restaurar_rotacion() -> void:
@@ -576,7 +585,43 @@ func restaurar_rotacion() -> void:
 # ==========================================
 # DIRECCIÓN
 # ==========================================
+func actualizar_hitbox_direccion() -> void:
 
+	# No cambiar las hitboxes direccionales durante el tornado.
+	if tornado_activo:
+		return
+
+	# Mientras Eva está en la pared, sus colisiones
+	# pertenecen al sistema de pared.
+	if (
+		agarrado_pared
+		or player.transfiriendo_hitbox_pared
+	):
+		return
+
+	# Player.gd será el único que cambie las colisiones.
+	player.mirando_izquierda = mirando_izquierda
+	player.actualizar_colision_direccion()
+	if tornado_activo:
+		collision_shape_player.set_deferred("disabled", true)
+		collision_shape_player_invertida.set_deferred("disabled", true)
+		return
+
+	var hitbox_nueva: CollisionShape2D
+	var hitbox_actual: CollisionShape2D
+
+	if mirando_izquierda:
+		hitbox_nueva = collision_shape_player_invertida
+		hitbox_actual = collision_shape_player
+	else:
+		hitbox_nueva = collision_shape_player
+		hitbox_actual = collision_shape_player_invertida
+
+	# Activar primero la hitbox correspondiente a la dirección nueva.
+	hitbox_nueva.set_deferred("disabled", false)
+
+	# Desactivar después la hitbox de la dirección anterior.
+	hitbox_actual.set_deferred("disabled", true)
 func establecer_direccion(
 	nueva_direccion: float
 ) -> void:
@@ -607,6 +652,7 @@ func establecer_direccion(
 		):
 			mirando_izquierda = nueva_direccion < 0.0
 
+			actualizar_hitbox_direccion()
 			if not agarrado_pared:
 				player.establecer_direccion_visual(
 					nueva_direccion
@@ -619,6 +665,8 @@ func establecer_direccion(
 	if direccion != 0.0:
 
 		mirando_izquierda = direccion < 0.0
+
+		actualizar_hitbox_direccion()
 
 		if not agarrado_pared:
 			player.establecer_direccion_visual(
@@ -897,14 +945,16 @@ func activar_tornado() -> void:
 	tiempo_tornado = DURACION_TORNADO
 	particulasTornado.emitting = true
 	# Desactivar colisión principal del Player
-	collision_tornado.set_deferred(
-		"disabled",
-		false
-	)
 	collision_shape_player.set_deferred(
 		"disabled",
 		true
 	)
+
+	collision_shape_player_invertida.set_deferred(
+		"disabled",
+		true
+	)
+
 	
 
 	enemigos_golpeados_tornado.clear()
@@ -1169,14 +1219,14 @@ func desactivar_tornado() -> void:
 	# Volver a activar colisión principal del Player
 	collision_shape_player.set_deferred(
 		"disabled",
-		false
-	)
-	
-	collision_tornado.set_deferred(
-		"disabled",
-		false
+		true
 	)
 
+	collision_tornado.set_deferred(
+		"disabled",
+		true
+	)
+	actualizar_hitbox_direccion()
 
 	# ==========================================
 	# RESTAURAR PARED
@@ -1510,7 +1560,7 @@ func _physics_process(delta: float) -> void:
 				player.velocity.y + GRAVITY * delta,
 				WALL_SLIDE_SPEED
 			)
-		elif not turbo_activo:
+		elif not turbo_activo and not deslizandose_pendiente:
 			if player.velocity.y > 0:
 				player.velocity.y += GRAVITY_CAIDA * delta
 			else:
@@ -1522,7 +1572,7 @@ func _physics_process(delta: float) -> void:
 # ==========================================
 
 	player.move_and_slide()
-
+	comprobar_transferencia_hitbox_pared()
 	actualizar_rotacion_pendiente(delta)
 
 	if comprobar_tile_mortal():
@@ -1550,13 +1600,13 @@ func _physics_process(delta: float) -> void:
 		puede_agarrarse_pared = true
 
 	if not turbo_activo:
-		detectar_pared()
+		detectar_pared(delta)
 
 	# ==========================================
 	# ESTADO DE SUELO
 	# ==========================================
 
-	if player.is_on_floor() and not turbo_activo and not deslizandose_pendiente:
+	if player.is_on_floor() and not turbo_activo and not deslizandose_pendiente and not agarrado_pared:
 		seSalto = false
 		saltoFuego = false
 
@@ -1566,19 +1616,43 @@ func _physics_process(delta: float) -> void:
 		puede_agarrarse_pared = true
 
 		player.restablecer_visual_suelo()
-
 	# ANIMACIÓN
 	if not turbo_activo:
+
 		if deslizandose_pendiente:
+
 			player.animated_sprite.visible = true
 			player.animated_sprite_pared.visible = false
 			player.animated_sprite.flip_v = false
 
-			if player.animated_sprite.animation != "quieta":
-				player.animated_sprite.play("quieta")
+			var animacion_pendiente := "quieta"
+
+			if direccion != 0.0 and normal_pendiente != Vector2.ZERO:
+
+				var tangente_animacion := Vector2(
+					normal_pendiente.y,
+					-normal_pendiente.x
+				).normalized()
+
+				if tangente_animacion.y < 0.0:
+					tangente_animacion = -tangente_animacion
+
+				var direccion_cuesta_abajo := signf(
+					tangente_animacion.x
+				)
+
+				if signf(direccion) != direccion_cuesta_abajo:
+
+					# Eva intenta subir, así que anima caminar,
+					# aunque en realidad continúe deslizándose.
+					animacion_pendiente = "correr"
+
+			if player.animated_sprite.animation != animacion_pendiente:
+				player.animated_sprite.play(animacion_pendiente)
+
 		else:
+
 			player.actualizar_animacion(direccion)
-		
 func comprobar_colision_turbo_diferida() -> void:
 	if not turbo_activo:
 		return
@@ -1625,48 +1699,74 @@ func comprobar_colision_turbo_diferida() -> void:
 # ==========================================
 # MOVIMIENTO SOBRE PENDIENTE INCLINADA
 # ==========================================
-
 func procesar_pendiente_inclinada(delta: float) -> void:
 
 	if normal_pendiente == Vector2.ZERO:
 		return
 
+	var normal := normal_pendiente.normalized()
+
 	var tangente := Vector2(
-		normal_pendiente.y,
-		-normal_pendiente.x
+		normal.y,
+		-normal.x
 	).normalized()
 
-	# Orientar la tangente hacia abajo.
+	# Orientar la tangente cuesta abajo.
 	if tangente.y < 0.0:
 		tangente = -tangente
 
-	# Mantener el deslizamiento natural.
-	var aceleracion := Vector2.DOWN.dot(tangente) * GRAVITY_CAIDA
-	velocidad_deslizamiento += aceleracion * delta
+	var direccion_cuesta_abajo := signf(tangente.x)
 
-	velocidad_deslizamiento = clampf(
-		velocidad_deslizamiento,
-		320.0,
-		450.0
+	# La gravedad acelera el deslizamiento cuesta abajo.
+	var aceleracion_gravedad := (
+		Vector2.DOWN.dot(tangente)
+		* GRAVITY
 	)
 
-	# Reducir la velocidad solamente al presionar cuesta arriba.
-	var direccion_cuesta_arriba := -signf(tangente.x)
+	velocidad_deslizamiento += (
+		aceleracion_gravedad * delta
+	)
 
-	if (
-		direccion != 0.0
-		and signf(direccion) == direccion_cuesta_arriba
-	):
-		var frenado := ACELERACION_CONTROL_PENDIENTE * delta
+	# No permitir que la velocidad sea negativa:
+	# eso haría que Eva ascendiera por la pendiente.
+	velocidad_deslizamiento = maxf(
+		velocidad_deslizamiento,
+		0.0
+	)
 
-		velocidad_deslizamiento = maxf(
-			velocidad_deslizamiento - frenado,
-			0.0
+	if direccion != 0.0:
+
+		var velocidad_objetivo: float
+
+		if signf(direccion) == direccion_cuesta_abajo:
+
+			# Si pulsa hacia abajo, caminar más rápido cuesta abajo.
+			velocidad_objetivo = MAX_SPEED
+
+		else:
+
+			# Si pulsa hacia arriba, seguirá cayendo,
+			# pero a una velocidad menor.
+			velocidad_objetivo = VELOCIDAD_DESLIZAMIENTO_PENDIENTE
+
+		velocidad_deslizamiento = move_toward(
+			velocidad_deslizamiento,
+			velocidad_objetivo,
+			ACCELERATION * delta
 		)
 
-	# Aplicar el movimiento paralelo a la pendiente.
-	player.velocity = tangente * velocidad_deslizamiento
+	# Nunca permitir desplazamiento cuesta arriba.
+	velocidad_deslizamiento = clampf(
+		velocidad_deslizamiento,
+		0.0,
+		MAX_SPEED
+	)
 
+	# Movimiento cuesta abajo y presión contra la superficie.
+	player.velocity = (
+		tangente * velocidad_deslizamiento
+		- normal * 35.0
+	)
 
 # SALTO
 # ==========================================
@@ -2264,66 +2364,247 @@ func _on_hitbox_turbo_body_entered(
 	
 
 
-
 # ==========================================
 # PARED
 # ==========================================
-# ==========================================
-# PARED
-# ==========================================
+func detectar_pared(delta: float) -> void:
 
-func detectar_pared() -> void:
+	# No interferir con una transición de colisiones.
+	if player.restaurando_hitbox_pared:
+		return
+
+	if player.transfiriendo_hitbox_pared:
+		return
+
+	# ==========================================
+	# BLOQUEOS
+	# ==========================================
 
 	if deslizandose_pendiente:
-		agarrado_pared = false
-		pared_normal = Vector2.ZERO
+		if agarrado_pared or not player.collision_pared.disabled:
+			salir_de_pared()
+
 		player.animated_sprite.visible = true
 		player.animated_sprite_pared.visible = false
 		return
 
 	if not puede_agarrarse_pared or tornado_activo:
-		agarrado_pared = false
-		pared_normal = Vector2.ZERO
-
-		if not deslizandose_pendiente:
-			player.rotation = 0.0
+		if agarrado_pared or not player.collision_pared.disabled:
+			salir_de_pared()
 		return
 
-	if player.is_on_floor():
-		agarrado_pared = false
-		pared_normal = Vector2.ZERO
-		return
+	# ==========================================
+	# BUSCAR UNA PARED VÁLIDA
+	# ANTES DE COMPROBAR EL SUELO
+	# ==========================================
 
-	if not player.is_on_wall():
-		agarrado_pared = false
-		pared_normal = Vector2.ZERO
-		return
+	var pared_detectada := false
+	var normal_detectada := Vector2.ZERO
 
 	for i in range(player.get_slide_collision_count()):
 
 		var collision := player.get_slide_collision(i)
+		var normal := collision.get_normal()
 
-		if abs(collision.get_normal().x) < 0.8:
+		# Ignorar suelo, techo y superficies que no sean paredes.
+		if absf(normal.x) < 0.8:
 			continue
 
+		# Solo aceptar paredes de la layer 3.
 		if not colision_tiene_layer(collision, WALL_LAYER):
 			continue
 
+		normal_detectada = normal
+		pared_detectada = true
+		break
+
+	# ==========================================
+	# SI HAY UNA PARED VÁLIDA, MANTENER EL AGARRE
+	# ==========================================
+
+	if pared_detectada:
+
+		var entrando_en_pared := (
+			not agarrado_pared
+			or signf(pared_normal.x) != signf(normal_detectada.x)
+		)
+
+		pared_normal = normal_detectada
+
+		tiempo_sin_contacto_pared = 0.0
+		tiempo_contacto_suelo_pared = 0.0
+
+		# Mantener el estado activado.
 		agarrado_pared = true
-		pared_normal = collision.get_normal()
+
+		player.velocity.x = 0.0
+		seSalto = false
+		saltoFuego = false
+
+		# Cambiar la hitbox y la animación solamente al entrar
+		# o al pasar a una pared del lado contrario.
+		if entrando_en_pared:
+			player.animacion_pared(normal_detectada)
+
+		return
+
+	# ==========================================
+	# NO SE DETECTÓ UNA PARED VÁLIDA
+	# ==========================================
+
+	if agarrado_pared or not player.collision_pared.disabled:
+
+		tiempo_sin_contacto_pared += delta
+
+		# Tolerar interrupciones breves durante el cambio de hitbox.
+		if tiempo_sin_contacto_pared < TOLERANCIA_PERDIDA_PARED:
+			return
+
+		salir_de_pared()
+		return
+
+	# ==========================================
+	# COMPROBAR EL SUELO SOLO SI NO ESTÁ AGARRADO
+	# ==========================================
+
+	tiempo_contacto_suelo_pared = 0.0
+	tiempo_sin_contacto_pared = 0.0
+
+	if player.is_on_floor():
+		return
+
+	# No iniciar otra transición mientras se restauran las hitboxes.
+	if player.restaurando_hitbox_pared:
+		return
+
+	# Si la transferencia de entrada sigue pendiente, esperar.
+	if player.transfiriendo_hitbox_pared:
+		return
+
+	# ==========================================
+	# PENDIENTE
+	# ==========================================
+	if deslizandose_pendiente:
+		if agarrado_pared or not player.collision_pared.disabled:
+			salir_de_pared()
+
+		player.animated_sprite.visible = true
+		player.animated_sprite_pared.visible = false
+		return
+
+	# ==========================================
+	# BLOQUEOS
+	# ==========================================
+	if not puede_agarrarse_pared or tornado_activo:
+		if agarrado_pared or not player.collision_pared.disabled:
+			salir_de_pared()
+		return
+
+	# ==========================================
+	# SUELO
+	# ==========================================
+
+	if player.is_on_floor():
+
+		if agarrado_pared or not player.collision_pared.disabled:
+
+			tiempo_contacto_suelo_pared += delta
+
+			# Ignorar un contacto con el suelo demasiado breve.
+			if tiempo_contacto_suelo_pared < TIEMPO_CONFIRMACION_SUELO_PARED:
+				return
+
+			# El contacto con el suelo se mantuvo.
+			salir_de_pared()
+
+		else:
+			tiempo_contacto_suelo_pared = 0.0
+
+		return
+
+	tiempo_contacto_suelo_pared = 0.0
+	# ==========================================
+	# CONTACTO CON PARED
+	# ==========================================
+
+	if not player.is_on_wall():
+
+		if agarrado_pared or not player.collision_pared.disabled:
+
+			tiempo_sin_contacto_pared += delta
+
+			# Tolerar interrupciones de contacto muy breves.
+			if tiempo_sin_contacto_pared < TOLERANCIA_PERDIDA_PARED:
+				return
+
+			salir_de_pared()
+
+		else:
+			tiempo_sin_contacto_pared = 0.0
+
+		return
+
+	tiempo_sin_contacto_pared = 0.0
+
+	# ==========================================
+	# REVISAR COLISIONES
+	# ==========================================
+	for i in range(player.get_slide_collision_count()):
+		var collision := player.get_slide_collision(i)
+		var normal := collision.get_normal()
+
+		# Ignorar superficies que no sean paredes.
+		if absf(normal.x) < 0.8:
+			continue
+
+		# Comprobar la layer de la pared.
+		if not colision_tiene_layer(collision, WALL_LAYER):
+			continue
+
+
+		# ==========================================
+		# PARED VÁLIDA
+		# ==========================================
+
+		# Comprobar si acabamos de entrar en la pared
+		# o si cambiamos de lado.
+		var entrando_en_pared := (
+			not agarrado_pared
+			or signf(pared_normal.x) != signf(normal.x)
+		)
+
+		pared_normal = normal
 		player.velocity.x = 0.0
 
 		seSalto = false
 		saltoFuego = false
 
-		player.animacion_pared(pared_normal)
-		return
+		# Activar inmediatamente el estado de pared.
+		agarrado_pared = true
 
+		# Cambiar la posición de CollisionPared y la animación
+		# únicamente al entrar o cambiar de lado.
+		if entrando_en_pared:
+			player.animacion_pared(normal)
+
+		return
+func salir_de_pared() -> void:
+
+	# Abandonar inmediatamente el estado de pared.
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 
+	# Restaurar la hitbox si la pared está activa
+	# o si todavía se estaba realizando la transferencia.
+	if (
+		not player.collision_pared.disabled
+		or player.transfiriendo_hitbox_pared
+	):
+		player.restaurar_hitbox_pared()
+
 	if not deslizandose_pendiente:
 		player.rotation = 0.0
+
 
 # ==========================================
 # OTROS
@@ -2389,10 +2670,7 @@ func start(
 
 	player.show()
 
-	collision_shape.set_deferred(
-		"disabled",
-		false
-	)
+	actualizar_hitbox_direccion()
 
 	self.projectile_container = (
 		projectile_container_nuevo
@@ -2491,3 +2769,42 @@ func morir():
 	player.velocity = Vector2.ZERO
 
 	player.hide()
+
+
+
+func comprobar_transferencia_hitbox_pared() -> void:
+	if not player.transfiriendo_hitbox_pared:
+		return
+
+	if player.restaurando_hitbox_pared:
+		return
+
+	if player.get_slide_collision_count() == 0:
+		return
+
+	for i in range(player.get_slide_collision_count()):
+		var collision := player.get_slide_collision(i)
+		var normal := collision.get_normal()
+
+		# Comprobar que sea una pared.
+		if absf(normal.x) < 0.8:
+			continue
+
+		if not colision_tiene_layer(collision, WALL_LAYER):
+			continue
+
+		# La hitbox de pared encontró una pared válida.
+		player.transfiriendo_hitbox_pared = false
+		agarrado_pared = true
+		pared_normal = normal
+
+		seSalto = false
+		saltoFuego = false
+		player.velocity.x = 0.0
+
+		
+
+		player.animacion_pared(normal)
+
+		print("[HITBOX PARED] Agarre completado.")
+		return

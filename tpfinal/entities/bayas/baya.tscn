@@ -10,11 +10,8 @@ radius = 10.049875
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3oyy8"]
 shader = ExtResource("2_fmwq5")
-shader_parameter/color_brillo = Color(0.4, 0.8, 1, 1)
-shader_parameter/intensidad = 1.2
-shader_parameter/radio = 6.0
-shader_parameter/difusion = 9.0
-shader_parameter/velocidad = 1.5
+shader_parameter/tamano = 1.0
+shader_parameter/intensidad = 1.0
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6puso"]
 load_path = "res://.godot/imported/particula roja.png-1b390b90bfa7d6833ed63898afd37e71.ctex"
@@ -40,15 +37,15 @@ script = ExtResource("1_vg7lt")
 shape = SubResource("CircleShape2D_ge01d")
 one_way_collision_margin = 0.0
 
-[node name="brillo" type="ColorRect" parent="InteractionArea/CollisionShape2D" unique_id=1918274283]
+[node name="brillo" type="ColorRect" parent="." unique_id=1918274283]
 texture_filter = 1
 material = SubResource("ShaderMaterial_3oyy8")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -18.5
+offset_left = -18.499998
 offset_top = -17.800001
-offset_right = 17.5
+offset_right = 17.500002
 offset_bottom = 18.199999
 grow_horizontal = 2
 grow_vertical = 2

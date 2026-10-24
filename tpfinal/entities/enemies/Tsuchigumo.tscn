@@ -5,8 +5,11 @@
 [ext_resource type="Texture2D" uid="uid://bdesw0d1tv463" path="res://sprites/enemigos/araña.png" id="3_ayacp"]
 [ext_resource type="PackedScene" uid="uid://c0mpbkd5vhumm" path="res://entities/explosion_nube.tscn" id="8_5rgbr"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ayacp"]
+size = Vector2(39.29412, 24.235294)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3oyy8"]
-size = Vector2(37.882355, 26.941177)
+size = Vector2(39.411766, 22.823528)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fgaqd"]
 atlas = ExtResource("3_ayacp")
@@ -55,10 +58,10 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(117.220276, 21.11111)
+size = Vector2(149.29411, 20.156862)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kwkry"]
-size = Vector2(10.529411, 50.988564)
+size = Vector2(10.529411, 50.705883)
 
 [node name="Tsuchigumo" unique_id=2131858162 instance=ExtResource("1_8wmoa")]
 scale = Vector2(8.5, 8.5)
@@ -69,16 +72,38 @@ CAMINATA = 200.0
 DISTANCIA_BORDE = 20.0
 DISTANCIA_PIES = 100.0
 DISTANCIA_BORDE_TECHO = 20.0
-DISTANCIA_TECHO = 100.0
+DISTANCIA_TECHO = 300.0
 VELOCIDAD_CAIDA_HORIZONTAL = 100.0
-DISTANCIA_SALTO = 40.0
-ALTURA_SALTO = 90.0
+GRAVEDAD_TECHO = 980.0
+VELOCIDAD_MAXIMA_ACERCAMIENTO_TECHO = 350.0
+VELOCIDAD_PRESION_TECHO = 80.0
+DISTANCIA_SNAP_TECHO = 24.0
+DISTANCIA_SNAP_SUELO = 12.0
+MASCARA_SUPERFICIES = 1
+TIEMPO_DETECCION_ATASCADA = 0.35
+DISTANCIA_MINIMA_MOVIMIENTO = 0.5
+DISTANCIA_SALTO = 1000.0
+VELOCIDAD_SALTO_HORIZONTAL = 2000.0
+ESPERA_ENTRE_SALTOS = 1.0
+ALTURA_SALTO = 45.0
+FUERZA_SALTO = 260.0
 DURACION_SALTO = 0.0
-PESO = 0.1
-vida = 5
+FUERZA_EMPUJE_ATAQUE = 800.0
+FUERZA_EMPUJE_CAIDA = 350.0
+ESPERA_EMPUJE_CONTACTO = 0.12
+FUERZA_RETROCESO_DANIO = 1400.0
+DURACION_RETROCESO_DANIO = 0.18
+DURACION_IGNORAR_JUGADOR = 1.0
+ESPERA_DANIO_CONTACTO = 0.5
+ESPERA_DESPUES_DANIO = 1.0
+vida = 6
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]
-position = Vector2(4.8235292, -3.4705892)
+position = Vector2(4.8235292, -4.1176476)
+shape = SubResource("RectangleShape2D_ayacp")
+
+[node name="CollisionInversa" type="CollisionShape2D" parent="." index="1" unique_id=690717439]
+position = Vector2(5.588233, 3.2941175)
 shape = SubResource("RectangleShape2D_3oyy8")
 
 [node name="AnimatedSprite2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
@@ -91,15 +116,18 @@ animation = &"caminar"
 collision_layer = 0
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="OrientacionEnemy/CollisionAtaque" index="0" unique_id=1834044500]
-position = Vector2(56.44868, -0.77777755)
+position = Vector2(40.411762, -1.2549018)
 shape = SubResource("RectangleShape2D_4jn62")
 
 [node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
-position = Vector2(-1.47059, -41.599674)
+position = Vector2(-1.47059, -41.882355)
 scale = Vector2(2, 2)
 shape = SubResource("RectangleShape2D_kwkry")
 
-[node name="ExplosionNube" parent="." index="3" unique_id=1050899421 instance=ExtResource("8_5rgbr")]
+[node name="ExplosionNube" parent="." index="4" unique_id=1050899421 instance=ExtResource("8_5rgbr")]
 visible = false
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="5" unique_id=16599916]
+bus = &"Sonido"
 
 [connection signal="body_entered" from="OrientacionEnemy/CollisionAtaque" to="." method="_on_area_ataque_body_entered"]
