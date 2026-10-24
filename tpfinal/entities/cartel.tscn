@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bldhn2hubvlxo" path="res://sprites/escenario/recursos/cartel.png" id="3_lbbbw"]
 
 [node name="Cartel" unique_id=1291660537 instance=ExtResource("1_uuypt")]
-scale = Vector2(2.3, 2.3)
+scale = Vector2(3, 3)
 script = ExtResource("2_s3wjb")
 dialogue_script = null
 

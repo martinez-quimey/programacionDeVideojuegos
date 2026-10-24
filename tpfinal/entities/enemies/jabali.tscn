@@ -230,6 +230,8 @@ DISTANCIA_BORDE = 20.0
 DISTANCIA_PIES = 100.0
 PESO = 30.0
 vida = 5
+FUERZA_EMPUJE_CONTACTO = 200.0
+FUERZA_EMPUJE_CONTACTO_DESDE_ARRIBA = 300.0
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]
 position = Vector2(-1.5, 1.2777777)

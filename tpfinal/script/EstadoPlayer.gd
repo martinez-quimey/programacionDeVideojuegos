@@ -585,43 +585,22 @@ func restaurar_rotacion() -> void:
 # ==========================================
 # DIRECCIÓN
 # ==========================================
+
+
+
 func actualizar_hitbox_direccion() -> void:
 
-	# No cambiar las hitboxes direccionales durante el tornado.
+	# No cambiar las hitboxes durante el tornado.
 	if tornado_activo:
 		return
 
-	# Mientras Eva está en la pared, sus colisiones
-	# pertenecen al sistema de pared.
-	if (
-		agarrado_pared
-		or player.transfiriendo_hitbox_pared
-	):
+	# El sistema de pared controla sus propias colisiones.
+	if agarrado_pared or player.transfiriendo_hitbox_pared:
 		return
 
-	# Player.gd será el único que cambie las colisiones.
+	# Player.gd es el único responsable de cambiar las hitboxes.
 	player.mirando_izquierda = mirando_izquierda
 	player.actualizar_colision_direccion()
-	if tornado_activo:
-		collision_shape_player.set_deferred("disabled", true)
-		collision_shape_player_invertida.set_deferred("disabled", true)
-		return
-
-	var hitbox_nueva: CollisionShape2D
-	var hitbox_actual: CollisionShape2D
-
-	if mirando_izquierda:
-		hitbox_nueva = collision_shape_player_invertida
-		hitbox_actual = collision_shape_player
-	else:
-		hitbox_nueva = collision_shape_player
-		hitbox_actual = collision_shape_player_invertida
-
-	# Activar primero la hitbox correspondiente a la dirección nueva.
-	hitbox_nueva.set_deferred("disabled", false)
-
-	# Desactivar después la hitbox de la dirección anterior.
-	hitbox_actual.set_deferred("disabled", true)
 func establecer_direccion(
 	nueva_direccion: float
 ) -> void:

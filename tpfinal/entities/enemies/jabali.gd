@@ -504,7 +504,7 @@ func comenzar_ataque():
 			#
 			# direccion = 1  -> derecha
 			# direccion = -1 -> izquierda
-			cuerpo.retroceso(Vector2(direccion, 0), 500)
+			cuerpo.retroceso(Vector2(direccion, 0), 400)
 			# Ataque = 2 de daño.
 			cuerpo.herir(2)
 			break
