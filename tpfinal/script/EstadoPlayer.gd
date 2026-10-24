@@ -2369,33 +2369,66 @@ func _on_hitbox_turbo_body_entered(
 # ==========================================
 func detectar_pared(delta: float) -> void:
 
-	# No interferir con una transición de colisiones.
+	# ==========================================
+	# VOLVER AL SUELO SI ESTÁ AGARRADA A UNA PARED
+	# ==========================================
+
+	# Dar prioridad al suelo cuando Eva ya está agarrada.
+	if agarrado_pared and player.is_on_floor():
+
+		tiempo_contacto_suelo_pared += delta
+
+		# Confirmar que el contacto con el suelo sea estable.
+		if tiempo_contacto_suelo_pared >= TIEMPO_CONFIRMACION_SUELO_PARED:
+
+			salir_de_pared()
+
+		return
+
+	# Si dejó de tocar el suelo, reiniciar el contador.
+	tiempo_contacto_suelo_pared = 0.0
+
+
+	# ==========================================
+	# TRANSICIONES DE COLISIONES
+	# ==========================================
+
 	if player.restaurando_hitbox_pared:
 		return
 
 	if player.transfiriendo_hitbox_pared:
 		return
 
+
 	# ==========================================
-	# BLOQUEOS
+	# PENDIENTE
 	# ==========================================
 
 	if deslizandose_pendiente:
+
 		if agarrado_pared or not player.collision_pared.disabled:
 			salir_de_pared()
 
 		player.animated_sprite.visible = true
 		player.animated_sprite_pared.visible = false
+
 		return
 
+
+	# ==========================================
+	# BLOQUEOS
+	# ==========================================
+
 	if not puede_agarrarse_pared or tornado_activo:
+
 		if agarrado_pared or not player.collision_pared.disabled:
 			salir_de_pared()
+
 		return
+
 
 	# ==========================================
 	# BUSCAR UNA PARED VÁLIDA
-	# ANTES DE COMPROBAR EL SUELO
 	# ==========================================
 
 	var pared_detectada := false
@@ -2416,10 +2449,12 @@ func detectar_pared(delta: float) -> void:
 
 		normal_detectada = normal
 		pared_detectada = true
+
 		break
 
+
 	# ==========================================
-	# SI HAY UNA PARED VÁLIDA, MANTENER EL AGARRE
+	# MANTENER EL AGARRE A LA PARED
 	# ==========================================
 
 	if pared_detectada:
@@ -2434,19 +2469,21 @@ func detectar_pared(delta: float) -> void:
 		tiempo_sin_contacto_pared = 0.0
 		tiempo_contacto_suelo_pared = 0.0
 
-		# Mantener el estado activado.
+		# Mantener el estado de pared.
 		agarrado_pared = true
 
 		player.velocity.x = 0.0
+
 		seSalto = false
 		saltoFuego = false
 
-		# Cambiar la hitbox y la animación solamente al entrar
-		# o al pasar a una pared del lado contrario.
+		# Cambiar la hitbox y la animación solo al entrar
+		# o cuando se pasa a una pared del lado contrario.
 		if entrando_en_pared:
 			player.animacion_pared(normal_detectada)
 
 		return
+
 
 	# ==========================================
 	# NO SE DETECTÓ UNA PARED VÁLIDA
@@ -2456,137 +2493,21 @@ func detectar_pared(delta: float) -> void:
 
 		tiempo_sin_contacto_pared += delta
 
-		# Tolerar interrupciones breves durante el cambio de hitbox.
+		# Tolerar interrupciones breves de contacto.
 		if tiempo_sin_contacto_pared < TOLERANCIA_PERDIDA_PARED:
 			return
 
 		salir_de_pared()
 		return
 
+
 	# ==========================================
-	# COMPROBAR EL SUELO SOLO SI NO ESTÁ AGARRADO
+	# EVA NO ESTÁ AGARRADA A NINGUNA PARED
 	# ==========================================
 
-	tiempo_contacto_suelo_pared = 0.0
 	tiempo_sin_contacto_pared = 0.0
 
 	if player.is_on_floor():
-		return
-
-	# No iniciar otra transición mientras se restauran las hitboxes.
-	if player.restaurando_hitbox_pared:
-		return
-
-	# Si la transferencia de entrada sigue pendiente, esperar.
-	if player.transfiriendo_hitbox_pared:
-		return
-
-	# ==========================================
-	# PENDIENTE
-	# ==========================================
-	if deslizandose_pendiente:
-		if agarrado_pared or not player.collision_pared.disabled:
-			salir_de_pared()
-
-		player.animated_sprite.visible = true
-		player.animated_sprite_pared.visible = false
-		return
-
-	# ==========================================
-	# BLOQUEOS
-	# ==========================================
-	if not puede_agarrarse_pared or tornado_activo:
-		if agarrado_pared or not player.collision_pared.disabled:
-			salir_de_pared()
-		return
-
-	# ==========================================
-	# SUELO
-	# ==========================================
-
-	if player.is_on_floor():
-
-		if agarrado_pared or not player.collision_pared.disabled:
-
-			tiempo_contacto_suelo_pared += delta
-
-			# Ignorar un contacto con el suelo demasiado breve.
-			if tiempo_contacto_suelo_pared < TIEMPO_CONFIRMACION_SUELO_PARED:
-				return
-
-			# El contacto con el suelo se mantuvo.
-			salir_de_pared()
-
-		else:
-			tiempo_contacto_suelo_pared = 0.0
-
-		return
-
-	tiempo_contacto_suelo_pared = 0.0
-	# ==========================================
-	# CONTACTO CON PARED
-	# ==========================================
-
-	if not player.is_on_wall():
-
-		if agarrado_pared or not player.collision_pared.disabled:
-
-			tiempo_sin_contacto_pared += delta
-
-			# Tolerar interrupciones de contacto muy breves.
-			if tiempo_sin_contacto_pared < TOLERANCIA_PERDIDA_PARED:
-				return
-
-			salir_de_pared()
-
-		else:
-			tiempo_sin_contacto_pared = 0.0
-
-		return
-
-	tiempo_sin_contacto_pared = 0.0
-
-	# ==========================================
-	# REVISAR COLISIONES
-	# ==========================================
-	for i in range(player.get_slide_collision_count()):
-		var collision := player.get_slide_collision(i)
-		var normal := collision.get_normal()
-
-		# Ignorar superficies que no sean paredes.
-		if absf(normal.x) < 0.8:
-			continue
-
-		# Comprobar la layer de la pared.
-		if not colision_tiene_layer(collision, WALL_LAYER):
-			continue
-
-
-		# ==========================================
-		# PARED VÁLIDA
-		# ==========================================
-
-		# Comprobar si acabamos de entrar en la pared
-		# o si cambiamos de lado.
-		var entrando_en_pared := (
-			not agarrado_pared
-			or signf(pared_normal.x) != signf(normal.x)
-		)
-
-		pared_normal = normal
-		player.velocity.x = 0.0
-
-		seSalto = false
-		saltoFuego = false
-
-		# Activar inmediatamente el estado de pared.
-		agarrado_pared = true
-
-		# Cambiar la posición de CollisionPared y la animación
-		# únicamente al entrar o cambiar de lado.
-		if entrando_en_pared:
-			player.animacion_pared(normal)
-
 		return
 func salir_de_pared() -> void:
 
