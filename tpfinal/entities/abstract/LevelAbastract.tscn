@@ -4315,4 +4315,6 @@ tile_set = SubResource("TileSet_h4vih")
 [node name="StartPosition" type="Marker2D" parent="." unique_id=442951874]
 position = Vector2(393, 629)
 
+[node name="bayas" type="Node2D" parent="." unique_id=788439811]
+
 [connection signal="game_paused" from="." to="." method="_on_game_paused"]

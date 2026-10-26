@@ -952,16 +952,24 @@ func _on_game_paused() -> void:
 # VOLVER AL MENÚ
 # =========================================================
 
-func _on_main_menu() -> void:
 
+func _on_main_menu() -> void:
 	print("MAIN: VOLVIENDO AL MENÚ")
 
 	get_tree().paused = false
 	Settings.sePuedePausar = false
+
+	print("MAIN: game antes de eliminar = ", game)
 
 	if game != null:
 		game.queue_free()
 		game = null
 
 	ruta_nivel_actual = ""
+
+	print("MAIN: mostrando menú principal")
+	print("MAIN: HUD = ", hud)
+
 	hud.show_main_menu()
+
+	print("MAIN: show_main_menu ejecutado")

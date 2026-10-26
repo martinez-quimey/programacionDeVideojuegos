@@ -307,15 +307,9 @@ func _ready() -> void:
 	# ==========================================
 
 	hitbox_tornado.monitoring = false
+	configurar_hitbox_ataque(hitbox_tornado)
 
-	configurar_hitbox_ataque(
-		hitbox_tornado
-	)
-
-	collision_tornado.set_deferred(
-	"disabled",
-	true
-	)
+	collision_tornado.set_deferred("disabled", true)
 
 
 	# ==========================================
@@ -873,21 +867,15 @@ func terminar_retroceso() -> void:
 # ==========================================
 # ACTIVAR TORNADO
 # ==========================================
-
 func activar_tornado() -> void:
 
 	if retroceso_activo:
-
 		return
-
 
 	if turbo_activo:
-
 		return
 
-
 	if tornado_activo:
-
 		return
 
 
@@ -896,7 +884,6 @@ func activar_tornado() -> void:
 	# ==========================================
 
 	if not player.is_on_floor():
-
 		return
 
 
@@ -905,14 +892,11 @@ func activar_tornado() -> void:
 	# ==========================================
 
 	if player.obtener_energia_fuego() < ENERGIA_TORNADO:
-
 		return
-
 
 	if not player.gastar_energia_fuego(
 		ENERGIA_TORNADO
 	):
-
 		return
 
 
@@ -923,7 +907,8 @@ func activar_tornado() -> void:
 	tornado_activo = true
 	tiempo_tornado = DURACION_TORNADO
 	particulasTornado.emitting = true
-	# Desactivar colisión principal del Player
+
+	# Desactivar las colisiones normales del Player.
 	collision_shape_player.set_deferred(
 		"disabled",
 		true
@@ -934,7 +919,11 @@ func activar_tornado() -> void:
 		true
 	)
 
-	
+	# Activar la colisión física del tornado.
+	collision_tornado.set_deferred(
+		"disabled",
+		false
+	)
 
 	enemigos_golpeados_tornado.clear()
 
@@ -965,14 +954,13 @@ func activar_tornado() -> void:
 		player.rotation = 0.0
 
 
-
 	# ==========================================
-	# HITBOX TORNADO
+	# HITBOX DE ATAQUE DEL TORNADO
 	# ==========================================
 
 	hitbox_tornado.monitoring = true
 
-	
+
 	# ==========================================
 	# ANIMACIÓN
 	# ==========================================
@@ -985,18 +973,11 @@ func activar_tornado() -> void:
 	# ==========================================
 
 	if mirando_izquierda:
-
 		player.velocity.x = -VELOCIDAD_TORNADO
-
 	else:
-
 		player.velocity.x = VELOCIDAD_TORNADO
 
-
 	player.velocity.y = 0.0
-
-
-
 
 
 # ==========================================
@@ -1179,32 +1160,32 @@ func comprobar_golpes_tornado() -> void:
 # DESACTIVAR TORNADO
 # ==========================================
 
+
 func desactivar_tornado() -> void:
 
 	if not tornado_activo:
-
 		return
-
 
 	tornado_activo = false
 	tiempo_tornado = 0.0
 	particulasTornado.emitting = false
 
 	# ==========================================
-	# DESACTIVAR HITBOX
+	# DESACTIVAR HITBOX DE ATAQUE
 	# ==========================================
 
 	hitbox_tornado.monitoring = false
-	# Volver a activar colisión principal del Player
-	collision_shape_player.set_deferred(
-		"disabled",
-		true
-	)
 
-	collision_tornado.set_deferred(
-		"disabled",
-		true
-	)
+	# ==========================================
+	# DESACTIVAR CUERPO FÍSICO DEL TORNADO
+	# ==========================================
+
+	collision_tornado.set_deferred("disabled", true)
+
+	# ==========================================
+	# RESTAURAR COLISIÓN NORMAL DE EVA
+	# ==========================================
+
 	actualizar_hitbox_direccion()
 
 	# ==========================================
@@ -1215,16 +1196,13 @@ func desactivar_tornado() -> void:
 	agarrado_pared = false
 	pared_normal = Vector2.ZERO
 
-
 	# ==========================================
 	# REDUCIR VELOCIDAD
 	# ==========================================
 
 	player.velocity.x = (
-		sign(player.velocity.x)
-		* MAX_SPEED
+		sign(player.velocity.x) * MAX_SPEED
 	)
-
 
 	# ==========================================
 	# RESTAURAR ANIMACIÓN
@@ -1232,10 +1210,7 @@ func desactivar_tornado() -> void:
 
 	player.restablecer_visual_suelo()
 
-
 	enemigos_golpeados_tornado.clear()
-
-
 
 # ==========================================
 # MADRIGUERA

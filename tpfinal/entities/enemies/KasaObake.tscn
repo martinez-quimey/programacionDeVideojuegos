@@ -35,7 +35,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_go41v"]
-size = Vector2(104, 405)
+size = Vector2(104, 430)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vowfh"]
 size = Vector2(110, 83)
@@ -59,14 +59,14 @@ VELOCIDAD_CAIDA_RAPIDA = 600.0
 position = Vector2(0.5, -16)
 shape = SubResource("RectangleShape2D_to83a")
 
-[node name="AnimatedSprite2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971]
+[node name="AnimatedSprite2D" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="0" unique_id=118100971 groups=["enemigos"]]
 texture_filter = 1
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_4jn62")
 animation = &"cerrado"
 
 [node name="CollisionShape2D" parent="OrientacionEnemy/DetectionArea" parent_id_path=PackedInt32Array(1040540624) index="0" unique_id=1132004423]
-position = Vector2(0, 201.5)
+position = Vector2(0, 214)
 shape = SubResource("RectangleShape2D_go41v")
 
 [node name="DamageArea" type="Area2D" parent="." index="3" unique_id=189345904]

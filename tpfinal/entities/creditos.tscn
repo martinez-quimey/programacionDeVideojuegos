@@ -19,6 +19,10 @@ offset_bottom = 40.0
 [node name="Label" type="Label" parent="VBoxContainer" unique_id=473337871]
 layout_mode = 2
 text = "Gracias a Crafpix por los assets de disparo de fuego y de jabali.
-Miwis de GodotShaders por el filtro
-El resto del arte es propio (Quimey Adonai Martinez)
+Miwis de GodotShaders creo la base del filtro visual usado en los niveles
+
+actuacion de voz:
+
+Eva: Arai
+El resto del arte es propio (Verdo)
 "

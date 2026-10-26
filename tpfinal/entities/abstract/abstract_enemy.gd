@@ -109,14 +109,30 @@ func collision_tiene_layer(
 
 # RETROCESO
 func retroceso(direccion_retroceso: Vector2, fuerza: int) -> void:
+	if is_queued_for_deletion():
+		return
+
 	if PESO <= 0.0 or fuerza <= 0:
 		return
 
-	direccion_retroceso = direccion_retroceso.normalized()
+	if direccion_retroceso.is_zero_approx():
+		return
 
+	var direccion_normalizada: Vector2 = direccion_retroceso.normalized()
 	var fuerza_efectiva: float = float(fuerza) / PESO
-	velocity.x = direccion_retroceso.x * fuerza_efectiva
 
+	# Aplicar el impulso horizontal.
+	velocity.x = direccion_normalizada.x * fuerza_efectiva
+
+	# Aplicar el impulso vertical si la dirección lo incluye.
+	if not is_zero_approx(direccion_normalizada.y):
+		velocity.y = direccion_normalizada.y * fuerza_efectiva
+
+	# Avisar al enemigo para que su movimiento automático
+	# no sobrescriba velocity.x inmediatamente.
+	#
+	# Si el enemigo sobrescribe frenarCaminatas(), se ejecutará
+	# esa versión. Así se conserva la compatibilidad con la araña.
 	frenarCaminatas()
 
 

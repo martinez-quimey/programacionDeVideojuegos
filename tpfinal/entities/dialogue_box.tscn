@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://h2yw1rfppqnk"]
 
 [ext_resource type="Script" uid="uid://b1mbghmqwc743" path="res://script/dialogue_box.gd" id="1_7hyon"]
-[ext_resource type="Shader" uid="uid://dwonjqeg4w8pk" path="res://entities/levels/level_1.gdshader" id="2_nc1wc"]
+[ext_resource type="Shader" uid="uid://dwonjqeg4w8pk" path="res://entities/levels/level_1/level_1.gdshader" id="2_nc1wc"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h7vu4"]
 shader = ExtResource("2_nc1wc")

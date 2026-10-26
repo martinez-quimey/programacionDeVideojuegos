@@ -6,6 +6,9 @@ extends "res://entities/abstract/abstract_enemy.gd"
 @export var SPEEDCORRIENDO: float = 400.0
 @export var CAMINATA: float = 400.0
 
+var en_retroceso: bool = false
+var temporizador_retroceso: Timer
+
 # =========================================================
 # DETECCIÓN DEL BORDE
 # =========================================================
@@ -60,8 +63,15 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		move_and_slide()
 
-		return
+		return	
+	# =====================================================
+	# RETROCESO
+	# =====================================================
 
+	if en_retroceso:
+		move_and_slide()
+		comprobar_colision_con_jugador()
+		return
 
 	# =====================================================
 	# GRAVEDAD
@@ -300,33 +310,19 @@ func patrullar(delta: float) -> void:
 # FRENAR CAMINATAS
 # =========================================================
 
-func frenarCaminatas():
-
+func frenarCaminatas() -> void:
 	if pausado_caminata:
 		return
 
-
-	# Solo bloquea el movimiento automático.
-	#
-	# NO modificar velocity.x.
-	#
-	# Así, si esta función fue llamada durante un
-	# retroceso, el retroceso continúa.
-
 	pausado_caminata = true
-
 	animationPlay("idle")
-
 
 	await get_tree().create_timer(1.0).timeout
 
-
-	if muerto:
+	if muerto or not is_instance_valid(self):
 		return
 
-
 	pausado_caminata = false
-
 
 # =========================================================
 # CAMBIAR DIRECCIÓN
@@ -649,3 +645,33 @@ func morir() -> void:
 				return
 
 	queue_free()
+	
+	
+# =========================================================
+# CONTROL DEL RETROCESO
+# =========================================================
+
+func iniciar_retroceso() -> void:
+	en_retroceso = true
+
+	# Crear el temporizador una sola vez.
+	if not is_instance_valid(temporizador_retroceso):
+		temporizador_retroceso = Timer.new()
+		temporizador_retroceso.one_shot = true
+		add_child(temporizador_retroceso)
+		temporizador_retroceso.timeout.connect(
+			_finalizar_retroceso
+		)
+
+	temporizador_retroceso.start(0.25)
+
+	print(
+		"JABALÍ: retroceso iniciado | velocidad X = ",
+		velocity.x
+	)
+
+
+func _finalizar_retroceso() -> void:
+	en_retroceso = false
+
+	print("JABALÍ: retroceso finalizado")

@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://budcy72xkwkse" path="res://entities/enemies/jabali.tscn" id="4_ye8cx"]
 [ext_resource type="PackedScene" uid="uid://4s4o0gfrimwv" path="res://entities/abstract/madrigueraAbstract.tscn" id="6_2lqro"]
 [ext_resource type="PackedScene" uid="uid://csxfnv26kh7h4" path="res://entities/ir_a_nivel.tscn" id="7_47es7"]
-[ext_resource type="PackedScene" uid="uid://cuailcqpldjar" path="res://entities/levels/level_1.tscn" id="8_7eom6"]
+[ext_resource type="PackedScene" uid="uid://cuailcqpldjar" path="res://entities/levels/level_1/El bosque espiritual.tscn" id="8_7eom6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
 size = Vector2(2847, 371)

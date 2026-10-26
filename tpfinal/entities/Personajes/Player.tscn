@@ -25,7 +25,7 @@
 [ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(130.13062, 153)
+size = Vector2(134, 172)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
 radius = 73.0695
@@ -122,7 +122,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uqenk"]
-size = Vector2(161, 129)
+size = Vector2(138, 120)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l1ths"]
 size = Vector2(101, 94)
@@ -151,7 +151,7 @@ script = ExtResource("1_l1ths")
 position = Vector2(27, 39)
 
 [node name="TiempoRecargaFuego" type="Timer" parent="." unique_id=1043286744]
-wait_time = 4.0
+wait_time = 3.5
 one_shot = true
 
 [node name="Invulnerabilidad" type="Timer" parent="." unique_id=1890532257]
@@ -174,10 +174,9 @@ GRAVITY_CAIDA = 1700.0
 FUERZA_HORIZONTAL_SALTO_PARED = 800.0
 
 [node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTornado" unique_id=225583521]
-position = Vector2(12.500002, -15.934088)
+position = Vector2(7.000002, -19)
 rotation = 1.5707964
 shape = SubResource("RectangleShape2D_4jn62")
 
@@ -208,19 +207,21 @@ sprite_frames = SubResource("SpriteFrames_nm73a")
 animation = &"pared"
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
-visible = false
-position = Vector2(9.5, -16.5)
+position = Vector2(8, -17)
 shape = SubResource("RectangleShape2D_uqenk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696735264]
+visible = false
 position = Vector2(35.5, -4)
 shape = SubResource("RectangleShape2D_l1ths")
 
 [node name="CollisionShape2DInvertida" type="CollisionShape2D" parent="." unique_id=824254369]
+visible = false
 position = Vector2(-40, -4)
 shape = SubResource("RectangleShape2D_nglq2")
 
 [node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
+visible = false
 position = Vector2(47, -49.5)
 shape = SubResource("RectangleShape2D_2fb44")
 

@@ -4,7 +4,9 @@ extends Node2D
 signal player_died
 signal game_paused
 
+@export var name_level: String = ""
 @export var nombre_nivel: String = ""
+@export var numero_nivel: int = 0
 
 @onready var player = $Player
 @onready var estado_manual: EstadoPlayer = $Player/estadoManual
@@ -28,6 +30,7 @@ var spawners_cargando: bool = false
 
 
 func _enter_tree() -> void:
+
 	# Separar Spawners antes de que sus hijos entren al árbol
 	# y ejecuten sus funciones _ready().
 	spawners_diferidos = get_node_or_null("Spawners")
@@ -35,13 +38,9 @@ func _enter_tree() -> void:
 	if spawners_diferidos != null:
 		remove_child(spawners_diferidos)
 
-		print(
-			"SPAWNERS: separados antes de iniciar el nivel"
-		)
+		print("SPAWNERS: separados antes de iniciar el nivel")
 	else:
-		print(
-			"SPAWNERS: no se encontró el nodo Spawners"
-		)
+		print("SPAWNERS: no se encontró el nodo Spawners")
 
 
 # =====================================================
@@ -220,11 +219,84 @@ func _ready() -> void:
 	Settings.sePuedePausar = true
 
 	print("PERF: configurar pausa = ", medir_ms(t), " ms")
+
+	# =====================================================
+	# RECALCULAR BAYAS DESPUÉS DEL INICIO
+	# =====================================================
+
+	print("BAYAS: programando recálculo diferido")
+	call_deferred("recalcular_bayas_diferido")
+
 	print("PERF: TOTAL _ready = ", medir_ms(inicio_ready), " ms")
 
 	print("##################################################")
 	print("######## PERF: FIN _READY ########################")
 	print("##################################################")
+	print("")
+
+
+# =====================================================
+# RECALCULAR BAYAS DESPUÉS DE INICIAR EL NIVEL
+# =====================================================
+
+func recalcular_bayas_diferido() -> void:
+
+	print("")
+	print("========================================")
+	print("BAYAS: INICIO DEL RECÁLCULO DIFERIDO")
+	print("========================================")
+
+	# Esperar un fotograma sin bloquear el flujo de carga.
+	await get_tree().process_frame
+
+	if not is_inside_tree():
+		print("BAYAS: el nivel salió del árbol; se cancela el recálculo")
+		return
+
+	var nodo_bayas: Node = get_node_or_null("bayas")
+
+	if nodo_bayas == null:
+		print("BAYAS: ERROR, no existe el nodo hijo llamado 'bayas'")
+		return
+
+	var hijos: Array[Node] = nodo_bayas.get_children()
+
+	print("BAYAS: cantidad de hijos encontrados = ", hijos.size())
+	print("BAYAS: lista de vida guardada = ", Settings.objetosVidaObtenidos)
+	print("BAYAS: lista de energía guardada = ", Settings.objetosEnergiaObtenidos)
+
+	var inicio_recalculo := Time.get_ticks_usec()
+	var cantidad_recalculada: int = 0
+	var cantidad_sin_metodo: int = 0
+
+	for hijo in hijos:
+
+		if not is_instance_valid(hijo):
+			continue
+
+		if hijo.has_method("recalcular_estado"):
+
+			print("BAYAS: recalculando hijo ", hijo.name)
+
+			hijo.recalcular_estado()
+			cantidad_recalculada += 1
+
+		else:
+
+			print(
+				"BAYAS: AVISO, el hijo ",
+				hijo.name,
+				" no tiene el método recalcular_estado()"
+			)
+
+			cantidad_sin_metodo += 1
+
+	print("BAYAS: hijos recalculados = ", cantidad_recalculada)
+	print("BAYAS: hijos sin método = ", cantidad_sin_metodo)
+	print("BAYAS: tiempo de recálculo = ", medir_ms(inicio_recalculo), " ms")
+
+	print("BAYAS: FIN DEL RECÁLCULO")
+	print("========================================")
 	print("")
 
 
