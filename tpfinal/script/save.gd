@@ -1,28 +1,207 @@
 extends Node
 
-
 # =========================================================
 # CONFIGURACIÓN DE GUARDADO
 # =========================================================
 
 const NOMBRE_CARPETA_GUARDADO := "evaTwoTalesSave"
 const DISCO_POR_DEFECTO := "C"
+const RUTA_CONFIGURACION_PREFERENCIAS := "user://preferencias_eva.cfg"
 
 # Estas variables solo existen mientras el juego está abierto.
-# No se guardan dentro del archivo de partida.
+# La preferencia elegida se guarda además en preferencias_eva.cfg.
 var DISCO_ACTUAL: String = ""
 var CARPETA_GUARDADO: String = ""
 var RUTA_GUARDADO: String = ""
 
-# La pantalla principal podrá consultar este mensaje para mostrar advertencias.
 var advertencia_disco: String = ""
-
-# Indica si se terminó la beta.
 var partidaFinalizada: bool = false
+
+# Indicadores persistentes de configuración inicial.
+# Si alguno es false, HUD muestra el paso correspondiente.
+var idioma_configurado: bool = false
+var disco_configurado: bool = false
+var controles_configurados: bool = false
 
 
 func _ready() -> void:
-	detectar_disco_actual()
+	_cargar_configuracion_preferencias()
+
+	if (
+		disco_configurado
+		and _es_disco_valido(str(DISCO_ACTUAL))
+		and DirAccess.open(str(DISCO_ACTUAL) + ":/") != null
+	):
+		_configurar_disco(DISCO_ACTUAL)
+	else:
+		if disco_configurado:
+			disco_configurado = false
+		detectar_disco_actual()
+
+	# Restaurar controles guardados si se completó su configuración.
+	# El tipo int está declarado explícitamente para evitar el error de inferencia
+	# que GDScript puede dar con expresiones que combinan valores de enum.
+	if controles_configurados:
+		var modo_restaurado: int = int(Settings.modo_controles)
+		Settings.cambiar_modo_controles(modo_restaurado)
+		Settings.cambiar_opcion_interaccion(int(Settings.opcion_interaccion))
+
+
+# =========================================================
+# PREFERENCIAS INDEPENDIENTES DE LA PARTIDA
+# =========================================================
+
+func _cargar_configuracion_preferencias() -> void:
+	var config := ConfigFile.new()
+	var error_carga := config.load(RUTA_CONFIGURACION_PREFERENCIAS)
+
+	if error_carga != OK:
+		idioma_configurado = false
+		disco_configurado = false
+		controles_configurados = false
+		return
+
+	idioma_configurado = bool(
+		config.get_value("estado", "idioma_configurado", false)
+	)
+	disco_configurado = bool(
+		config.get_value("estado", "disco_configurado", false)
+	)
+	controles_configurados = bool(
+		config.get_value("estado", "controles_configurados", false)
+	)
+
+	if idioma_configurado:
+		Settings.language = str(
+			config.get_value("preferencias", "language", "es")
+		)
+		if Settings.language not in ["es", "en"]:
+			Settings.language = "es"
+			idioma_configurado = false
+
+	if disco_configurado:
+		var disco_guardado := str(
+			config.get_value("preferencias", "disco", DISCO_POR_DEFECTO)
+		).to_upper()
+		if _es_disco_valido(disco_guardado):
+			DISCO_ACTUAL = disco_guardado
+		else:
+			disco_configurado = false
+
+	if controles_configurados:
+		var modo_guardado := int(
+			config.get_value(
+				"preferencias",
+				"modo_controles",
+				Settings.ModoControles.MODO_A
+			)
+		)
+		Settings.modo_controles = (
+			Settings.ModoControles.MODO_B
+			if modo_guardado == Settings.ModoControles.MODO_B
+			else Settings.ModoControles.MODO_A
+		)
+		Settings.opcion_interaccion = clampi(
+			int(config.get_value("preferencias", "opcion_interaccion", 0)),
+			0,
+			1
+		)
+
+
+func guardar_configuracion_preferencias() -> bool:
+	var config := ConfigFile.new()
+	# Cargar primero para no perder futuras preferencias agregadas a este archivo.
+	config.load(RUTA_CONFIGURACION_PREFERENCIAS)
+
+	config.set_value("estado", "idioma_configurado", idioma_configurado)
+	config.set_value("estado", "disco_configurado", disco_configurado)
+	config.set_value("estado", "controles_configurados", controles_configurados)
+
+	config.set_value("preferencias", "language", Settings.language)
+	config.set_value("preferencias", "disco", DISCO_ACTUAL)
+	config.set_value("preferencias", "modo_controles", int(Settings.modo_controles))
+	config.set_value("preferencias", "opcion_interaccion", Settings.opcion_interaccion)
+
+	var error_guardado := config.save(RUTA_CONFIGURACION_PREFERENCIAS)
+	if error_guardado != OK:
+		push_warning(
+			"No se pudo guardar la configuración general. Error: "
+			+ str(error_guardado)
+		)
+		return false
+
+	_actualizar_preferencias_guardado_existente()
+	return true
+
+
+func configuracion_inicial_completa() -> bool:
+	return idioma_configurado and disco_configurado and controles_configurados
+
+
+func confirmar_controles_configurados() -> void:
+	controles_configurados = true
+	guardar_configuracion_preferencias()
+
+
+func _actualizar_preferencias_guardado_existente() -> void:
+	# No crear una falsa partida solo por elegir opciones.
+	# Si ya existe un archivo de partida, actualizar sus preferencias sin
+	# borrar el progreso ni otros campos almacenados.
+	if RUTA_GUARDADO.is_empty() or not FileAccess.file_exists(RUTA_GUARDADO):
+		return
+
+	var lectura := FileAccess.open(RUTA_GUARDADO, FileAccess.READ)
+	if lectura == null:
+		push_warning("No se pudieron leer las preferencias de la partida guardada.")
+		return
+	var existentes = lectura.get_var()
+	lectura.close()
+	if not existentes is Dictionary:
+		# No sobrescribir un archivo de partida que no se pudo interpretar.
+		push_warning("El archivo de partida no contiene un diccionario válido; no se actualizaron sus preferencias.")
+		return
+	var datos: Dictionary = existentes
+
+	datos["language"] = Settings.language
+	datos["idiomaConfigurado"] = idioma_configurado
+	datos["disco"] = DISCO_ACTUAL
+	datos["discoConfigurado"] = disco_configurado
+	datos["modoControles"] = int(Settings.modo_controles)
+	datos["opcionInteraccion"] = Settings.opcion_interaccion
+	datos["controlesConfigurados"] = controles_configurados
+
+	var escritura := FileAccess.open(RUTA_GUARDADO, FileAccess.WRITE)
+	if escritura == null:
+		push_warning("No se pudieron actualizar las preferencias dentro de la partida guardada.")
+		return
+	escritura.store_var(datos)
+	escritura.close()
+
+
+func seleccionar_disco_inicial(disco: String) -> bool:
+	disco = disco.to_upper()
+	if not _es_disco_valido(disco):
+		advertencia_disco = "El disco seleccionado no es válido."
+		return false
+	if DirAccess.open(disco + ":/") == null:
+		advertencia_disco = "El disco " + disco + " no está disponible. Selecciona una unidad existente."
+		return false
+
+	_configurar_disco(disco)
+	disco_configurado = true
+
+	if not guardar_configuracion_preferencias():
+		advertencia_disco = "No se pudo guardar la selección del disco."
+		return false
+
+	advertencia_disco = ""
+	print("DISCO CONFIGURADO: ", DISCO_ACTUAL)
+	print("Carpeta de guardado: ", CARPETA_GUARDADO)
+	return true
+
+
+func _es_disco_valido(disco: String) -> bool:
+	return disco.to_upper() in ["C", "D"]
 
 
 # =========================================================
@@ -30,13 +209,25 @@ func _ready() -> void:
 # =========================================================
 
 func detectar_disco_actual() -> String:
-	# Prioridad: C primero y, si no existe la carpeta, D.
-	if DirAccess.dir_exists_absolute(_ruta_carpeta_para_disco("C")):
+	# Primero priorizar un archivo de partida real. Después, carpetas existentes.
+	# Esto evita elegir C solo porque quedó una carpeta vacía allí cuando la
+	# partida real está guardada en D.
+	var ruta_c := _ruta_carpeta_para_disco("C")
+	var ruta_d := _ruta_carpeta_para_disco("D")
+	var save_c := ruta_c.path_join("partida.save")
+	var save_d := ruta_d.path_join("partida.save")
+
+	if FileAccess.file_exists(save_c):
 		_configurar_disco("C")
-	elif DirAccess.dir_exists_absolute(_ruta_carpeta_para_disco("D")):
+		disco_configurado = true
+	elif FileAccess.file_exists(save_d):
+		_configurar_disco("D")
+		disco_configurado = true
+	elif DirAccess.dir_exists_absolute(ruta_c):
+		_configurar_disco("C")
+	elif DirAccess.dir_exists_absolute(ruta_d):
 		_configurar_disco("D")
 	else:
-		# Si todavía no hay carpeta en ninguno, se intenta empezar en C.
 		_configurar_disco(DISCO_POR_DEFECTO)
 
 	print("DISCO DE GUARDADO DETECTADO: ", DISCO_ACTUAL)
@@ -65,7 +256,6 @@ func _asegurar_disco_inicializado() -> void:
 
 func asegurar_carpeta() -> bool:
 	_asegurar_disco_inicializado()
-
 	if DirAccess.dir_exists_absolute(CARPETA_GUARDADO):
 		return true
 
@@ -84,37 +274,9 @@ func asegurar_carpeta() -> bool:
 # =========================================================
 
 func guardar_idioma() -> void:
-	if not asegurar_carpeta():
-		return
-
-	var datos: Dictionary = {}
-	if FileAccess.file_exists(RUTA_GUARDADO):
-		var archivo_lectura := FileAccess.open(RUTA_GUARDADO, FileAccess.READ)
-		if archivo_lectura != null:
-			var datos_existentes = archivo_lectura.get_var()
-			archivo_lectura.close()
-			if datos_existentes is Dictionary:
-				datos = datos_existentes
-
-	datos["language"] = Settings.language
-
-	var archivo := FileAccess.open(RUTA_GUARDADO, FileAccess.WRITE)
-	if archivo == null:
-		advertencia_disco = "No se pudo escribir el idioma en el disco " + DISCO_ACTUAL + ". Puede que no haya espacio o que no se tengan permisos."
-		push_warning(advertencia_disco)
-		return
-
-	archivo.store_var(datos)
-	var error_escritura := archivo.get_error()
-	archivo.close()
-	if error_escritura != OK:
-		advertencia_disco = "No se pudo completar el guardado del idioma. Comprueba el espacio disponible en el disco " + DISCO_ACTUAL + "."
-		push_warning(advertencia_disco)
-		return
-
-	advertencia_disco = ""
-	print("IDIOMA GUARDADO: ", Settings.language)
-	print("Ubicación: ", RUTA_GUARDADO)
+	idioma_configurado = true
+	guardar_configuracion_preferencias()
+	print("IDIOMA CONFIGURADO: ", Settings.language)
 
 
 # =========================================================
@@ -137,6 +299,12 @@ func _obtener_datos_partida() -> Dictionary:
 
 	return {
 		"language": Settings.language,
+		"idiomaConfigurado": idioma_configurado,
+		"disco": DISCO_ACTUAL,
+		"discoConfigurado": disco_configurado,
+		"modoControles": int(Settings.modo_controles),
+		"opcionInteraccion": Settings.opcion_interaccion,
+		"controlesConfigurados": controles_configurados,
 		"vida": Settings.vidaActual,
 		"energia": Settings.energiaActual,
 		"nivelActual": Settings.nivelActual,
@@ -154,10 +322,8 @@ func _obtener_datos_partida() -> Dictionary:
 func guardar_partida() -> void:
 	if not asegurar_carpeta():
 		return
-
 	if not _escribir_datos_partida():
 		return
-
 	print("PARTIDA GUARDADA")
 	print("Nivel guardado: ", Settings.nivelActual)
 	print("Partida finalizada: ", partidaFinalizada)
@@ -190,7 +356,6 @@ func _escribir_datos_partida() -> bool:
 
 func cargar_partida() -> bool:
 	_asegurar_disco_inicializado()
-
 	if not FileAccess.file_exists(RUTA_GUARDADO):
 		print("No existe una partida guardada")
 		print("Ruta buscada: ", RUTA_GUARDADO)
@@ -207,15 +372,40 @@ func cargar_partida() -> bool:
 		print("El archivo de guardado no contiene datos válidos")
 		return false
 
-	partidaFinalizada = datos.get("partidaFinalizada", false)
-	Settings.language = datos.get("language", "es")
-	Settings.vidaActual = datos.get("vida", Settings.vidaInicial)
-	Settings.energiaActual = datos.get("energia", Settings.energiaInicial)
-	Settings.nivelActual = datos.get("nivelActual", "")
+	partidaFinalizada = bool(datos.get("partidaFinalizada", false))
+
+	# Las preferencias globales ya guardadas tienen prioridad. Si no hay una
+	# preferencia global, se intenta recuperar la que hubiera en el save antiguo.
+	if not idioma_configurado and datos.has("language"):
+		Settings.language = str(datos.get("language", "es"))
+		if Settings.language not in ["es", "en"]:
+			Settings.language = "es"
+		idioma_configurado = true
+
+	if not controles_configurados and datos.has("modoControles"):
+		var modo_guardado: int = int(
+			datos.get("modoControles", Settings.ModoControles.MODO_A)
+		)
+		var modo_partida: int = int(Settings.ModoControles.MODO_A)
+		if modo_guardado == int(Settings.ModoControles.MODO_B):
+			modo_partida = int(Settings.ModoControles.MODO_B)
+		Settings.cambiar_modo_controles(modo_partida)
+		Settings.cambiar_opcion_interaccion(
+			int(datos.get("opcionInteraccion", 0))
+		)
+		controles_configurados = bool(datos.get("controlesConfigurados", true))
+
+	Settings.vidaActual = int(datos.get("vida", Settings.vidaInicial))
+	Settings.energiaActual = int(datos.get("energia", Settings.energiaInicial))
+	Settings.nivelActual = str(datos.get("nivelActual", ""))
 	var ids_guardados: Array = datos.get("nivelesCompletados", [])
 	Settings.establecer_niveles_completados(ids_guardados)
 	Settings.objetosVidaObtenidos = datos.get("objetosVidaObtenidos", [])
 	Settings.objetosEnergiaObtenidos = datos.get("objetosEnergiaObtenidos", [])
+
+	# Si se recuperaron preferencias de un save antiguo, migrarlas al archivo
+	# global para que no dependan únicamente de la existencia de esa partida.
+	guardar_configuracion_preferencias()
 
 	print("PARTIDA CARGADA")
 	print("Nivel guardado: ", Settings.nivelActual)
@@ -229,6 +419,11 @@ func cargar_partida() -> bool:
 # =========================================================
 
 func obtener_idioma_guardado():
+	var config := ConfigFile.new()
+	if config.load(RUTA_CONFIGURACION_PREFERENCIAS) == OK:
+		if bool(config.get_value("estado", "idioma_configurado", false)):
+			return str(config.get_value("preferencias", "language", "es"))
+
 	_asegurar_disco_inicializado()
 	if not FileAccess.file_exists(RUTA_GUARDADO):
 		return null
@@ -236,12 +431,9 @@ func obtener_idioma_guardado():
 	var archivo := FileAccess.open(RUTA_GUARDADO, FileAccess.READ)
 	if archivo == null:
 		return null
-
 	var datos = archivo.get_var()
 	archivo.close()
-	if datos == null or not datos is Dictionary:
-		return null
-	if not datos.has("language"):
+	if datos == null or not datos is Dictionary or not datos.has("language"):
 		return null
 	return datos["language"]
 
@@ -274,16 +466,13 @@ func existe_partida() -> bool:
 	var archivo := FileAccess.open(RUTA_GUARDADO, FileAccess.READ)
 	if archivo == null:
 		return false
-
 	var datos = archivo.get_var()
 	archivo.close()
 	if datos == null or not datos is Dictionary:
 		return false
 	if datos.get("partidaFinalizada", false):
 		return false
-	if not datos.has("nivelActual"):
-		return false
-	if datos["nivelActual"] == "":
+	if not datos.has("nivelActual") or str(datos["nivelActual"]) == "":
 		return false
 	return true
 
@@ -308,7 +497,6 @@ func borrar_partida() -> void:
 
 # =========================================================
 # ESCRIBIR EN DISCO BORRANDO ANTES EL ARCHIVO ANTERIOR
-# Esta función se usará tras pedir confirmación en el menú.
 # =========================================================
 
 func escribir_en_disco() -> bool:
@@ -327,7 +515,6 @@ func escribir_en_disco() -> bool:
 
 # =========================================================
 # CAMBIAR AL DISCO C O D
-# Devuelve true si la transferencia terminó correctamente.
 # =========================================================
 
 func cambiar_a_c() -> bool:
@@ -343,7 +530,7 @@ func _transferir_a_disco(disco_destino: String) -> bool:
 	advertencia_disco = ""
 	disco_destino = disco_destino.to_upper()
 
-	if disco_destino != "C" and disco_destino != "D":
+	if not _es_disco_valido(disco_destino):
 		advertencia_disco = "El disco de destino no es válido."
 		push_warning(advertencia_disco)
 		return false
@@ -356,20 +543,21 @@ func _transferir_a_disco(disco_destino: String) -> bool:
 	var carpeta_destino := _ruta_carpeta_para_disco(disco_destino)
 	var origen_existe := DirAccess.dir_exists_absolute(carpeta_origen)
 
-	# Si el destino ya tiene contenido, no se sobrescribe nada.
+	# Si el destino ya tiene contenido, no se sobrescribe nada sin confirmación.
 	if DirAccess.dir_exists_absolute(carpeta_destino) and _carpeta_tiene_contenido(carpeta_destino):
 		advertencia_disco = "El disco " + disco_destino + " ya contiene datos en " + carpeta_destino + ". No se modificó ningún archivo."
 		push_warning(advertencia_disco)
 		return false
 
 	if not origen_existe:
-		# Todavía no hay datos que copiar; basta con preparar el destino.
 		var crear_resultado := DirAccess.make_dir_recursive_absolute(carpeta_destino)
 		if crear_resultado != OK:
 			advertencia_disco = "No se pudo crear la carpeta de guardado en el disco " + disco_destino + ". Comprueba permisos y espacio disponible."
 			push_warning(advertencia_disco)
 			return false
 		_configurar_disco(disco_destino)
+		disco_configurado = true
+		guardar_configuracion_preferencias()
 		print("DISCO DE GUARDADO CAMBIADO A ", DISCO_ACTUAL)
 		return true
 
@@ -400,8 +588,10 @@ func _transferir_a_disco(disco_destino: String) -> bool:
 		push_warning(advertencia_disco)
 		return false
 
-	# La copia está verificada: actualizar las rutas en memoria y recién después borrar el origen.
+	# La copia está verificada: cambiar las rutas y luego borrar el origen.
 	_configurar_disco(disco_destino)
+	disco_configurado = true
+	guardar_configuracion_preferencias()
 
 	if not _borrar_carpeta_completa(carpeta_origen):
 		advertencia_disco = "La partida se copió al disco " + disco_destino + ", pero no se pudo borrar la carpeta antigua del disco " + ("C" if disco_destino == "D" else "D") + ". Hay una copia adicional; revisa los archivos antes de volver a transferir."
@@ -438,7 +628,6 @@ func _copiar_contenido(origen: String, destino: String) -> bool:
 	var dir_origen := DirAccess.open(origen)
 	if dir_origen == null:
 		return false
-
 	if not DirAccess.dir_exists_absolute(destino):
 		if DirAccess.make_dir_recursive_absolute(destino) != OK:
 			return false
@@ -461,7 +650,6 @@ func _copiar_contenido(origen: String, destino: String) -> bool:
 			if error_copia != OK:
 				dir_origen.list_dir_end()
 				return false
-
 		nombre = dir_origen.get_next()
 
 	dir_origen.list_dir_end()
@@ -493,7 +681,6 @@ func _verificar_copia(origen: String, destino: String) -> bool:
 			if FileAccess.get_size(ruta_origen) != FileAccess.get_size(ruta_destino):
 				dir_origen.list_dir_end()
 				return false
-
 		nombre = dir_origen.get_next()
 
 	dir_origen.list_dir_end()
@@ -526,8 +713,7 @@ func _obtener_tamano_carpeta(ruta: String) -> int:
 
 func _obtener_espacio_libre(disco: String) -> int:
 	# Godot no expone de forma portable el espacio libre de una unidad.
-	# En Windows se consulta PowerShell. Si no se puede consultar, devuelve -1
-	# y la copia se intenta igualmente; los errores de escritura se capturan.
+	# En Windows se consulta PowerShell. Si falla, devuelve -1 y se intenta copiar.
 	if OS.get_name() != "Windows":
 		return -1
 
@@ -594,7 +780,6 @@ func _borrar_carpeta_completa(ruta: String) -> bool:
 			if DirAccess.remove_absolute(ruta_hijo) != OK:
 				directorio.list_dir_end()
 				return false
-
 		nombre = directorio.get_next()
 
 	directorio.list_dir_end()

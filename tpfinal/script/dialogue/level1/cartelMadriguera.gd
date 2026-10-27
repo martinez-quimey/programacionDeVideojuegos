@@ -1,15 +1,21 @@
-
 extends DialogueAbstract
 
 func create_dialogue() -> void:
+	var boton_teclado: String = "la flecha abajo"
+	var boton_teclado_en: String = "Down Arrow"
+
+	if Settings.modo_controles == Settings.ModoControles.MODO_B:
+		boton_teclado = "S"
+		boton_teclado_en = "S"
+
 	if Settings.language == "es":
 		add_line(
 			"Cartel",
-            "Con abajo se puede entrar en madrigueras"
+			"Con " + boton_teclado + " se puede entrar en madrigueras."
 		)
 
 	elif Settings.language == "en":
 		add_line(
 			"Sign",
-            "Press down to enter burrows"
+			"Press " + boton_teclado_en + " to enter burrows."
 		)

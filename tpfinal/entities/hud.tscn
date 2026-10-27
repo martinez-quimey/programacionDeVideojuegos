@@ -297,6 +297,21 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
+[node name="Controles" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=1550948739]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
 [node name="Disco" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=382891921]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
@@ -328,6 +343,81 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
 [node name="Panel" type="Panel" parent="Opciones/MarginContainer" unique_id=2018155714]
+z_index = -1
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
+
+[node name="Controles" type="Control" parent="." unique_id=2045659867]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Controles" unique_id=985203966]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Controles/MarginContainer" unique_id=1690206076]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Controles/MarginContainer/CenterContainer" unique_id=1862473537]
+layout_mode = 2
+
+[node name="Control" type="Button" parent="Controles/MarginContainer/CenterContainer/VBoxContainer" unique_id=1906040943]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="BotonDeInteract" type="Button" parent="Controles/MarginContainer/CenterContainer/VBoxContainer" unique_id=1810334162]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="BackButton" type="Button" parent="Controles/MarginContainer/CenterContainer/VBoxContainer" unique_id=569062929]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="Panel" type="Panel" parent="Controles/MarginContainer" unique_id=1603051178]
 z_index = -1
 layout_mode = 2
 mouse_filter = 2
@@ -802,7 +892,10 @@ text = "Exit"
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton" to="." method="_on_quit_game_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Sonido" to="." method="_on_sonido_button_pressed"]
+[connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Controles" to="." method="_on_sonido_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Disco" to="." method="_on_sonido_button_pressed"]
+[connection signal="pressed" from="Controles/MarginContainer/CenterContainer/VBoxContainer/Control" to="." method="_on_language_button_pressed"]
+[connection signal="pressed" from="Controles/MarginContainer/CenterContainer/VBoxContainer/BotonDeInteract" to="." method="_on_sonido_button_pressed"]
 [connection signal="pressed" from="Sonido/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/YesButton" to="." method="_on_yes_button_pressed"]
 [connection signal="pressed" from="Confirmacion/CenterContainer/VBoxContainer/NoButton" to="." method="_on_no_button_pressed"]
