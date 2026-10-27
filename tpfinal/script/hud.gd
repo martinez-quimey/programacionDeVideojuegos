@@ -1,5 +1,8 @@
 extends CanvasLayer
 
+# true: guardado tradicional en C:/ o D:/.
+# false: modo navegador; los datos solo viven en variables mientras el juego está abierto.
+const MODO_GUARDADO_EN_DISCO: bool = false
 
 signal start_game
 signal retry_game
@@ -29,6 +32,11 @@ var etiqueta_explicacion_modo_a: Label
 var etiqueta_explicacion_modo_b: Label
 
 
+func _enter_tree() -> void:
+	# Configurar Save antes de que el HUD utilice sus métodos en _ready().
+	Save.configurar_modo_guardado(MODO_GUARDADO_EN_DISCO)
+
+
 # =========================================================
 # READY
 # =========================================================
@@ -56,8 +64,9 @@ func _ready() -> void:
 	_configurar_pantalla_sonido()
 	_cargar_volumenes()
 
-	# Recuperar la partida antes de actualizar el estado de los botones.
-	if FileAccess.file_exists(Save.RUTA_GUARDADO):
+	# Recuperar los datos antes de actualizar el estado de los botones.
+	# En modo navegador, los datos están en memoria y no existe RUTA_GUARDADO.
+	if Save.hay_datos_guardados():
 		Save.cargar_partida()
 
 	var start_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton
@@ -129,6 +138,8 @@ func _ready() -> void:
 	var opciones_disco_button = opciones_vbox.get_node_or_null("Disco")
 	if opciones_disco_button is Button and not opciones_disco_button.pressed.is_connected(_on_disco_button_pressed):
 		opciones_disco_button.pressed.connect(_on_disco_button_pressed)
+	if opciones_disco_button is Control:
+		opciones_disco_button.visible = Save.modo_guardado_en_disco
 
 	var opciones_controles_button = opciones_vbox.get_node_or_null("Controles")
 	if opciones_controles_button is Button and not opciones_controles_button.pressed.is_connected(_on_controles_button_pressed):
@@ -189,6 +200,10 @@ func _ready() -> void:
 
 
 func actualizar_menu_discos() -> void:
+	if not Save.modo_guardado_en_disco:
+		$Disco.hide()
+		return
+
 	var titulo: Label = $Disco/CenterContainer/VBoxContainer/Title2
 	var c_button: Button = $Disco/CenterContainer/VBoxContainer/cButton
 	var d_button: Button = $Disco/CenterContainer/VBoxContainer/dButton
@@ -409,7 +424,7 @@ func _continuar_asistente_configuracion() -> void:
 			volver_idioma.hide()
 		return
 
-	if not Save.disco_configurado:
+	if Save.modo_guardado_en_disco and not Save.disco_configurado:
 		paso_configuracion_inicial = PasoConfiguracionInicial.DISCO
 		show_disco_menu()
 		var vbox_disco = $Disco/CenterContainer/VBoxContainer
@@ -907,10 +922,6 @@ func _cambiar_selector_con_flechas(nodo: Node, direccion: int) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			call_deferred("_depurar_control_bajo_mouse")
-
 	var raiz = get_node_or_null("Controles")
 	if raiz == null or not raiz.visible:
 		return
@@ -1218,6 +1229,10 @@ func show_opciones() -> void:
 		primer_boton.grab_focus()
 
 func show_disco_menu() -> void:
+	if not Save.modo_guardado_en_disco:
+		show_opciones()
+		return
+
 	$MainMenu.hide()
 	$GameOver.hide()
 	$LanguageMenu.hide()
@@ -1425,6 +1440,10 @@ func update_language() -> void:
 	# Actualizar también los controles y el menú de discos.
 	_actualizar_textos_controles()
 
+	var boton_opcion_disco = opciones.get_node_or_null("Disco")
+	if boton_opcion_disco is Control:
+		boton_opcion_disco.visible = Save.modo_guardado_en_disco
+
 	if is_node_ready():
 		actualizar_menu_discos()
 
@@ -1518,7 +1537,8 @@ func _on_language_button_pressed() -> void:
 
 
 func _on_disco_button_pressed() -> void:
-	show_disco_menu()
+	if Save.modo_guardado_en_disco:
+		show_disco_menu()
 
 
 func _on_c_button_pressed() -> void:
@@ -1530,6 +1550,9 @@ func _on_d_button_pressed() -> void:
 
 
 func _manejar_seleccion_disco(disco: String) -> void:
+	if not Save.modo_guardado_en_disco:
+		return
+
 	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.DISCO:
 		if not Save.seleccionar_disco_inicial(disco):
 			var mensaje := Save.advertencia_disco
@@ -1542,6 +1565,9 @@ func _manejar_seleccion_disco(disco: String) -> void:
 
 
 func _intentar_cambiar_disco(disco_destino: String) -> void:
+	if not Save.modo_guardado_en_disco:
+		return
+
 	if disco_destino == Save.DISCO_ACTUAL:
 		Save.advertencia_disco = ""
 		show_opciones()
@@ -1858,26 +1884,37 @@ func _cambiar_volumen_bus(nombre_bus: String, valor: float) -> void:
 
 
 func _guardar_volumenes() -> void:
+	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
+	var efectos: float = float(vbox_sonido.get_node("SonidoSlider").value)
+	var musica: float = float(vbox_sonido.get_node("MusicaSlider").value)
+	var voces: float = float(vbox_sonido.get_node("VocesSlider").value)
+
+	# El modo navegador no crea opciones.cfg: los volúmenes quedan en Save.
+	if not Save.modo_guardado_en_disco:
+		Save.volumenes_memoria = {
+			"efectos": efectos,
+			"musica": musica,
+			"voces": voces
+		}
+		return
 
 	var config := ConfigFile.new()
-	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
-
 	config.set_value(
 		"sonido",
 		"efectos",
-		vbox_sonido.get_node("SonidoSlider").value
+		efectos
 	)
 
 	config.set_value(
 		"sonido",
 		"musica",
-		vbox_sonido.get_node("MusicaSlider").value
+		musica
 	)
 
 	config.set_value(
 		"sonido",
 		"voces",
-		vbox_sonido.get_node("VocesSlider").value
+		voces
 	)
 
 
@@ -1900,60 +1937,44 @@ func _guardar_volumenes() -> void:
 
 
 func _cargar_volumenes() -> void:
-
-	var config := ConfigFile.new()
-	var error := config.load(RUTA_OPCIONES_SONIDO)
-
 	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
 
 	var sonido_slider: HSlider = vbox_sonido.get_node("SonidoSlider")
 	var musica_slider: HSlider = vbox_sonido.get_node("MusicaSlider")
 	var voces_slider: HSlider = vbox_sonido.get_node("VocesSlider")
 
-
-	if error == OK:
-
-		# Recuperar los valores guardados.
-		sonido_slider.set_value_no_signal(
-			config.get_value("sonido", "efectos", 50.0)
-		)
-
-		musica_slider.set_value_no_signal(
-			config.get_value("sonido", "musica", 50.0)
-		)
-
-		voces_slider.set_value_no_signal(
-			config.get_value("sonido", "voces", 50.0)
-		)
-
-		print("VOLUMENES CARGADOS")
-
+	# En modo navegador se usan exclusivamente las variables del autoload Save.
+	if not Save.modo_guardado_en_disco:
+		sonido_slider.set_value_no_signal(float(Save.volumenes_memoria.get("efectos", 50.0)))
+		musica_slider.set_value_no_signal(float(Save.volumenes_memoria.get("musica", 50.0)))
+		voces_slider.set_value_no_signal(float(Save.volumenes_memoria.get("voces", 50.0)))
 	else:
+		var config := ConfigFile.new()
+		var error := config.load(RUTA_OPCIONES_SONIDO)
 
-		# Si no hay configuración, empezar en 50 %.
-		sonido_slider.set_value_no_signal(50.0)
-		musica_slider.set_value_no_signal(50.0)
-		voces_slider.set_value_no_signal(50.0)
-
-		print("No se pudo cargar opciones.cfg. Error: ", error)
-		print("Se usarán los valores predeterminados: 50 %.")
-
+		if error == OK:
+			sonido_slider.set_value_no_signal(float(config.get_value("sonido", "efectos", 50.0)))
+			musica_slider.set_value_no_signal(float(config.get_value("sonido", "musica", 50.0)))
+			voces_slider.set_value_no_signal(float(config.get_value("sonido", "voces", 50.0)))
+			print("VOLUMENES CARGADOS")
+		else:
+			sonido_slider.set_value_no_signal(50.0)
+			musica_slider.set_value_no_signal(50.0)
+			voces_slider.set_value_no_signal(50.0)
+			print("No se pudo cargar opciones.cfg. Error: ", error)
+			print("Se usarán los valores predeterminados: 50 %.")
+			_guardar_volumenes()
 
 	# Aplicar los valores al mezclador.
 	_cambiar_volumen_bus("Sonido", sonido_slider.value)
 	_cambiar_volumen_bus("Musica", musica_slider.value)
 	_cambiar_volumen_bus("Voces", voces_slider.value)
 
-
-	# Si no existía la configuración, crear los valores iniciales.
-	if error != OK:
-		_guardar_volumenes()
-
-
 	print("Efectos: ", sonido_slider.value)
 	print("Música: ", musica_slider.value)
 	print("Voces: ", voces_slider.value)
-	print("Archivo: ", RUTA_OPCIONES_SONIDO)
+	if Save.modo_guardado_en_disco:
+		print("Archivo: ", RUTA_OPCIONES_SONIDO)
 
 
 func _on_spanish_button_pressed() -> void:
@@ -2190,15 +2211,3 @@ func _actualizar_estado_flechas(tipo: String) -> void:
 			else Color.WHITE
 		)
 		
-func _depurar_control_bajo_mouse() -> void:
-	var control = get_viewport().gui_get_hovered_control()
-
-	if control != null:
-		print(
-			"Control bajo el mouse: ",
-			control.get_path(),
-			" | Mouse Filter: ",
-			control.mouse_filter
-		)
-	else:
-		print("No hay ningún Control bajo el mouse.")
