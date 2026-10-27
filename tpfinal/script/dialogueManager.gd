@@ -25,6 +25,7 @@ func _ready() -> void:
 	timer_automatico.timeout.connect(_on_timer_automatico_timeout)
 
 	add_child(timer_automatico)
+	Settings.sePuedePausar = false
 
 
 func _process(_delta: float) -> void:
@@ -177,3 +178,4 @@ func end_dialogue() -> void:
 		Settings.sePuedePausar = true
 
 	current_dialogue_es_automatico = false
+	Settings.sePuedePausar = true

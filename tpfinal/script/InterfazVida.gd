@@ -45,6 +45,7 @@ var _tiempo_parpadeo := 0.0
 
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_theme_constant_override("separation", separacion)
 
 	_posicion_original = position
@@ -88,7 +89,7 @@ func _crear_colas() -> void:
 
 	for i in range(max_value):
 		var cola := TextureRect.new()
-
+		cola.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cola.texture = textura_cola
 		cola.custom_minimum_size = tamano_cola
 		cola.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

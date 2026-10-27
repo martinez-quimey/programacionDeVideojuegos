@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cjsocy4o8vnfr"]
 
-[ext_resource type="Script" uid="uid://bhxfk2u1qcnd" path="res://entities/InterfazVida.gd" id="1_788sk"]
+[ext_resource type="Script" uid="uid://bhxfk2u1qcnd" path="res://script/InterfazVida.gd" id="1_788sk"]
 [ext_resource type="Texture2D" uid="uid://mxkqpqsl5168" path="res://sprites/cola.png" id="2_sxyae"]
 [ext_resource type="Script" uid="uid://dfjy5h5wmvuik" path="res://script/interfaz_energia.gd" id="3_sxyae"]
 [ext_resource type="Texture2D" uid="uid://cn80ygku7t7ra" path="res://sprites/energia.png" id="4_2afea"]
@@ -17,10 +17,12 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 
 [node name="InterfazVida" type="HBoxContainer" parent="CanvasLayer/Control" unique_id=1071319097]
 texture_filter = 1
 layout_mode = 0
+mouse_filter = 2
 script = ExtResource("1_788sk")
 textura_cola = ExtResource("2_sxyae")
 tamano_cola = Vector2(126, 126)
@@ -31,6 +33,7 @@ texture_filter = 1
 layout_mode = 0
 offset_top = 150.0
 offset_bottom = 150.0
+mouse_filter = 2
 script = ExtResource("3_sxyae")
 textura_cola = ExtResource("4_2afea")
 tamano_cola = Vector2(126, 126)

@@ -48,6 +48,7 @@ offset_right = 38625.0
 offset_bottom = 12973.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1509912943]
 anchors_preset = -1
@@ -56,9 +57,11 @@ anchor_right = 0.767
 anchor_bottom = 0.81
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 
 [node name="Panel" type="Panel" parent="MarginContainer" unique_id=1020383961]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Portrait" type="Panel" parent="MarginContainer/Panel" unique_id=1041713054]
 layout_mode = 0
@@ -67,12 +70,14 @@ offset_top = -270.944
 offset_right = 143.0
 offset_bottom = -142.944
 scale = Vector2(2, 2)
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
 [node name="marcointerior" type="Panel" parent="MarginContainer/Panel/Portrait" unique_id=1881682187]
 layout_mode = 0
 offset_right = 130.0
 offset_bottom = 128.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7hyon")
 
 [node name="marcointerior" type="Panel" parent="MarginContainer/Panel/Portrait/marcointerior" unique_id=232056752]
@@ -81,6 +86,7 @@ offset_left = 3.0
 offset_top = 3.0
 offset_right = 127.0
 offset_bottom = 123.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_nc1wc")
 
 [node name="Portrait" type="TextureRect" parent="MarginContainer/Panel/Portrait/marcointerior/marcointerior" unique_id=796673808]

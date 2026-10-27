@@ -136,6 +136,7 @@ offset_right = 38625.0
 offset_bottom = 12973.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="fondo" parent="escenario/fondo" parent_id_path=PackedInt32Array(2132640867) index="0" unique_id=249928600]
 position = Vector2(0, 52)
@@ -162,6 +163,7 @@ offset_right = 32522.0
 offset_bottom = 5032.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.49803922, 0.7176471, 0.8509804, 1)
 
 [node name="fondo3" type="ColorRect" parent="escenario/fondo" parent_id_path=PackedInt32Array(2132640867) index="4" unique_id=1591874652]
@@ -176,6 +178,7 @@ offset_right = 28211.0
 offset_bottom = 13144.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.23369104, 0.15529957, 0.0080014, 1)
 
 [node name="fondo4" type="ColorRect" parent="escenario/fondo" parent_id_path=PackedInt32Array(2132640867) index="5" unique_id=1804852345]
@@ -190,6 +193,7 @@ offset_right = 37921.0
 offset_bottom = 5955.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.23369104, 0.15529957, 0.0080014, 1)
 
 [node name="TileMapLayer" parent="escenario" parent_id_path=PackedInt32Array(1798412436) index="1" unique_id=832274235]
@@ -340,14 +344,12 @@ position = Vector2(4453, -220)
 collision_mask = 1
 SPEEDCAMINANDO = 100.0
 CAMINATA = 200.0
-PESO = 1.0
 
 [node name="Jabali2" parent="Enemigos" index="1" unique_id=714098571 instance=ExtResource("3_w2ymw")]
 position = Vector2(21706, -782)
 collision_mask = 1
 SPEEDCAMINANDO = 100.0
 CAMINATA = 200.0
-PESO = 1.0
 
 [node name="Tsuchigumo" parent="Enemigos" index="2" unique_id=299820287 instance=ExtResource("25_ivv4w")]
 position = Vector2(17905, 5729)

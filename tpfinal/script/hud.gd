@@ -147,6 +147,7 @@ func _ready() -> void:
 	if not disco_back_button.pressed.is_connected(_on_disco_back_button_pressed):
 		disco_back_button.pressed.connect(_on_disco_back_button_pressed)
 
+
 	# Botones de pausa.
 	var continuar_button = $Pause/CenterContainer/VBoxContainer/Continuar
 	if not continuar_button.pressed.is_connected(_on_continuar_button_pressed):
@@ -906,6 +907,10 @@ func _cambiar_selector_con_flechas(nodo: Node, direccion: int) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			call_deferred("_depurar_control_bajo_mouse")
+
 	var raiz = get_node_or_null("Controles")
 	if raiz == null or not raiz.visible:
 		return
@@ -2184,3 +2189,16 @@ func _actualizar_estado_flechas(tipo: String) -> void:
 			if derecha.disabled
 			else Color.WHITE
 		)
+		
+func _depurar_control_bajo_mouse() -> void:
+	var control = get_viewport().gui_get_hovered_control()
+
+	if control != null:
+		print(
+			"Control bajo el mouse: ",
+			control.get_path(),
+			" | Mouse Filter: ",
+			control.mouse_filter
+		)
+	else:
+		print("No hay ningún Control bajo el mouse.")

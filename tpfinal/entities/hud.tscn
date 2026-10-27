@@ -783,6 +783,7 @@ alignment = 1
 layout_mode = 2
 
 [node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=507573745]
+z_index = 2
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
@@ -798,6 +799,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_u6mqm")
 text = "Start"
 
 [node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=1726611479]
+z_index = 2
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
