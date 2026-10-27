@@ -2,7 +2,7 @@ extends CanvasLayer
 
 # true: guardado tradicional en C:/ o D:/.
 # false: modo navegador; los datos solo viven en variables mientras el juego está abierto.
-const MODO_GUARDADO_EN_DISCO: bool = false
+const MODO_GUARDADO_EN_DISCO: bool = true
 
 signal start_game
 signal retry_game
@@ -2081,23 +2081,19 @@ func _crear_flechas_selector(selector: Control, tipo: String) -> void:
 	var padre := selector.get_parent()
 	var indice := selector.get_index()
 
-	# El selector central deja de ejecutar acciones.
+	# El selector central es SOLO una etiqueta visual.
+	# Desconectar todas las señales evita que conexiones hechas desde el
+	# editor de Godot (por ejemplo, a Idioma o Sonido) sigan ejecutándose.
 	if selector is Button:
-		if selector.pressed.is_connected(_on_boton_control_pressed):
-			selector.pressed.disconnect(_on_boton_control_pressed)
-
-		if selector.pressed.is_connected(_on_boton_interaccion_pressed):
-			selector.pressed.disconnect(_on_boton_interaccion_pressed)
+		_desconectar_conexiones_selector(selector, "pressed")
+		_desconectar_conexiones_selector(selector, "button_down")
+		_desconectar_conexiones_selector(selector, "button_up")
 
 	if selector is OptionButton:
-		if selector.item_selected.is_connected(_on_selector_modo_controles_elegido):
-			selector.item_selected.disconnect(_on_selector_modo_controles_elegido)
+		_desconectar_conexiones_selector(selector, "item_selected")
 
-		if selector.item_selected.is_connected(_on_selector_interaccion_elegido):
-			selector.item_selected.disconnect(_on_selector_interaccion_elegido)
-
-		# No permitir que el selector abra su lista al pulsarlo.
-		selector.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# El selector central no recibe clics. Solo se usan las flechas laterales.
+	selector.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var contenedor := HBoxContainer.new()
 	contenedor.name = "ContenedorFlechas_" + tipo
@@ -2136,6 +2132,19 @@ func _crear_flechas_selector(selector: Control, tipo: String) -> void:
 	contenedor.add_child(derecha)
 
 	_actualizar_estado_flechas(tipo)
+
+
+func _desconectar_conexiones_selector(nodo: Object, nombre_senal: String) -> void:
+	if not nodo.has_signal(nombre_senal):
+		return
+
+	# get_signal_connection_list devuelve las conexiones existentes, incluidas
+	# las creadas desde el editor de escenas.
+	var conexiones: Array = nodo.get_signal_connection_list(nombre_senal)
+	for conexion in conexiones:
+		var callable_conectado: Callable = conexion.get("callable", Callable())
+		if callable_conectado.is_valid() and nodo.is_connected(nombre_senal, callable_conectado):
+			nodo.disconnect(nombre_senal, callable_conectado)
 
 
 func _on_flecha_selector_pressed(tipo: String, direccion: int) -> void:
