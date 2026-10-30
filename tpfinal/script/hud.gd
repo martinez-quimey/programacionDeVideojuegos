@@ -47,9 +47,6 @@ func _ready() -> void:
 	if Settings.language.is_empty():
 		Settings.language = "es"
 
-		# Guardar el idioma inicial para que las siguientes ejecuciones
-		# no vuelvan a arrancar con el idioma vacío.
-		Save.guardar_idioma()
 
 	$Confirmacion.hide()
 	$Sonido.hide()
@@ -230,6 +227,8 @@ func actualizar_menu_discos() -> void:
 # =========================================================
 
 func _process(_delta: float) -> void:
+	if not Save.modo_guardado_en_disco:
+		return
 	# Save.advertencia_disco permite detectar fallos de escritura que ocurran
 	# desde otras partes del juego, no solamente desde estos botones.
 	if confirmando_transferencia_disco:
@@ -635,6 +634,7 @@ func _actualizar_selectores_controles() -> void:
 	_actualizar_estado_flechas("control")
 	_actualizar_estado_flechas("interaccion")
 
+
 func _actualizar_textos_controles() -> void:
 	var raiz = get_node_or_null("Controles")
 	if raiz == null:
@@ -642,6 +642,52 @@ func _actualizar_textos_controles() -> void:
 
 	var boton_control = _obtener_selector_control()
 	var boton_interaccion = _obtener_selector_interaccion()
+
+	# Conectar los selectores para actualizar los textos al modificarlos.
+	_conectar_actualizacion_selector(boton_control)
+	_conectar_actualizacion_selector(boton_interaccion)
+
+	# Determinar cómo mostrar las direcciones según el modo de guardado.
+	var izquierda: String
+	var derecha: String
+	var arriba: String
+	var abajo: String
+
+	if Save.modo_guardado_en_disco:
+		izquierda = "←"
+		derecha = "→"
+		arriba = "↑"
+		abajo = "↓"
+	else:
+		if Settings.language == "es":
+			izquierda = "Izquierda"
+			derecha = "Derecha"
+			arriba = "Arriba"
+			abajo = "Abajo"
+		else:
+			izquierda = "Left"
+			derecha = "Right"
+			arriba = "Up"
+			abajo = "Down"
+
+	# Obtener las opciones de interacción según el modo de controles.
+	var opciones_interaccion: Array = []
+
+	if Settings.modo_controles == Settings.ModoControles.MODO_A:
+		if Settings.language == "es":
+			opciones_interaccion = ["Arriba", "E"]
+		else:
+			opciones_interaccion = ["Up", "E"]
+	else:
+		opciones_interaccion = ["W", "E"]
+
+	var indice_opcion: int = clampi(
+		Settings.opcion_interaccion,
+		0,
+		opciones_interaccion.size() - 1
+	)
+
+	var tecla_interaccion: String = str(opciones_interaccion[indice_opcion])
 
 	# Actualizar el botón del modo de controles.
 	if boton_control is Button and not (boton_control is OptionButton):
@@ -658,32 +704,13 @@ func _actualizar_textos_controles() -> void:
 
 	# Actualizar el botón de interacción.
 	if boton_interaccion is Button and not (boton_interaccion is OptionButton):
-		var opciones_interaccion: Array = []
-
-		if Settings.modo_controles == Settings.ModoControles.MODO_A:
-			if Settings.language == "es":
-				opciones_interaccion = ["Arriba", "E"]
-			else:
-				opciones_interaccion = ["Up", "E"]
-		else:
-			opciones_interaccion = ["W", "E"]
-
-		var indice_opcion: int = clampi(
-			Settings.opcion_interaccion,
-			0,
-			opciones_interaccion.size() - 1
-		)
-
 		var nombre_interaccion: String = (
 			"Interacción: "
 			if Settings.language == "es"
 			else "Interact: "
 		)
 
-		boton_interaccion.text = (
-			nombre_interaccion
-			+ str(opciones_interaccion[indice_opcion])
-		)
+		boton_interaccion.text = nombre_interaccion + tecla_interaccion
 
 	# Actualizar los textos generales de la pantalla.
 	var titulo = _buscar_nodo_por_nombre(raiz, "Title")
@@ -713,7 +740,7 @@ func _actualizar_textos_controles() -> void:
 			else "Continue"
 		)
 
-	# Explicación lateral de ambos modos.
+	# Actualizar la explicación de ambos modos.
 	if (
 		is_instance_valid(etiqueta_explicacion_modo_a)
 		and is_instance_valid(etiqueta_explicacion_modo_b)
@@ -721,12 +748,14 @@ func _actualizar_textos_controles() -> void:
 		if Settings.language == "es":
 			etiqueta_explicacion_modo_a.text = (
 				"MODO A · FLECHAS\n"
-				+ "Mover: ← / →\n"
+				+ "Mover: " + izquierda + " / " + derecha + "\n"
 				+ "Saltar: Espacio\n"
 				+ "Salto fuego: Z\n"
 				+ "Diálogo: Z o Espacio\n"
-				+ "Interacción: ↑ o E\n"
-				+ "Madriguera: ↓\n"
+				+ "Interacción: " + (
+					arriba if Settings.opcion_interaccion == 0 else "E"
+				) + "\n"
+				+ "Madriguera: " + abajo + "\n"
 				+ "Tornado: X\n"
 				+ "TurboFuego: C"
 			)
@@ -737,7 +766,9 @@ func _actualizar_textos_controles() -> void:
 				+ "Saltar: N\n"
 				+ "Salto fuego: J\n"
 				+ "Diálogo: J o N\n"
-				+ "Interacción: W o E\n"
+				+ "Interacción: " + (
+					"W" if Settings.opcion_interaccion == 0 else "E"
+				) + "\n"
 				+ "Madriguera: S\n"
 				+ "Tornado: K\n"
 				+ "TurboFuego: L"
@@ -745,12 +776,14 @@ func _actualizar_textos_controles() -> void:
 		else:
 			etiqueta_explicacion_modo_a.text = (
 				"MODE A · ARROW KEYS\n"
-				+ "Move: ← / →\n"
+				+ "Move: " + izquierda + " / " + derecha + "\n"
 				+ "Jump: Space\n"
 				+ "Fire jump: Z\n"
 				+ "Dialogue: Z or Space\n"
-				+ "Interact: ↑ or E\n"
-				+ "Burrow: ↓\n"
+				+ "Interact: " + (
+					arriba if Settings.opcion_interaccion == 0 else "E"
+				) + "\n"
+				+ "Burrow: " + abajo + "\n"
 				+ "Tornado: X\n"
 				+ "TurboFire: C"
 			)
@@ -761,16 +794,49 @@ func _actualizar_textos_controles() -> void:
 				+ "Jump: N\n"
 				+ "Fire jump: Y\n"
 				+ "Dialogue: J or N\n"
-				+ "Interact: W or E\n"
+				+ "Interact: " + (
+					"W" if Settings.opcion_interaccion == 0 else "E"
+				) + "\n"
 				+ "Burrow: S\n"
 				+ "Tornado: K\n"
 				+ "TurboFire: L"
 			)
+			
+func _conectar_actualizacion_selector(selector) -> void:
+	if not selector is Control:
+		return
+
+	var actualizar_diferido := Callable(
+		self,
+		"_actualizar_textos_controles_diferido"
+	)
+
+	# Conectar el selector principal.
+	if selector is Button:
+		if not selector.pressed.is_connected(actualizar_diferido):
+			selector.pressed.connect(actualizar_diferido)
+
+	# Conectar también las flechas laterales.
+	var contenedor = selector.get_parent()
+
+	if contenedor is HBoxContainer:
+		for hijo in contenedor.get_children():
+			if hijo is Button and hijo.name.begins_with("Flecha"):
+				if not hijo.pressed.is_connected(actualizar_diferido):
+					hijo.pressed.connect(actualizar_diferido)
+
+
+func _actualizar_textos_controles_diferido() -> void:
+	call_deferred("_actualizar_textos_controles")
+
+
 func _crear_panel_explicacion_controles() -> void:
 	var raiz = get_node_or_null("Controles")
 	if not raiz is Control:
 		return
+
 	var existente = raiz.get_node_or_null("ExplicacionModosPanel")
+
 	if existente is PanelContainer:
 		panel_explicacion_controles = existente
 		etiqueta_explicacion_modo_a = existente.get_node_or_null("VBox/ModoA") as Label
@@ -813,7 +879,6 @@ func _crear_panel_explicacion_controles() -> void:
 	vbox.add_child(etiqueta_explicacion_modo_b)
 
 	_actualizar_textos_controles()
-
 
 func show_controles_menu(es_asistente: bool = false) -> void:
 	$MainMenu.hide()
@@ -1977,20 +2042,23 @@ func _cargar_volumenes() -> void:
 		print("Archivo: ", RUTA_OPCIONES_SONIDO)
 
 
+
 func _on_spanish_button_pressed() -> void:
 	if confirmando_transferencia_disco:
 		_resolver_confirmacion_transferencia(true)
 		return
 
 	Settings.language = "es"
-	Save.guardar_idioma()
-	update_language()
 
+	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.IDIOMA:
+		Save.idioma_configurado = true
+	else:
+		Save.guardar_idioma()
+	update_language()
 	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.IDIOMA:
 		_continuar_asistente_configuracion()
 	else:
 		show_opciones()
-
 
 func _on_english_button_pressed() -> void:
 	if confirmando_transferencia_disco:
@@ -1998,14 +2066,18 @@ func _on_english_button_pressed() -> void:
 		return
 
 	Settings.language = "en"
-	Save.guardar_idioma()
+
+	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.IDIOMA:
+		Save.idioma_configurado = true
+	else:
+		Save.guardar_idioma()
+
 	update_language()
 
 	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.IDIOMA:
 		_continuar_asistente_configuracion()
 	else:
 		show_opciones()
-
 
 # =========================================================
 # VOLVER DESDE IDIOMA
@@ -2068,72 +2140,55 @@ func _on_main_menu_button2_pressed() -> void:
 	main_menu.emit()
 
 	Settings.checkpoint = 0
-
-
 func _crear_flechas_selector(selector: Control, tipo: String) -> void:
-	if selector == null:
+	var padre = selector.get_parent()
+	if padre == null:
 		return
 
-	# Evitar crear las flechas dos veces.
-	if selector.get_parent().name == "ContenedorFlechas_" + tipo:
-		return
-
-	var padre := selector.get_parent()
-	var indice := selector.get_index()
-
-	# El selector central es SOLO una etiqueta visual.
-	# Desconectar todas las señales evita que conexiones hechas desde el
-	# editor de Godot (por ejemplo, a Idioma o Sonido) sigan ejecutándose.
-	if selector is Button:
-		_desconectar_conexiones_selector(selector, "pressed")
-		_desconectar_conexiones_selector(selector, "button_down")
-		_desconectar_conexiones_selector(selector, "button_up")
-
-	if selector is OptionButton:
-		_desconectar_conexiones_selector(selector, "item_selected")
-
-	# El selector central no recibe clics. Solo se usan las flechas laterales.
-	selector.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var indice_original = selector.get_index()
 
 	var contenedor := HBoxContainer.new()
-	contenedor.name = "ContenedorFlechas_" + tipo
-	contenedor.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	contenedor.alignment = BoxContainer.ALIGNMENT_CENTER
+	contenedor.name = "ContenedorFlechas"
+	contenedor.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	contenedor.add_theme_constant_override("separation", 8)
 
-	# Conservar la posición del selector dentro del contenedor original.
-	padre.add_child(contenedor)
-	padre.move_child(contenedor, indice)
+	var flecha_izquierda := Button.new()
+	flecha_izquierda.name = "FlechaIzquierda"
 
+	var flecha_derecha := Button.new()
+	flecha_derecha.name = "FlechaDerecha"
+
+	if Save.modo_guardado_en_disco:
+		flecha_izquierda.text = "◀"
+		flecha_derecha.text = "▶"
+	else:
+		flecha_izquierda.text = "<"
+		flecha_derecha.text = ">"
+
+	for flecha in [flecha_izquierda, flecha_derecha]:
+		flecha.custom_minimum_size = Vector2(40, 0)
+		flecha.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		flecha.focus_mode = Control.FOCUS_NONE
+		flecha.add_theme_font_size_override("font_size", 24)
+
+	flecha_izquierda.pressed.connect(
+		_on_flecha_selector_pressed.bind(tipo, -1)
+	)
+
+	flecha_derecha.pressed.connect(
+		_on_flecha_selector_pressed.bind(tipo, 1)
+	)
+
+	# Sacar el selector de su posición original.
 	padre.remove_child(selector)
+
+	# Orden horizontal: izquierda, selector, derecha.
+	contenedor.add_child(flecha_izquierda)
 	contenedor.add_child(selector)
+	contenedor.add_child(flecha_derecha)
 
-	selector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-	# Flecha izquierda.
-	var izquierda := Button.new()
-	izquierda.name = "FlechaIzquierda"
-	izquierda.text = "◀"
-	izquierda.custom_minimum_size = Vector2(40, 0)
-	izquierda.focus_mode = Control.FOCUS_NONE
-	izquierda.pressed.connect(_on_flecha_selector_pressed.bind(tipo, -1))
-	contenedor.add_child(izquierda)
-
-	# La flecha izquierda debe aparecer antes del selector.
-	contenedor.move_child(izquierda, 0)
-
-	# Flecha derecha.
-	var derecha := Button.new()
-	derecha.name = "FlechaDerecha"
-	derecha.text = "▶"
-	derecha.custom_minimum_size = Vector2(40, 0)
-	derecha.focus_mode = Control.FOCUS_NONE
-	derecha.pressed.connect(_on_flecha_selector_pressed.bind(tipo, 1))
-	contenedor.add_child(derecha)
-
-	_actualizar_estado_flechas(tipo)
-
-
+	padre.add_child(contenedor)
+	padre.move_child(contenedor, indice_original)
 func _desconectar_conexiones_selector(nodo: Object, nombre_senal: String) -> void:
 	if not nodo.has_signal(nombre_senal):
 		return

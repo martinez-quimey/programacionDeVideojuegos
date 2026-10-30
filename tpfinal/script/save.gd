@@ -360,7 +360,6 @@ func obtener_idioma_guardado():
 
 func seleccionar_disco_inicial(disco: String) -> bool:
 	if not modo_guardado_en_disco:
-		advertencia_disco = "La selección de disco está desactivada en este modo."
 		return false
 
 	disco = disco.to_upper()
@@ -668,7 +667,6 @@ func cambiar_a_d() -> bool:
 
 func _transferir_a_disco(disco_destino: String) -> bool:
 	if not modo_guardado_en_disco:
-		advertencia_disco = "El cambio de disco está desactivado en este modo."
 		return false
 
 	_asegurar_disco_inicializado()
