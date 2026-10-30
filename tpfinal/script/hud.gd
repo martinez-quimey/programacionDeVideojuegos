@@ -2,7 +2,7 @@ extends CanvasLayer
 
 # true: guardado tradicional en C:/ o D:/.
 # false: modo navegador; los datos solo viven en variables mientras el juego está abierto.
-const MODO_GUARDADO_EN_DISCO: bool = true
+const MODO_GUARDADO_EN_DISCO: bool = false
 
 signal start_game
 signal retry_game
@@ -1294,7 +1294,7 @@ func show_opciones() -> void:
 		primer_boton.grab_focus()
 
 func show_disco_menu() -> void:
-	if not Save.modo_guardado_en_disco:
+	if not MODO_GUARDADO_EN_DISCO:
 		show_opciones()
 		return
 
