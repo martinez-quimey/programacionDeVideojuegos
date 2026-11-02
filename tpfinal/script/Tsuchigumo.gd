@@ -1,4 +1,4 @@
-extends "res://entities/abstract/abstract_enemy.gd"
+extends AbstractEnemy
 
 enum Modo { TECHO, SUELO }
 
@@ -62,8 +62,8 @@ const SONIDO_SALTO_ARAÑA: AudioStream = preload(
 @onready var hitbox_inversa: CollisionShape2D = $CollisionInversa
 @onready var orientacion_enemy: Node2D = $OrientacionEnemy
 @onready var area_ataque: Area2D = $OrientacionEnemy/CollisionAtaque
-@onready var explosion_nube: Node2D = $ExplosionNube
-@onready var reproductor_sonido: AudioStreamPlayer = $AudioStreamPlayer
+
+@onready var reproductor_sonido: AudioStreamPlayer2D = $AudioStreamPlayer2D
 
 enum Estado {
 	PATRULLANDO,
@@ -216,8 +216,7 @@ func _ready() -> void:
 				_on_area_ataque_body_exited
 			)
 
-	if is_instance_valid(explosion_nube):
-		explosion_nube.hide()
+
 
 	aplicar_orientacion_modo()
 	actualizar_direccion_sprite()
@@ -1486,27 +1485,6 @@ func animationPlay(nombre: String) -> void:
 			morir()
 
 
-# =========================================================
-# EXPLOSIÓN
-# =========================================================
-
-func soltar_explosion_nube() -> void:
-	if not is_instance_valid(explosion_nube):
-		return
-
-	var padre := get_parent()
-
-	if padre == null:
-		return
-
-	remove_child(explosion_nube)
-	padre.add_child(explosion_nube)
-
-	explosion_nube.global_position = global_position
-	explosion_nube.show()
-
-	if explosion_nube.has_method("reproducir"):
-		explosion_nube.reproducir()
 
 
 # =========================================================

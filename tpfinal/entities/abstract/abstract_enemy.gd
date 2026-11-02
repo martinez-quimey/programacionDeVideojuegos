@@ -1,12 +1,13 @@
 
 extends CharacterBody2D
+class_name AbstractEnemy
 
 var direccion: float = 1.0
 
 @onready var Invulnerabilidad: Timer = $Invulnerabilidad
 @onready var detection_area: Area2D = $OrientacionEnemy/DetectionArea
 @onready var animated_sprite: AnimatedSprite2D = $OrientacionEnemy/AnimatedSprite2D
-
+@onready var explosion_nube: Node2D = $ExplosionNube
 # FÍSICA
 @export var GRAVITY: float = 600.0
 @export var PESO: float = 1.0
@@ -35,7 +36,8 @@ func _ready() -> void:
 
 		if not detection_area.body_exited.is_connected(_on_body_exited):
 			detection_area.body_exited.connect(_on_body_exited)
-
+	if is_instance_valid(explosion_nube):
+		explosion_nube.hide()
 
 # OPTIMIZACIÓN
 func comprobar_distancia_al_player() -> void:
@@ -160,6 +162,24 @@ func actuarContraPlayer() -> void:
 func dejarDeActuarContraPlayer() -> void:
 	pass
 
+
+func soltar_explosion_nube() -> void:
+	if not is_instance_valid(explosion_nube):
+		return
+
+	var padre := get_parent()
+
+	if padre == null:
+		return
+
+	remove_child(explosion_nube)
+	padre.add_child(explosion_nube)
+
+	explosion_nube.global_position = global_position
+	explosion_nube.show()
+
+	if explosion_nube.has_method("reproducir"):
+		explosion_nube.reproducir()
 
 # MUERTE PREDETERMINADA
 # Los enemigos con animación de muerte deben sobrescribir esta función.

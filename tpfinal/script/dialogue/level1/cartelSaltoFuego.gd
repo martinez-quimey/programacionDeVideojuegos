@@ -4,7 +4,7 @@ func create_dialogue() -> void:
 	var boton_teclado: String = "Z"
 
 	if Settings.modo_controles == Settings.ModoControles.MODO_B:
-		boton_teclado = "Y"
+		boton_teclado = "J"
 
 	if Settings.language == "es":
 		add_line(

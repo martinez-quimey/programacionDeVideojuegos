@@ -1,5 +1,5 @@
 # jabali
-extends "res://entities/abstract/abstract_enemy.gd"
+extends AbstractEnemy
 
 
 @export var SPEEDCAMINANDO: float = 200.0
@@ -8,6 +8,16 @@ extends "res://entities/abstract/abstract_enemy.gd"
 
 var en_retroceso: bool = false
 var temporizador_retroceso: Timer
+
+# Cambiá estas rutas por las ubicaciones reales de los audios.
+@export_file("*.ogg", "*.wav", "*.mp3") var rutaIdle: String = "res://sonidos/enemigos/jabali/jabaliidle.ogg"
+@export_file("*.ogg", "*.wav", "*.mp3") var rutaChillido: String = "res://sonidos/enemigos/jabali/jabalichillido.ogg"
+
+@onready var reproductor_sonido: AudioStreamPlayer2D = $AudioStreamPlayer2D
+
+var sonido_idle: AudioStream
+var sonido_chillido: AudioStream
+var temporizador_sonido_idle: Timer
 
 # =========================================================
 # DETECCIÓN DEL BORDE
@@ -43,7 +53,6 @@ var jugador_dentro_ataque: bool = false
 
 
 func _ready():
-	var tiempo_inicio = Time.get_ticks_msec()
 	super._ready()
 
 	area_ataque.body_entered.connect(_on_area_ataque_body_entered)
@@ -51,7 +60,41 @@ func _ready():
 
 	# Empieza mirando hacia la derecha.
 	actualizar_direccion_sprite()
-	
+
+	# Cargar los sonidos desde las rutas configuradas.
+	sonido_idle = load(rutaIdle) as AudioStream
+	sonido_chillido = load(rutaChillido) as AudioStream
+
+	# Reproducir el sonido idle cada 5 segundos.
+	temporizador_sonido_idle = Timer.new()
+	temporizador_sonido_idle.wait_time = 5.0
+	temporizador_sonido_idle.one_shot = false
+	add_child(temporizador_sonido_idle)
+	temporizador_sonido_idle.timeout.connect(reproducir_sonido_idle)
+	temporizador_sonido_idle.start()
+
+
+func reproducir_sonido_idle() -> void:
+	if muerto or not is_instance_valid(reproductor_sonido):
+		return
+
+	if sonido_idle == null:
+		return
+
+	reproductor_sonido.stream = sonido_idle
+	reproductor_sonido.play()
+
+
+func reproducir_chillido() -> void:
+	if not is_instance_valid(reproductor_sonido):
+		return
+
+	if sonido_chillido == null:
+		return
+
+	reproductor_sonido.stream = sonido_chillido
+	reproductor_sonido.play()
+
 
 
 
@@ -613,6 +656,15 @@ func morir() -> void:
 	pausado_caminata = true
 	velocity = Vector2.ZERO
 
+	# Detener el sonido idle y reproducir el chillido de muerte.
+	if is_instance_valid(temporizador_sonido_idle):
+		temporizador_sonido_idle.stop()
+
+	reproducir_chillido()
+
+	# La nube se separa del jabalí antes de que este sea eliminado.
+	soltar_explosion_nube()
+
 	set_physics_process(false)
 
 	if is_instance_valid(Invulnerabilidad):
@@ -675,3 +727,41 @@ func _finalizar_retroceso() -> void:
 	en_retroceso = false
 
 	print("JABALÍ: retroceso finalizado")
+
+
+
+# RECIBIR DAÑO
+func herir(num: int) -> void:
+	if num <= 0 or is_queued_for_deletion():
+		return
+
+	if not is_instance_valid(Invulnerabilidad):
+		return
+
+	if not Invulnerabilidad.is_stopped():
+		return
+
+	print("Enemigo herido")
+	print("Vida anterior: ", vida)
+
+	vida -= num
+
+	print("Vida nueva: ", vida)
+
+	if vida <= 0:
+		morir()
+		return
+
+	# Reiniciar el intervalo: pasarán otros 5 segundos
+	# antes del próximo sonido idle.
+	if is_instance_valid(temporizador_sonido_idle):
+		temporizador_sonido_idle.start()
+
+	# El chillido interrumpe el sonido idle si estaba sonando.
+	reproducir_chillido()
+
+	if isBoss:
+		pass
+
+	Invulnerabilidad.start()
+	animacionHerida()

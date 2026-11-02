@@ -2,7 +2,7 @@ extends CanvasLayer
 
 # true: guardado tradicional en C:/ o D:/.
 # false: modo navegador; los datos solo viven en variables mientras el juego está abierto.
-const MODO_GUARDADO_EN_DISCO: bool = false
+const MODO_GUARDADO_EN_DISCO: bool = true
 
 signal start_game
 signal retry_game

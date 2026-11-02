@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4lpi7603csb6"
-path="res://.godot/imported/tornado2.png-949196a4be993fcaabf4b01746294261.ctex"
+uid="uid://dit0j5dkvwnfx"
+path="res://.godot/imported/tornadoMejora.png-d40850a0d15a21eefe80faaa2977d083.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/eva/tornado2.png"
-dest_files=["res://.godot/imported/tornado2.png-949196a4be993fcaabf4b01746294261.ctex"]
+source_file="res://sprites/eva/tornadoMejora.png"
+dest_files=["res://.godot/imported/tornadoMejora.png-d40850a0d15a21eefe80faaa2977d083.ctex"]
 
 [params]
 

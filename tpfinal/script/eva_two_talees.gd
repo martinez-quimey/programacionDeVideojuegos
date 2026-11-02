@@ -6,7 +6,18 @@ extends CharacterBody2D
 
 @export var esInmuneALaLava: bool = false
 
+# ==========================================
+# ROTACIÓN ALEATORIA DEL TORNADO
+# ==========================================
 
+var tween_tornado: Tween
+var rotacion_inicial_tornado: float = 0.0
+
+const TORNADO_ROTACION_MAXIMA: float = 12.0
+const TORNADO_INTERVALO_MINIMO: float = 0.12
+const TORNADO_INTERVALO_MAXIMO: float = 0.35
+var rotacion_tornado_activa: bool = false
+const TORNADO_DURACION_ROTACION: float = 0.10
 # ==========================================
 # TRANSICIÓN DE COLISIONES
 # ==========================================
@@ -330,10 +341,21 @@ func reproducir_animacion(nombre: String) -> void:
 		animated_sprite.play()
 		ultima_animacion = nombre
 
-
 func animacion_tornado() -> void:
-	animated_sprite.play("tornado")
 
+	animated_sprite.visible = true
+	animated_sprite_pared.visible = false
+
+	animated_sprite.flip_v = false
+
+	# Guardar la rotación inicial.
+	rotacion_inicial_tornado = animated_sprite.rotation
+
+	# Iniciar animación.
+	reproducir_animacion("tornado")
+
+	# Iniciar movimiento caótico.
+	iniciar_rotacion_tornado()
 
 func actualizar_animacion(direccion_animacion: float) -> void:
 	if direccion_animacion != 0 and not estado_actual.agarrado_pared:
@@ -854,3 +876,85 @@ func _repetir_sonido_loop() -> void:
 	if sonidos.stream != null:
 		sonidos.play()
 		sonidos.finished.connect(_repetir_sonido_loop, CONNECT_ONE_SHOT)
+
+
+
+func iniciar_rotacion_tornado() -> void:
+
+	if rotacion_tornado_activa:
+		return
+
+	rotacion_tornado_activa = true
+
+	_rotacion_tornado_loop()
+
+
+func _rotacion_tornado_loop() -> void:
+
+	var direccion: float = 1.0
+
+	while rotacion_tornado_activa:
+
+		# Tiempo aleatorio antes del siguiente giro.
+		var espera = randf_range(0.04, 0.12)
+
+		await get_tree().create_timer(espera).timeout
+
+		if not rotacion_tornado_activa:
+			return
+
+		# Calcular la rotación actual respecto al inicio.
+		var grados_actuales = rad_to_deg(
+			animated_sprite.rotation - rotacion_inicial_tornado
+		)
+
+		# Calcular cuánto puede avanzar antes de alcanzar el límite.
+		var distancia_limite = (
+			TORNADO_ROTACION_MAXIMA - direccion * grados_actuales
+		)
+
+		# Elegir aleatoriamente cuánto avanzará.
+		var avance = randf_range(
+			minf(3.0, distancia_limite),
+			distancia_limite
+		)
+
+		var grados_destino = (
+			grados_actuales + direccion * avance
+		)
+
+		# Girar suavemente.
+		tween_tornado = create_tween()
+
+		tween_tornado.tween_property(
+			animated_sprite,
+			"rotation",
+			rotacion_inicial_tornado + deg_to_rad(grados_destino),
+			randf_range(0.08, 0.18)
+		).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+		await tween_tornado.finished
+
+		if not rotacion_tornado_activa:
+			return
+
+		# Cambiar el sentido del giro.
+		direccion *= -1.0
+
+
+func detener_rotacion_tornado() -> void:
+
+	rotacion_tornado_activa = false
+
+	if tween_tornado and tween_tornado.is_running():
+		tween_tornado.kill()
+
+	# Recuperar la rotación original.
+	var tween = create_tween()
+
+	tween.tween_property(
+		animated_sprite,
+		"rotation",
+		rotacion_inicial_tornado,
+		0.12
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

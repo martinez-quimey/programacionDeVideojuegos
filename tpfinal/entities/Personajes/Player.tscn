@@ -12,17 +12,15 @@
 [ext_resource type="Texture2D" uid="uid://nm63mfxfwfaa" path="res://sprites/eva/idle/idlepng_0002.png" id="10_8k4me"]
 [ext_resource type="Texture2D" uid="uid://2yiwdmp4ag65" path="res://sprites/eva/idle/idlepng_0003.png" id="11_ukjk6"]
 [ext_resource type="Texture2D" uid="uid://uprrxu2sldgt" path="res://sprites/eva/idle/idlepng_0004.png" id="12_0a5kr"]
-[ext_resource type="Texture2D" uid="uid://h4uif4lojobs" path="res://sprites/eva/tornado1.png" id="12_uqenk"]
 [ext_resource type="Texture2D" uid="uid://bkn8of2mnxcou" path="res://sprites/eva/idle/idlepng_0005.png" id="13_ehcps"]
-[ext_resource type="Texture2D" uid="uid://d4lpi7603csb6" path="res://sprites/eva/tornado2.png" id="13_nm73a"]
 [ext_resource type="Texture2D" uid="uid://bng1g4uxk2b1m" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo.png" id="13_uq2ph"]
-[ext_resource type="Texture2D" uid="uid://cvob2ecmp77v7" path="res://sprites/eva/tornado3.png" id="14_2fb44"]
 [ext_resource type="Texture2D" uid="uid://dysrk804eu5xd" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo2.png" id="14_3c5qw"]
 [ext_resource type="Texture2D" uid="uid://c0qwx01r07fe3" path="res://sprites/eva/idle/idlepng_0006.png" id="14_nfh3g"]
 [ext_resource type="Texture2D" uid="uid://b0ir1vfka54gn" path="res://sprites/eva/pared.png" id="14_nm73a"]
 [ext_resource type="Texture2D" uid="uid://bv4d8008f5vrb" path="res://sprites/eva/salto.png" id="15_jkdnt"]
 [ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
 [ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
+[ext_resource type="Texture2D" uid="uid://dit0j5dkvwnfx" path="res://sprites/eva/tornadoMejora.png" id="17_nm73a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
 size = Vector2(134, 172)
@@ -30,6 +28,70 @@ size = Vector2(134, 172)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
 radius = 73.0695
 height = 205.84895
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nm73a"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2fb44"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2oybu"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nglq2"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tkdp0"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fq88h"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8k4me"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ukjk6"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0a5kr"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ehcps"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nfh3g"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jkdnt"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uugmw"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qj6aq"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e0ics"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qnocp"]
+atlas = ExtResource("17_nm73a")
+region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lderi"]
 animations = [{
@@ -82,14 +144,53 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": ExtResource("12_uqenk")
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_nm73a")
 }, {
 "duration": 1.0,
-"texture": ExtResource("13_nm73a")
+"texture": SubResource("AtlasTexture_2fb44")
 }, {
 "duration": 1.0,
-"texture": ExtResource("14_2fb44")
+"texture": SubResource("AtlasTexture_2oybu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nglq2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tkdp0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fq88h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8k4me")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ukjk6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0a5kr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ehcps")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nfh3g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jkdnt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uugmw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qj6aq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e0ics")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qnocp")
 }],
 "loop": 1,
 "name": &"tornado",
@@ -181,7 +282,6 @@ rotation = 1.5707964
 shape = SubResource("RectangleShape2D_4jn62")
 
 [node name="HitboxTurbo" type="Area2D" parent="." unique_id=1704353825]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxTurbo" unique_id=1166951105]
 position = Vector2(1.0000019, -7)
@@ -192,14 +292,13 @@ shape = SubResource("CapsuleShape2D_5p1bl")
 position = Vector2(27, 39)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1194749253]
-visible = false
 texture_filter = 3
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"correr"
+animation = &"tornado"
+frame_progress = 0.033421937
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=2109890388]
-visible = false
 texture_filter = 3
 position = Vector2(48, -1)
 scale = Vector2(4, 4)

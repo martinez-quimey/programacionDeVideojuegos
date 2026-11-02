@@ -1162,7 +1162,7 @@ func comprobar_golpes_tornado() -> void:
 
 
 func desactivar_tornado() -> void:
-
+	player.detener_rotacion_tornado()
 	if not tornado_activo:
 		return
 
