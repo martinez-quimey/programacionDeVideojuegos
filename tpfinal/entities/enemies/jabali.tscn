@@ -215,17 +215,19 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
-size = Vector2(15.33793, 21.11111)
+size = Vector2(13.573223, 21.11111)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kwkry"]
 size = Vector2(61.222225, 22.5)
 
 [node name="Jabali" unique_id=2131858162 instance=ExtResource("1_kwkry")]
-scale = Vector2(8.5, 8.5)
+scale = Vector2(8.3, 8.3)
 script = ExtResource("2_kwkry")
-SPEEDCAMINANDO = 200.0
-SPEEDCORRIENDO = 600.0
+SPEEDCAMINANDO = 100.0
+SPEEDCORRIENDO = 590.0
 CAMINATA = 400.0
+rutaIdle = "res://sonidos/enemigos/jabali/jabaliidle.ogg"
+rutaChillido = "res://sonidos/enemigos/jabali/jabalichillido.ogg"
 DISTANCIA_BORDE = 20.0
 DISTANCIA_PIES = 100.0
 vida = 5
@@ -245,7 +247,7 @@ animation = &"atacar"
 collision_layer = 0
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="OrientacionEnemy/CollisionAtaque" index="0" unique_id=1834044500]
-position = Vector2(5.5075064, -0.77777755)
+position = Vector2(4.6251535, -0.77777755)
 shape = SubResource("RectangleShape2D_4jn62")
 
 [node name="DetectionArea" parent="OrientacionEnemy" parent_id_path=PackedInt32Array(187453929) index="2" unique_id=1040540624 groups=["enemigos"]]
@@ -254,3 +256,6 @@ shape = SubResource("RectangleShape2D_4jn62")
 position = Vector2(12.444445, -13.111112)
 scale = Vector2(2, 2)
 shape = SubResource("RectangleShape2D_kwkry")
+
+[node name="ExplosionNube" parent="." index="4" unique_id=1050899421]
+visible = false

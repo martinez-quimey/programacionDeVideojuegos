@@ -47,6 +47,6 @@ sprite_frames = SubResource("SpriteFrames_4jn62")
 animation = &"vacio"
 
 [node name="Marker2D" type="Marker2D" parent="." unique_id=1382856088]
-position = Vector2(15.75, 32.5)
+position = Vector2(15.75, 37.5)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

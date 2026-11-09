@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://mnh32v0ycddy"
-path="res://.godot/imported/correr_0003.png-a6eee6762bef8fc033c94a888726618c.ctex"
+uid="uid://f00lkme1fu7n"
+path="res://.godot/imported/idlepng.png-32b02884b8d1a265862eae9ff8909e59.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/eva/correr/correr_0003.png"
-dest_files=["res://.godot/imported/correr_0003.png-a6eee6762bef8fc033c94a888726618c.ctex"]
+source_file="res://sprites/eva/idlepng.png"
+dest_files=["res://.godot/imported/idlepng.png-32b02884b8d1a265862eae9ff8909e59.ctex"]
 
 [params]
 

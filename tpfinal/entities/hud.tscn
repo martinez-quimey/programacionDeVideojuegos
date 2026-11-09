@@ -312,21 +312,6 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 text = "Startt"
 
-[node name="Disco" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=382891921]
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
-
 [node name="BackButton" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=1254991548]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
@@ -647,100 +632,6 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
 
-[node name="Disco" type="Control" parent="." unique_id=171095692]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="CenterContainer" type="CenterContainer" parent="Disco" unique_id=614165471]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Disco/CenterContainer" unique_id=1571517868]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Disco/CenterContainer/VBoxContainer" unique_id=406802892]
-custom_minimum_size = Vector2(500, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "Eva Two Tales Kitsune"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="Title2" type="Label" parent="Disco/CenterContainer/VBoxContainer" unique_id=289122342]
-custom_minimum_size = Vector2(500, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 58
-text = "Eva Two Tales Kitsune"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="cButton" type="Button" parent="Disco/CenterContainer/VBoxContainer" unique_id=1556980633]
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
-
-[node name="dButton" type="Button" parent="Disco/CenterContainer/VBoxContainer" unique_id=209655081]
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
-
-[node name="BackButton" type="Button" parent="Disco/CenterContainer/VBoxContainer" unique_id=1384565552]
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
-theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
-
-[node name="Panel" type="Panel" parent="Disco" unique_id=1447118486]
-z_index = -1
-layout_mode = 0
-offset_left = -474.0
-offset_top = -283.0
-offset_right = 1959.0
-offset_bottom = 1235.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")
-
 [node name="Pause" type="Control" parent="." unique_id=560659944]
 process_mode = 3
 layout_mode = 3
@@ -884,6 +775,8 @@ theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_ko5hl")
 theme_override_styles/focus = SubResource("StyleBoxFlat_u6mqm")
 text = "Exit"
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1778506271]
+
 [connection signal="main_menu" from="." to="." method="_on_main_menu"]
 [connection signal="retry_game" from="." to="." method="_on_retry_game"]
 [connection signal="start_game" from="." to="." method="_on_start_game"]
@@ -895,7 +788,6 @@ text = "Exit"
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Sonido" to="." method="_on_sonido_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Controles" to="." method="_on_sonido_button_pressed"]
-[connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Disco" to="." method="_on_sonido_button_pressed"]
 [connection signal="pressed" from="Controles/MarginContainer/CenterContainer/VBoxContainer/Control" to="." method="_on_language_button_pressed"]
 [connection signal="pressed" from="Controles/MarginContainer/CenterContainer/VBoxContainer/BotonDeInteract" to="." method="_on_sonido_button_pressed"]
 [connection signal="pressed" from="Sonido/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

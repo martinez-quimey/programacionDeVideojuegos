@@ -1,25 +1,16 @@
 [gd_scene format=3 uid="uid://whuuytfa1xog"]
 
-[ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/eva_two_talees.gd" id="1_l1ths"]
-[ext_resource type="Script" uid="uid://dan4lcfk622wr" path="res://script/estadoManual.gd" id="1_utwpb"]
+[ext_resource type="Script" uid="uid://dopdxfyh41mto" path="res://script/player/eva_two_talees.gd" id="1_l1ths"]
+[ext_resource type="Script" uid="uid://dan4lcfk622wr" path="res://script/player/estadoManual.gd" id="1_utwpb"]
+[ext_resource type="Script" uid="uid://ckxesldh0ss46" path="res://script/player/ataques_player.gd" id="2_uqenk"]
 [ext_resource type="AudioStream" uid="uid://bdu5caft8pp7" path="res://sonidos/eva/disparoFuego_1.ogg" id="3_2oybu"]
 [ext_resource type="PackedScene" uid="uid://d1vqhl5w3s8st" path="res://entities/proyectiles/proyectile_fuego.tscn" id="4_nglq2"]
-[ext_resource type="Texture2D" uid="uid://ciqh36oxbpkfy" path="res://sprites/eva/correr/correr_0001.png" id="5_2fb44"]
-[ext_resource type="Texture2D" uid="uid://mgsqc4scawya" path="res://sprites/eva/correr/correr_0002.png" id="6_2oybu"]
-[ext_resource type="Texture2D" uid="uid://mnh32v0ycddy" path="res://sprites/eva/correr/correr_0003.png" id="7_nglq2"]
-[ext_resource type="Texture2D" uid="uid://xckanmu34ult" path="res://sprites/eva/correr/correr_0004.png" id="8_tkdp0"]
-[ext_resource type="Texture2D" uid="uid://ct0kg7hmxta7p" path="res://sprites/eva/idle/idlepng_0001.png" id="9_fq88h"]
-[ext_resource type="Texture2D" uid="uid://nm63mfxfwfaa" path="res://sprites/eva/idle/idlepng_0002.png" id="10_8k4me"]
-[ext_resource type="Texture2D" uid="uid://2yiwdmp4ag65" path="res://sprites/eva/idle/idlepng_0003.png" id="11_ukjk6"]
-[ext_resource type="Texture2D" uid="uid://uprrxu2sldgt" path="res://sprites/eva/idle/idlepng_0004.png" id="12_0a5kr"]
-[ext_resource type="Texture2D" uid="uid://bkn8of2mnxcou" path="res://sprites/eva/idle/idlepng_0005.png" id="13_ehcps"]
+[ext_resource type="Texture2D" uid="uid://doowdb3jt616" path="res://sprites/eva/correr/correrSprites.png" id="7_hm1li"]
+[ext_resource type="Texture2D" uid="uid://bll6e1mifngae" path="res://sprites/eva/paredpng.png" id="12_5p1bl"]
 [ext_resource type="Texture2D" uid="uid://bng1g4uxk2b1m" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo.png" id="13_uq2ph"]
 [ext_resource type="Texture2D" uid="uid://dysrk804eu5xd" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo2.png" id="14_3c5qw"]
-[ext_resource type="Texture2D" uid="uid://c0qwx01r07fe3" path="res://sprites/eva/idle/idlepng_0006.png" id="14_nfh3g"]
-[ext_resource type="Texture2D" uid="uid://b0ir1vfka54gn" path="res://sprites/eva/pared.png" id="14_nm73a"]
-[ext_resource type="Texture2D" uid="uid://bv4d8008f5vrb" path="res://sprites/eva/salto.png" id="15_jkdnt"]
 [ext_resource type="Texture2D" uid="uid://cye2fxuedpu2l" path="res://sprites/eva/turbo/eva two tales kitsuneTurbo3.png" id="15_jkysx"]
-[ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/estadoAutomatico.gd" id="17_jkysx"]
+[ext_resource type="Script" uid="uid://7mjkwiyotpeb" path="res://script/player/estadoAutomatico.gd" id="17_jkysx"]
 [ext_resource type="Texture2D" uid="uid://dit0j5dkvwnfx" path="res://sprites/eva/tornadoMejora.png" id="17_nm73a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jn62"]
@@ -28,6 +19,53 @@ size = Vector2(134, 172)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5p1bl"]
 radius = 73.0695
 height = 205.84895
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uq2ph"]
+atlas = ExtResource("7_hm1li")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3c5qw"]
+atlas = ExtResource("7_hm1li")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kipqk"]
+atlas = ExtResource("7_hm1li")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uqenk"]
+atlas = ExtResource("7_hm1li")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_5p1bl"]
+load_path = "res://.godot/imported/idlepng.png-32b02884b8d1a265862eae9ff8909e59.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oh201"]
+atlas = SubResource("CompressedTexture2D_5p1bl")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ub3e"]
+atlas = SubResource("CompressedTexture2D_5p1bl")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u7jup"]
+atlas = SubResource("CompressedTexture2D_5p1bl")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yrnx8"]
+atlas = SubResource("CompressedTexture2D_5p1bl")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i25ue"]
+atlas = SubResource("CompressedTexture2D_5p1bl")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eqt0t"]
+atlas = SubResource("CompressedTexture2D_5p1bl")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5w4vd"]
+atlas = ExtResource("7_hm1li")
+region = Rect2(384, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nm73a"]
 atlas = ExtResource("17_nm73a")
@@ -97,16 +135,16 @@ region = Rect2(64, 0, 64, 64)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_2fb44")
+"texture": SubResource("AtlasTexture_uq2ph")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_2oybu")
+"texture": SubResource("AtlasTexture_3c5qw")
 }, {
 "duration": 1.0,
-"texture": ExtResource("7_nglq2")
+"texture": SubResource("AtlasTexture_kipqk")
 }, {
 "duration": 1.0,
-"texture": ExtResource("8_tkdp0")
+"texture": SubResource("AtlasTexture_uqenk")
 }],
 "loop": 1,
 "name": &"correr",
@@ -114,22 +152,22 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("9_fq88h")
+"texture": SubResource("AtlasTexture_oh201")
 }, {
 "duration": 1.0,
-"texture": ExtResource("10_8k4me")
+"texture": SubResource("AtlasTexture_6ub3e")
 }, {
 "duration": 1.0,
-"texture": ExtResource("11_ukjk6")
+"texture": SubResource("AtlasTexture_u7jup")
 }, {
 "duration": 1.0,
-"texture": ExtResource("12_0a5kr")
+"texture": SubResource("AtlasTexture_yrnx8")
 }, {
 "duration": 1.0,
-"texture": ExtResource("13_ehcps")
+"texture": SubResource("AtlasTexture_i25ue")
 }, {
 "duration": 1.0,
-"texture": ExtResource("14_nfh3g")
+"texture": SubResource("AtlasTexture_eqt0t")
 }],
 "loop": 1,
 "name": &"quieta",
@@ -137,7 +175,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("15_jkdnt")
+"texture": SubResource("AtlasTexture_5w4vd")
 }],
 "loop": 1,
 "name": &"salto",
@@ -215,7 +253,7 @@ animations = [{
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("14_nm73a")
+"texture": ExtResource("12_5p1bl")
 }],
 "loop": 1,
 "name": &"pared",
@@ -259,20 +297,18 @@ one_shot = true
 wait_time = 2.0
 one_shot = true
 
+[node name="AtaquesPlayer" type="Node2D" parent="." unique_id=1827446920]
+script = ExtResource("2_uqenk")
+DURACION_TURBO = 0.17
+sonido_saltoFuego = ExtResource("3_2oybu")
+JUMP_FIRE_FORCE = -680.0
+projectile_scene = ExtResource("4_nglq2")
+
 [node name="estadoManual" type="Node2D" parent="." unique_id=395898327 groups=["jugador"]]
 script = ExtResource("1_utwpb")
-sonido_saltoFuego = ExtResource("3_2oybu")
-projectile_scene = ExtResource("4_nglq2")
-JUMP_FORCE = -500.0
-JUMP_FIRE_FORCE = -680.0
-FUERZA_HORIZONTAL_SALTO_PARED = 800.0
 
 [node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
 script = ExtResource("17_jkysx")
-sonido_saltoFuego = ExtResource("3_2oybu")
-projectile_scene = ExtResource("4_nglq2")
-GRAVITY_CAIDA = 1700.0
-FUERZA_HORIZONTAL_SALTO_PARED = 800.0
 
 [node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
 
@@ -295,15 +331,17 @@ position = Vector2(27, 39)
 texture_filter = 3
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_lderi")
-animation = &"tornado"
-frame_progress = 0.033421937
+animation = &"correr"
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=2109890388]
 texture_filter = 3
 position = Vector2(48, -1)
+rotation = 1.5707964
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_nm73a")
 animation = &"pared"
+flip_h = true
+flip_v = true
 
 [node name="CollisionShapeTornado" type="CollisionShape2D" parent="." unique_id=114201977]
 position = Vector2(8, -17)
@@ -320,7 +358,6 @@ position = Vector2(-40, -4)
 shape = SubResource("RectangleShape2D_nglq2")
 
 [node name="CollisionPared" type="CollisionShape2D" parent="." unique_id=2016736518]
-visible = false
 position = Vector2(47, -49.5)
 shape = SubResource("RectangleShape2D_2fb44")
 

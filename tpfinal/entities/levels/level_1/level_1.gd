@@ -1,4 +1,4 @@
-extends "res://script/abstractLevel.gd"
+extends "res://script/abstract/abstractLevel.gd"
 
 func _ready() -> void:
 	super._ready()

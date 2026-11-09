@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dp451odq65s60"]
 
-[ext_resource type="Script" uid="uid://bv6u3g704e7k4" path="res://script/abstractLevel.gd" id="1_l8taw"]
+[ext_resource type="Script" uid="uid://bv6u3g704e7k4" path="res://script/abstract/abstractLevel.gd" id="1_l8taw"]
 [ext_resource type="PackedScene" uid="uid://whuuytfa1xog" path="res://entities/Personajes/Player.tscn" id="2_wn5rq"]
 [ext_resource type="Texture2D" uid="uid://bgbn7uos8541t" path="res://sprites/escenario/colisiones.png" id="2_x8ioc"]
 [ext_resource type="Texture2D" uid="uid://bscfbohnry7f4" path="res://sprites/escenario/decoracion.png" id="3_7nmst"]

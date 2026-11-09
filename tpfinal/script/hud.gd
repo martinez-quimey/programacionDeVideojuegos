@@ -1,27 +1,17 @@
 extends CanvasLayer
 
-# true: guardado tradicional en C:/ o D:/.
-# false: modo navegador; los datos solo viven en variables mientras el juego está abierto.
-const MODO_GUARDADO_EN_DISCO: bool = true
 
 signal start_game
 signal retry_game
 signal main_menu
 signal continue_game
 
-# Estado temporal de la confirmación de transferencia.
-var confirmando_transferencia_disco: bool = false
-var disco_destino_pendiente: String = ""
-var mostrando_advertencia_disco: bool = false
 var pantallas_visibles_antes_de_advertencia: Array[Control] = []
-var panel_advertencia_disco: PanelContainer
-var etiqueta_advertencia_disco: Label
 
-# Asistente de primera ejecución: idioma -> disco -> controles.
+
 enum PasoConfiguracionInicial {
 	NINGUNO,
 	IDIOMA,
-	DISCO,
 	CONTROLES
 }
 
@@ -31,10 +21,20 @@ var panel_explicacion_controles: PanelContainer
 var etiqueta_explicacion_modo_a: Label
 var etiqueta_explicacion_modo_b: Label
 
+# =========================================================
+# SONIDO DE BOTONES
+# =========================================================
 
-func _enter_tree() -> void:
-	# Configurar Save antes de que el HUD utilice sus métodos en _ready().
-	Save.configurar_modo_guardado(MODO_GUARDADO_EN_DISCO)
+# Cambiá esta ruta por la ubicación definitiva del sonido.
+const RUTA_SONIDO_BOTON_PRESIONADO := "res://sonidos/botonPresionado.ogg"
+
+# AudioStreamPlayer creado como hijo directo del HUD.
+@onready var reproductor_sonido_boton: AudioStreamPlayer = (
+	get_node_or_null("AudioStreamPlayer") as AudioStreamPlayer
+)
+
+var sonido_boton_presionado: AudioStream
+
 
 
 # =========================================================
@@ -42,6 +42,23 @@ func _enter_tree() -> void:
 # =========================================================
 
 func _ready() -> void:
+	# Cargar el sonido genérico de los botones.
+	if ResourceLoader.exists(RUTA_SONIDO_BOTON_PRESIONADO):
+		sonido_boton_presionado = load(RUTA_SONIDO_BOTON_PRESIONADO) as AudioStream
+	else:
+		push_warning(
+			"No existe el sonido de botones: "
+			+ RUTA_SONIDO_BOTON_PRESIONADO
+		)
+
+	if reproductor_sonido_boton == null:
+		push_warning(
+			"No se encontró un AudioStreamPlayer llamado AudioStreamPlayer como hijo directo del HUD."
+		)
+	elif AudioServer.get_bus_index("Sonido") != -1:
+		# Así el volumen del efecto también responde al ajuste de Sonido.
+		reproductor_sonido_boton.bus = "Sonido"
+
 	# El español es el idioma predeterminado en la primera ejecución.
 	# Si ya hay un idioma guardado, se respeta.
 	if Settings.language.is_empty():
@@ -51,13 +68,12 @@ func _ready() -> void:
 	$Confirmacion.hide()
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
+
 
 	var pantalla_controles_inicial = get_node_or_null("Controles")
 	if pantalla_controles_inicial is Control:
 		pantalla_controles_inicial.hide()
 
-	_crear_panel_advertencia_disco()
 	_configurar_pantalla_sonido()
 	_cargar_volumenes()
 
@@ -132,28 +148,9 @@ func _ready() -> void:
 	if opciones_language_button is Button and not opciones_language_button.pressed.is_connected(_on_language_button_pressed):
 		opciones_language_button.pressed.connect(_on_language_button_pressed)
 
-	var opciones_disco_button = opciones_vbox.get_node_or_null("Disco")
-	if opciones_disco_button is Button and not opciones_disco_button.pressed.is_connected(_on_disco_button_pressed):
-		opciones_disco_button.pressed.connect(_on_disco_button_pressed)
-	if opciones_disco_button is Control:
-		opciones_disco_button.visible = Save.modo_guardado_en_disco
-
 	var opciones_controles_button = opciones_vbox.get_node_or_null("Controles")
 	if opciones_controles_button is Button and not opciones_controles_button.pressed.is_connected(_on_controles_button_pressed):
 		opciones_controles_button.pressed.connect(_on_controles_button_pressed)
-
-	# Botones del menú de discos.
-	var c_button = $Disco/CenterContainer/VBoxContainer/cButton
-	if not c_button.pressed.is_connected(_on_c_button_pressed):
-		c_button.pressed.connect(_on_c_button_pressed)
-
-	var d_button = $Disco/CenterContainer/VBoxContainer/dButton
-	if not d_button.pressed.is_connected(_on_d_button_pressed):
-		d_button.pressed.connect(_on_d_button_pressed)
-
-	var disco_back_button = $Disco/CenterContainer/VBoxContainer/BackButton
-	if not disco_back_button.pressed.is_connected(_on_disco_back_button_pressed):
-		disco_back_button.pressed.connect(_on_disco_back_button_pressed)
 
 
 	# Botones de pausa.
@@ -184,227 +181,76 @@ func _ready() -> void:
 	_configurar_selectores_controles()
 	_crear_panel_explicacion_controles()
 
-	# Traducir los textos antes de mostrar cualquier menú.
+	# Conectar el sonido a todos los botones existentes y a los que se
+	# agreguen dinámicamente más adelante.
+	_conectar_sonido_botones(self)
+
+	# El HUD es hijo de la escena principal. Su _ready se ejecuta antes
+	# que el _ready del padre, que es donde se configura Save. Por eso
+	# la pantalla inicial se decide de forma diferida.
+	call_deferred("_inicializar_interfaz_tras_cargar_preferencias")
+
+
+func _inicializar_interfaz_tras_cargar_preferencias() -> void:
+	# Esperar a que termine la inicialización de los demás nodos de la escena.
+	await get_tree().process_frame
+
+	if Settings.language.is_empty():
+		Settings.language = "es"
+
+	# Los selectores se inicializan de nuevo con los valores ya cargados desde Save.
+	_actualizar_selectores_controles()
 	update_language()
 	actualizar_estado_botones()
 
-	# El asistente inicial sigue solicitando las preferencias que falten.
+	# El asistente solo aparece si las preferencias realmente faltan.
 	if not Save.configuracion_inicial_completa():
 		configuracion_inicial_activa = true
 		_continuar_asistente_configuracion()
 	else:
+		configuracion_inicial_activa = false
+		paso_configuracion_inicial = PasoConfiguracionInicial.NINGUNO
 		show_main_menu()
 
 
-func actualizar_menu_discos() -> void:
-	if not Save.modo_guardado_en_disco:
-		$Disco.hide()
-		return
-
-	var titulo: Label = $Disco/CenterContainer/VBoxContainer/Title2
-	var c_button: Button = $Disco/CenterContainer/VBoxContainer/cButton
-	var d_button: Button = $Disco/CenterContainer/VBoxContainer/dButton
-
-	if Settings.language == "es":
-		titulo.text = "Disco actual: " + Save.DISCO_ACTUAL
-	else:
-		titulo.text = "Current disk: " + Save.DISCO_ACTUAL
-
-	# No ofrecer unidades que no existen. Durante la configuración inicial
-	# sí se permite confirmar la unidad activa; en Opciones normal, la actual
-	# queda deshabilitada para evitar una transferencia innecesaria.
-	var c_disponible: bool = DirAccess.open("C:/") != null
-	var d_disponible: bool = DirAccess.open("D:/") != null
-	var durante_asistente := configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.DISCO
-	if durante_asistente:
-		c_button.disabled = not c_disponible
-		d_button.disabled = not d_disponible
-	else:
-		c_button.disabled = not c_disponible or Save.DISCO_ACTUAL == "C"
-		d_button.disabled = not d_disponible or Save.DISCO_ACTUAL == "D"
 # =========================================================
-# ADVERTENCIAS DE DISCO
+# SONIDO GLOBAL DE BOTONES
 # =========================================================
 
-func _process(_delta: float) -> void:
-	if not Save.modo_guardado_en_disco:
-		return
-	# Save.advertencia_disco permite detectar fallos de escritura que ocurran
-	# desde otras partes del juego, no solamente desde estos botones.
-	if confirmando_transferencia_disco:
-		return
+func _conectar_sonido_botones(nodo: Node) -> void:
+	# BaseButton incluye Button y los controles derivados de botones.
+	if nodo is BaseButton:
+		var boton := nodo as BaseButton
+		if not boton.pressed.is_connected(_reproducir_sonido_boton):
+			boton.pressed.connect(_reproducir_sonido_boton)
 
-	if not Save.advertencia_disco.is_empty() and not mostrando_advertencia_disco:
-		var mensaje: String = str(Save.advertencia_disco)
-		Save.advertencia_disco = ""
-		_mostrar_advertencia_disco(mensaje)
+	# Escuchar nuevos hijos para cubrir botones creados durante el juego,
+	# por ejemplo, los botones del selector de niveles.
+	if not nodo.child_entered_tree.is_connected(_on_hud_child_entered_tree):
+		nodo.child_entered_tree.connect(_on_hud_child_entered_tree)
 
-
-func _crear_panel_advertencia_disco() -> void:
-	panel_advertencia_disco = PanelContainer.new()
-	panel_advertencia_disco.name = "AdvertenciaDiscoPanel"
-	panel_advertencia_disco.anchor_left = 0.15
-	panel_advertencia_disco.anchor_top = 0.35
-	panel_advertencia_disco.anchor_right = 0.85
-	panel_advertencia_disco.anchor_bottom = 0.65
-	panel_advertencia_disco.offset_left = 0
-	panel_advertencia_disco.offset_top = 0
-	panel_advertencia_disco.offset_right = 0
-	panel_advertencia_disco.offset_bottom = 0
-	panel_advertencia_disco.z_index = 100
-	panel_advertencia_disco.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(panel_advertencia_disco)
-
-	etiqueta_advertencia_disco = Label.new()
-	etiqueta_advertencia_disco.name = "Mensaje"
-	etiqueta_advertencia_disco.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	etiqueta_advertencia_disco.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	etiqueta_advertencia_disco.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	etiqueta_advertencia_disco.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	etiqueta_advertencia_disco.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	panel_advertencia_disco.add_child(etiqueta_advertencia_disco)
-
-	panel_advertencia_disco.hide()
+	for hijo in nodo.get_children():
+		_conectar_sonido_botones(hijo)
 
 
-func _mostrar_advertencia_disco(mensaje: String) -> void:
-	if mostrando_advertencia_disco:
+func _on_hud_child_entered_tree(hijo: Node) -> void:
+	_conectar_sonido_botones(hijo)
+
+
+func _reproducir_sonido_boton() -> void:
+	if not is_instance_valid(reproductor_sonido_boton):
 		return
 
-	mostrando_advertencia_disco = true
-	pantallas_visibles_antes_de_advertencia.clear()
-
-	var pantallas: Array[Control] = [
-		$MainMenu,
-		$GameOver,
-		$Opciones,
-		$LanguageMenu,
-		$Disco,
-		$Pause,
-		$Confirmacion,
-		$SelectorNiveles,
-		$Sonido,
-		$Controles
-	]
-
-	for pantalla in pantallas:
-		if pantalla.visible:
-			pantallas_visibles_antes_de_advertencia.append(pantalla)
-			pantalla.hide()
-
-	var mensaje_minusculas := mensaje.to_lower()
-	if mensaje_minusculas.contains("espacio") or mensaje_minusculas.contains("lleno"):
-		if Settings.language == "en":
-			etiqueta_advertencia_disco.text = "The disk you are trying to write to is full.\n" + mensaje
-		else:
-			etiqueta_advertencia_disco.text = "El disco al que intentas escribir está lleno.\n" + mensaje
-	else:
-		etiqueta_advertencia_disco.text = mensaje
-
-	panel_advertencia_disco.show()
-	await get_tree().create_timer(5.0).timeout
-
-	panel_advertencia_disco.hide()
-	for pantalla in pantallas_visibles_antes_de_advertencia:
-		if is_instance_valid(pantalla):
-			pantalla.show()
-
-	pantallas_visibles_antes_de_advertencia.clear()
-	mostrando_advertencia_disco = false
-
-
-# =========================================================
-# CONFIRMACIÓN PARA SOBRESCRIBIR UN DISCO
-# Se reutiliza LanguageMenu: los botones pasan a ser Sí y No.
-# =========================================================
-
-func _mostrar_confirmacion_transferencia(disco_destino: String) -> void:
-	confirmando_transferencia_disco = true
-	disco_destino_pendiente = disco_destino
-	Save.advertencia_disco = ""
-
-	$MainMenu.hide()
-	$GameOver.hide()
-	$Opciones.hide()
-	$Sonido.hide()
-	$Disco.hide()
-	$Controles.hide()
-	$Pause.hide()
-	$SelectorNiveles.hide()
-	$Confirmacion.hide()
-
-	var vbox = $LanguageMenu/CenterContainer/VBoxContainer
-	vbox.get_node("Title").text = (
-		"El disco " + disco_destino + " ya contiene una partida de Eva. "
-		+ "Si continúas, se borrará ese archivo y se reemplazará por la partida "
-		+ "del disco " + Save.DISCO_ACTUAL + ". ¿Quieres continuar?"
-		if Settings.language == "es"
-		else
-		"Disk " + disco_destino + " already contains an Eva save. "
-		+ "If you continue, that file will be deleted and replaced with the save "
-		+ "from disk " + Save.DISCO_ACTUAL + ". Do you want to continue?"
-	)
-
-	var boton_espanol: Button = vbox.get_node("SpanishButton")
-	var boton_ingles: Button = vbox.get_node("EnglishButton")
-	var boton_volver = vbox.get_node_or_null("BackButton")
-
-	boton_espanol.text = "Sí" if Settings.language == "es" else "Yes"
-	boton_ingles.text = "No"
-	boton_espanol.show()
-	boton_ingles.show()
-	if boton_volver is Control:
-		boton_volver.hide()
-
-	$LanguageMenu.show()
-	boton_espanol.grab_focus()
-
-
-func _resolver_confirmacion_transferencia(aceptar: bool) -> void:
-	if not confirmando_transferencia_disco:
+	if sonido_boton_presionado == null:
 		return
 
-	var disco_destino := disco_destino_pendiente
-	confirmando_transferencia_disco = false
-	disco_destino_pendiente = ""
+	reproductor_sonido_boton.stream = sonido_boton_presionado
+	reproductor_sonido_boton.play()
 
-	# Restaurar el botón oculto antes de volver a usar la pantalla de idioma.
-	var boton_volver_idioma = $LanguageMenu/CenterContainer/VBoxContainer.get_node_or_null("BackButton")
-	if boton_volver_idioma is Control:
-		boton_volver_idioma.show()
 
-	if not aceptar:
-		update_language()
-		show_disco_menu()
-		return
 
-	var disco_origen: String = str(Save.DISCO_ACTUAL)
-	var carpeta_origen := Save.CARPETA_GUARDADO
 
-	# Cambiar temporalmente la ruta activa al destino para usar la escritura
-	# destructiva solicitada. El origen se conserva hasta que la escritura acabe.
-	Save._configurar_disco(disco_destino)
-	if not Save.escribir_en_disco():
-		var mensaje: String = str(Save.advertencia_disco)
-		Save._configurar_disco(disco_origen)
-		Save.advertencia_disco = ""
-		update_language()
-		show_opciones()
-		_mostrar_advertencia_disco(mensaje if not mensaje.is_empty() else "No se pudo escribir en el disco " + disco_destino + ".")
-		return
 
-	# Solo se borra el origen después de que la escritura en el destino termine.
-	if not Save._borrar_carpeta_completa(carpeta_origen):
-		Save.advertencia_disco = "La partida se escribió en el disco " + disco_destino + ", pero no se pudo borrar la carpeta anterior del disco " + disco_origen + ". Hay una copia adicional."
-		update_language()
-		show_opciones()
-		return
-
-	Save.advertencia_disco = ""
-	Save.disco_configurado = true
-	Save.guardar_configuracion_preferencias()
-	update_language()
-	show_opciones()
 
 
 # =========================================================
@@ -423,20 +269,7 @@ func _continuar_asistente_configuracion() -> void:
 			volver_idioma.hide()
 		return
 
-	if Save.modo_guardado_en_disco and not Save.disco_configurado:
-		paso_configuracion_inicial = PasoConfiguracionInicial.DISCO
-		show_disco_menu()
-		var vbox_disco = $Disco/CenterContainer/VBoxContainer
-		var volver_disco = vbox_disco.get_node_or_null("BackButton")
-		if volver_disco is Control:
-			volver_disco.hide()
-			volver_disco.focus_mode = Control.FOCUS_NONE
-		actualizar_menu_discos()
-		var boton_c = vbox_disco.get_node_or_null("cButton")
-		if boton_c is Control:
-			boton_c.grab_focus()
-		return
-
+	
 	if not Save.controles_configurados:
 		paso_configuracion_inicial = PasoConfiguracionInicial.CONTROLES
 		show_controles_menu(true)
@@ -455,11 +288,6 @@ func _guardar_visibilidad_botones_asistente(es_asistente: bool) -> void:
 	if volver_idioma is Control:
 		volver_idioma.visible = not es_asistente
 		volver_idioma.focus_mode = Control.FOCUS_ALL if not es_asistente else Control.FOCUS_NONE
-
-	var volver_disco = $Disco/CenterContainer/VBoxContainer.get_node_or_null("BackButton")
-	if volver_disco is Control:
-		volver_disco.visible = not es_asistente
-		volver_disco.focus_mode = Control.FOCUS_ALL if not es_asistente else Control.FOCUS_NONE
 
 	var raiz_controles = get_node_or_null("Controles")
 	if raiz_controles != null:
@@ -557,30 +385,43 @@ func _buscar_nodo_por_nombre(raiz: Node, nombre_buscado: String) -> Node:
 			return encontrado
 	return null
 
-
 func _configurar_selectores_controles() -> void:
 	var selector_control = _obtener_selector_control()
+
 	if selector_control == null:
 		push_warning("No se encontró BotonControl en la pantalla Controles.")
+
 	elif selector_control is OptionButton:
 		selector_control.clear()
 		selector_control.add_item("Modo A")
 		selector_control.add_item("Modo B")
+
 		if not selector_control.item_selected.is_connected(_on_selector_modo_controles_elegido):
 			selector_control.item_selected.connect(_on_selector_modo_controles_elegido)
+
 	elif selector_control is Button:
-		if not selector_control.pressed.is_connected(_on_boton_control_pressed):
-			selector_control.pressed.connect(_on_boton_control_pressed)
+		# El selector puede recibir el foco, pero no debe activarse.
+		selector_control.focus_mode = Control.FOCUS_ALL
+		selector_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+		_desconectar_conexiones_selector(selector_control, "pressed")
+
 
 	var selector_interaccion = _obtener_selector_interaccion()
+
 	if selector_interaccion == null:
 		push_warning("No se encontró BotonDeInteract en la pantalla Controles.")
+
 	elif selector_interaccion is OptionButton:
 		if not selector_interaccion.item_selected.is_connected(_on_selector_interaccion_elegido):
 			selector_interaccion.item_selected.connect(_on_selector_interaccion_elegido)
+
 	elif selector_interaccion is Button:
-		if not selector_interaccion.pressed.is_connected(_on_boton_interaccion_pressed):
-			selector_interaccion.pressed.connect(_on_boton_interaccion_pressed)
+		selector_interaccion.focus_mode = Control.FOCUS_ALL
+		selector_interaccion.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+		_desconectar_conexiones_selector(selector_interaccion, "pressed")
+
 
 	_actualizar_selectores_controles()
 
@@ -595,8 +436,6 @@ func _configurar_selectores_controles() -> void:
 	)
 
 	_actualizar_selectores_controles()
-
-
 func _actualizar_selectores_controles() -> void:
 	var selector_control = _obtener_selector_control()
 	var modo: int = int(Settings.modo_controles)
@@ -653,22 +492,16 @@ func _actualizar_textos_controles() -> void:
 	var arriba: String
 	var abajo: String
 
-	if Save.modo_guardado_en_disco:
-		izquierda = "←"
-		derecha = "→"
-		arriba = "↑"
-		abajo = "↓"
+	if Settings.language == "es":
+		izquierda = "Izquierda"
+		derecha = "Derecha"
+		arriba = "Arriba"
+		abajo = "Abajo"
 	else:
-		if Settings.language == "es":
-			izquierda = "Izquierda"
-			derecha = "Derecha"
-			arriba = "Arriba"
-			abajo = "Abajo"
-		else:
-			izquierda = "Left"
-			derecha = "Right"
-			arriba = "Up"
-			abajo = "Down"
+		izquierda = "Left"
+		derecha = "Right"
+		arriba = "Up"
+		abajo = "Down"
 
 	# Obtener las opciones de interacción según el modo de controles.
 	var opciones_interaccion: Array = []
@@ -811,10 +644,6 @@ func _conectar_actualizacion_selector(selector) -> void:
 		"_actualizar_textos_controles_diferido"
 	)
 
-	# Conectar el selector principal.
-	if selector is Button:
-		if not selector.pressed.is_connected(actualizar_diferido):
-			selector.pressed.connect(actualizar_diferido)
 
 	# Conectar también las flechas laterales.
 	var contenedor = selector.get_parent()
@@ -886,7 +715,7 @@ func show_controles_menu(es_asistente: bool = false) -> void:
 	$LanguageMenu.hide()
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
+
 	$Pause.hide()
 	$SelectorNiveles.hide()
 	$Confirmacion.hide()
@@ -1079,7 +908,6 @@ func obtener_botones_visibles() -> Array[Button]:
 		$GameOver,
 		$Opciones,
 		$LanguageMenu,
-		$Disco,
 		$Pause,
 		$Confirmacion,
 		$SelectorNiveles,
@@ -1199,28 +1027,25 @@ func mover_seleccion(
 # =========================================================
 # ACTIVAR SELECCIÓN
 # =========================================================
-
 func activar_seleccion() -> void:
 	var boton_actual = get_viewport().gui_get_focus_owner()
 
-	# Los selectores centrales no ejecutan acciones.
+	# Los selectores de controles no se pueden activar.
+	# Solamente se modifican usando las flechas izquierda y derecha.
 	if boton_actual == _obtener_selector_control():
 		return
 
 	if boton_actual == _obtener_selector_interaccion():
 		return
 
+	# El resto de los botones funciona normalmente.
 	if boton_actual is Button and not boton_actual.disabled:
 		boton_actual.pressed.emit()
-# =========================================================
-# MENÚ PRINCIPAL
-# =========================================================
 
 func show_main_menu() -> void:
 
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
 	$Controles.hide()
 	$MainMenu.show()
 
@@ -1249,7 +1074,6 @@ func show_game_over() -> void:
 
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
 	$Controles.hide()
 	$MainMenu.hide()
 
@@ -1276,7 +1100,6 @@ func show_opciones() -> void:
 	$GameOver.hide()
 	$LanguageMenu.hide()
 	$Sonido.hide()
-	$Disco.hide()
 	$Controles.hide()
 	$Pause.hide()
 	$SelectorNiveles.hide()
@@ -1286,45 +1109,12 @@ func show_opciones() -> void:
 	var primer_boton = vbox.get_node_or_null("LanguageButton")
 	if primer_boton == null:
 		primer_boton = vbox.get_node_or_null("Sonido")
-	if primer_boton == null:
-		primer_boton = vbox.get_node_or_null("Disco")
+
 	if primer_boton == null:
 		primer_boton = vbox.get_node_or_null("Controles")
 	if primer_boton is Control:
 		primer_boton.grab_focus()
 
-func show_disco_menu() -> void:
-	if not MODO_GUARDADO_EN_DISCO:
-		show_opciones()
-		return
-
-	$MainMenu.hide()
-	$GameOver.hide()
-	$LanguageMenu.hide()
-	$Sonido.hide()
-	$Opciones.hide()
-	$Controles.hide()
-	$Pause.hide()
-	$SelectorNiveles.hide()
-	$Confirmacion.hide()
-
-	actualizar_menu_discos()
-	$Disco.show()
-	var boton_volver_disco = $Disco/CenterContainer/VBoxContainer.get_node_or_null("BackButton")
-	var durante_asistente := configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.DISCO
-	if boton_volver_disco is Control:
-		boton_volver_disco.visible = not durante_asistente
-		boton_volver_disco.focus_mode = Control.FOCUS_NONE if durante_asistente else Control.FOCUS_ALL
-
-	var c_button: Button = $Disco/CenterContainer/VBoxContainer/cButton
-	var d_button: Button = $Disco/CenterContainer/VBoxContainer/dButton
-
-	if not c_button.disabled:
-		c_button.grab_focus()
-	elif not d_button.disabled:
-		d_button.grab_focus()
-	elif not durante_asistente:
-		$Disco/CenterContainer/VBoxContainer/BackButton.grab_focus()
 # =========================================================
 # MENÚ IDIOMA
 # =========================================================
@@ -1333,7 +1123,7 @@ func show_language_menu() -> void:
 
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
+
 	$Controles.hide()
 	$MainMenu.hide()
 
@@ -1365,7 +1155,7 @@ func show_pause_menu() -> void:
 
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
+
 	$Controles.hide()
 	$MainMenu.hide()
 
@@ -1391,7 +1181,6 @@ func show_selector_niveles() -> void:
 
 	$Sonido.hide()
 	$Opciones.hide()
-	$Disco.hide()
 	$Controles.hide()
 	$MainMenu.hide()
 
@@ -1443,7 +1232,6 @@ func update_language() -> void:
 	var opciones = $Opciones/MarginContainer/CenterContainer/VBoxContainer
 	opciones.get_node("LanguageButton").text = "Idioma" if es else "Language"
 	opciones.get_node("Sonido").text = "Sonido" if es else "Sound"
-	opciones.get_node("Disco").text = "Disco" if es else "Disk"
 
 	var controles_opciones = opciones.get_node_or_null("Controles")
 	if controles_opciones is Button:
@@ -1459,13 +1247,6 @@ func update_language() -> void:
 	sonido.get_node("LabelMusica").text = "Música" if es else "Music"
 	sonido.get_node("LabelVoces").text = "Voces" if es else "Voices"
 	sonido.get_node("BackButton").text = "Volver" if es else "Back"
-
-	# Menú de discos.
-	var disco = $Disco/CenterContainer/VBoxContainer
-	disco.get_node("Title").text = "Disco" if es else "Disk"
-	disco.get_node("cButton").text = "Disco C" if es else "Disk C"
-	disco.get_node("dButton").text = "Disco D" if es else "Disk D"
-	disco.get_node("BackButton").text = "Volver" if es else "Back"
 
 	# Menú de idioma.
 	var idioma = $LanguageMenu/CenterContainer/VBoxContainer
@@ -1502,15 +1283,11 @@ func update_language() -> void:
 	confirmacion.get_node("YesButton").text = "Sí" if es else "Yes"
 	confirmacion.get_node("NoButton").text = "No"
 
-	# Actualizar también los controles y el menú de discos.
+	# Actualizar también los controles
 	_actualizar_textos_controles()
 
-	var boton_opcion_disco = opciones.get_node_or_null("Disco")
-	if boton_opcion_disco is Control:
-		boton_opcion_disco.visible = Save.modo_guardado_en_disco
 
-	if is_node_ready():
-		actualizar_menu_discos()
+
 
 
 # =========================================================
@@ -1601,75 +1378,10 @@ func _on_language_button_pressed() -> void:
 	show_language_menu()
 
 
-func _on_disco_button_pressed() -> void:
-	if Save.modo_guardado_en_disco:
-		show_disco_menu()
 
 
-func _on_c_button_pressed() -> void:
-	_manejar_seleccion_disco("C")
 
 
-func _on_d_button_pressed() -> void:
-	_manejar_seleccion_disco("D")
-
-
-func _manejar_seleccion_disco(disco: String) -> void:
-	if not Save.modo_guardado_en_disco:
-		return
-
-	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.DISCO:
-		if not Save.seleccionar_disco_inicial(disco):
-			var mensaje := Save.advertencia_disco
-			Save.advertencia_disco = ""
-			_mostrar_advertencia_disco(mensaje if not mensaje.is_empty() else "No se pudo seleccionar el disco " + disco + ".")
-			return
-		_continuar_asistente_configuracion()
-		return
-	_intentar_cambiar_disco(disco)
-
-
-func _intentar_cambiar_disco(disco_destino: String) -> void:
-	if not Save.modo_guardado_en_disco:
-		return
-
-	if disco_destino == Save.DISCO_ACTUAL:
-		Save.advertencia_disco = ""
-		show_opciones()
-		return
-
-	var carpeta_origen := Save.CARPETA_GUARDADO
-	var carpeta_destino: String = "C:/" + str(Save.NOMBRE_CARPETA_GUARDADO) if disco_destino == "C" else "D:/" + str(Save.NOMBRE_CARPETA_GUARDADO)
-	var existe_partida_origen := FileAccess.file_exists(carpeta_origen.path_join("partida.save"))
-	var existe_partida_destino := FileAccess.file_exists(carpeta_destino.path_join("partida.save"))
-
-	var transferencia_correcta: bool
-	if disco_destino == "C":
-		transferencia_correcta = Save.cambiar_a_c()
-	else:
-		transferencia_correcta = Save.cambiar_a_d()
-
-	if transferencia_correcta:
-		Save.advertencia_disco = ""
-		show_opciones()
-		return
-
-	var mensaje: String = str(Save.advertencia_disco)
-	Save.advertencia_disco = ""
-
-	# Solo pedir confirmación destructiva cuando hay una partida de Eva en
-	# ambos discos. Si no, se muestra la advertencia normal de Save.
-	if existe_partida_origen and existe_partida_destino:
-		_mostrar_confirmacion_transferencia(disco_destino)
-		return
-
-	show_opciones()
-	if not mensaje.is_empty():
-		_mostrar_advertencia_disco(mensaje)
-
-
-func _on_disco_back_button_pressed() -> void:
-	show_opciones()
 
 
 # =========================================================
@@ -1892,7 +1604,7 @@ func _on_sonido_button_pressed() -> void:
 	$GameOver.hide()
 	$LanguageMenu.hide()
 	$Opciones.hide()
-	$Disco.hide()
+
 	$Pause.hide()
 	$SelectorNiveles.hide()
 	$Confirmacion.hide()
@@ -1954,14 +1666,13 @@ func _guardar_volumenes() -> void:
 	var musica: float = float(vbox_sonido.get_node("MusicaSlider").value)
 	var voces: float = float(vbox_sonido.get_node("VocesSlider").value)
 
-	# El modo navegador no crea opciones.cfg: los volúmenes quedan en Save.
-	if not Save.modo_guardado_en_disco:
-		Save.volumenes_memoria = {
+	
+	Save.volumenes_memoria = {
 			"efectos": efectos,
 			"musica": musica,
 			"voces": voces
 		}
-		return
+		
 
 	var config := ConfigFile.new()
 	config.set_value(
@@ -2000,7 +1711,6 @@ func _guardar_volumenes() -> void:
 		print("Voces: ", config.get_value("sonido", "voces"))
 		print("Ruta: ", RUTA_OPCIONES_SONIDO)
 
-
 func _cargar_volumenes() -> void:
 	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
 
@@ -2008,27 +1718,30 @@ func _cargar_volumenes() -> void:
 	var musica_slider: HSlider = vbox_sonido.get_node("MusicaSlider")
 	var voces_slider: HSlider = vbox_sonido.get_node("VocesSlider")
 
-	# En modo navegador se usan exclusivamente las variables del autoload Save.
-	if not Save.modo_guardado_en_disco:
-		sonido_slider.set_value_no_signal(float(Save.volumenes_memoria.get("efectos", 50.0)))
-		musica_slider.set_value_no_signal(float(Save.volumenes_memoria.get("musica", 50.0)))
-		voces_slider.set_value_no_signal(float(Save.volumenes_memoria.get("voces", 50.0)))
-	else:
-		var config := ConfigFile.new()
-		var error := config.load(RUTA_OPCIONES_SONIDO)
+	var config := ConfigFile.new()
+	var error := config.load(RUTA_OPCIONES_SONIDO)
 
-		if error == OK:
-			sonido_slider.set_value_no_signal(float(config.get_value("sonido", "efectos", 50.0)))
-			musica_slider.set_value_no_signal(float(config.get_value("sonido", "musica", 50.0)))
-			voces_slider.set_value_no_signal(float(config.get_value("sonido", "voces", 50.0)))
-			print("VOLUMENES CARGADOS")
-		else:
-			sonido_slider.set_value_no_signal(50.0)
-			musica_slider.set_value_no_signal(50.0)
-			voces_slider.set_value_no_signal(50.0)
-			print("No se pudo cargar opciones.cfg. Error: ", error)
-			print("Se usarán los valores predeterminados: 50 %.")
-			_guardar_volumenes()
+	if error == OK:
+		sonido_slider.set_value_no_signal(
+			float(config.get_value("sonido", "efectos", 50.0))
+		)
+		musica_slider.set_value_no_signal(
+			float(config.get_value("sonido", "musica", 50.0))
+		)
+		voces_slider.set_value_no_signal(
+			float(config.get_value("sonido", "voces", 50.0))
+		)
+
+		print("VOLUMENES CARGADOS")
+	else:
+		sonido_slider.set_value_no_signal(50.0)
+		musica_slider.set_value_no_signal(50.0)
+		voces_slider.set_value_no_signal(50.0)
+
+		print("No se pudo cargar opciones.cfg. Error: ", error)
+		print("Se usarán los valores predeterminados: 50 %.")
+
+		_guardar_volumenes()
 
 	# Aplicar los valores al mezclador.
 	_cambiar_volumen_bus("Sonido", sonido_slider.value)
@@ -2038,16 +1751,9 @@ func _cargar_volumenes() -> void:
 	print("Efectos: ", sonido_slider.value)
 	print("Música: ", musica_slider.value)
 	print("Voces: ", voces_slider.value)
-	if Save.modo_guardado_en_disco:
-		print("Archivo: ", RUTA_OPCIONES_SONIDO)
-
-
+	print("Archivo: ", RUTA_OPCIONES_SONIDO)
 
 func _on_spanish_button_pressed() -> void:
-	if confirmando_transferencia_disco:
-		_resolver_confirmacion_transferencia(true)
-		return
-
 	Settings.language = "es"
 
 	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.IDIOMA:
@@ -2061,10 +1767,6 @@ func _on_spanish_button_pressed() -> void:
 		show_opciones()
 
 func _on_english_button_pressed() -> void:
-	if confirmando_transferencia_disco:
-		_resolver_confirmacion_transferencia(false)
-		return
-
 	Settings.language = "en"
 
 	if configuracion_inicial_activa and paso_configuracion_inicial == PasoConfiguracionInicial.IDIOMA:
@@ -2084,9 +1786,6 @@ func _on_english_button_pressed() -> void:
 # =========================================================
 
 func _on_back_button_pressed() -> void:
-	if confirmando_transferencia_disco:
-		_resolver_confirmacion_transferencia(false)
-		return
 	if configuracion_inicial_activa:
 		return
 	show_opciones()
@@ -2158,12 +1857,9 @@ func _crear_flechas_selector(selector: Control, tipo: String) -> void:
 	var flecha_derecha := Button.new()
 	flecha_derecha.name = "FlechaDerecha"
 
-	if Save.modo_guardado_en_disco:
-		flecha_izquierda.text = "◀"
-		flecha_derecha.text = "▶"
-	else:
-		flecha_izquierda.text = "<"
-		flecha_derecha.text = ">"
+
+	flecha_izquierda.text = "<"
+	flecha_derecha.text = ">"
 
 	for flecha in [flecha_izquierda, flecha_derecha]:
 		flecha.custom_minimum_size = Vector2(40, 0)

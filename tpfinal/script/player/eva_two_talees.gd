@@ -413,7 +413,7 @@ func establecer_direccion_visual(nueva_direccion: float) -> void:
 
 
 func aplicar_direccion_visual() -> void:
-	if not estado_actual.deslizandose_pendiente:
+	if not estado_actual.en_pendiente:
 		rotation = 0.0
 
 	scale = Vector2.ONE

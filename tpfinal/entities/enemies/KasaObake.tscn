@@ -52,8 +52,11 @@ gravity = Vector3(0, 98, 0)
 
 [node name="CharacterBody2D" unique_id=86738375 instance=ExtResource("1_1g1o7")]
 script = ExtResource("2_vowfh")
+rutaRisa = "res://sonidos/enemigos/paraguas/risaParaguas.ogg"
 VELOCIDAD_CAIDA_LENTA = 80.0
 VELOCIDAD_CAIDA_RAPIDA = 600.0
+FUERZA_EMPUJE_CONTACTO = 300.0
+FUERZA_EMPUJE_CONTACTO_DESDE_ARRIBA = 400.0
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=1444408395]
 position = Vector2(0.5, -16)
