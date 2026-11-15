@@ -4,7 +4,7 @@ extends AbstractEnemy
 
 @export var SPEEDCAMINANDO: float = 200.0
 @export var SPEEDCORRIENDO: float = 400.0
-@export var CAMINATA: float = 400.0
+@export var CAMINATA: float = 900.0
 
 var en_retroceso: bool = false
 var temporizador_retroceso: Timer

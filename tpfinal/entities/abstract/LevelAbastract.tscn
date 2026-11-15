@@ -24,6 +24,7 @@
 [ext_resource type="PackedScene" uid="uid://jocxgcatpy43" path="res://entities/madriguera_izquierda.tscn" id="21_87rbd"]
 [ext_resource type="PackedScene" uid="uid://cv78gsq2jrhn5" path="res://entities/escenario/Roca.tscn" id="23_0gjq2"]
 [ext_resource type="PackedScene" uid="uid://cjsocy4o8vnfr" path="res://entities/interfaz.tscn" id="24_5cf6w"]
+[ext_resource type="AudioStream" uid="uid://kpcu13tupp6l" path="res://sonidos/level1/el bosque espiritual.ogg" id="25_87rbd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x8ioc"]
 texture = ExtResource("2_x8ioc")
@@ -4316,5 +4317,11 @@ tile_set = SubResource("TileSet_h4vih")
 position = Vector2(393, 629)
 
 [node name="bayas" type="Node2D" parent="." unique_id=788439811]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=2124546156]
+stream = ExtResource("25_87rbd")
+autoplay = true
+bus = &"Musica"
+parameters/looping = true
 
 [connection signal="game_paused" from="." to="." method="_on_game_paused"]

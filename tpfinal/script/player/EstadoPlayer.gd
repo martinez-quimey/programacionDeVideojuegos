@@ -1018,35 +1018,20 @@ func retroceso(
 	fuerza: float
 ) -> void:
 
-	print("\n========== INICIO RETROCESO ==========")
-	print("[RETROCESO] Dirección recibida: ", direccion_empuje)
-	print("[RETROCESO] Fuerza recibida: ", fuerza)
-	print("[RETROCESO] PESO: ", PESO)
-	print("[RETROCESO] ataques.turbo_activo: ", ataques.turbo_activo)
-	print("[RETROCESO] ataques.tiempo_invulnerabilidad_turbo: ", ataques.tiempo_invulnerabilidad_turbo)
-	print("[RETROCESO] Invulnerabilidad detenida: ", Invulnerabilidad.is_stopped())
-	print("[RETROCESO] retroceso_activo: ", retroceso_activo)
-
 	# ==========================================
 	# COMPROBAR BLOQUEOS
 	# ==========================================
 
 	if ataques.turbo_activo or ataques.tiempo_invulnerabilidad_turbo > 0.0 or not Invulnerabilidad.is_stopped():
 
-		print("[RETROCESO CANCELADO] Turbo o invulnerabilidad activos.")
-		print("========================================\n")
 		return
 
 	if retroceso_activo:
 
-		print("[RETROCESO CANCELADO] Ya hay un retroceso activo.")
-		print("========================================\n")
 		return
 
 	if PESO <= 0:
 
-		print("[RETROCESO CANCELADO] PESO es menor o igual a cero.")
-		print("========================================\n")
 		return
 
 	if direccion_empuje.length() == 0:
