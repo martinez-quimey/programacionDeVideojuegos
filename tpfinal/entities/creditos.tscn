@@ -1,28 +1,101 @@
 [gd_scene format=3 uid="uid://bhi7hqr80xnkv"]
 
+[ext_resource type="Script" uid="uid://d230xx5lk3xtl" path="res://entities/creditos.gd" id="1_lrh7j"]
+
 [node name="Creditos" type="Control" unique_id=2051821688]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lrh7j")
+velocidad = 200.0
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=890020703]
+[node name="Control" type="Control" parent="." unique_id=994569690]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=118386129]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 1152.0
+offset_bottom = 648.0
+size_flags_horizontal = 11
+size_flags_vertical = 15
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=388258585]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=473337871]
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer" unique_id=388258585]
+z_index = 1
 layout_mode = 2
+alignment = 1
+
+[node name="Arte" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=531677098]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 39
+text = "Arte"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=473337871]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Verdo"
+horizontal_alignment = 1
+
+[node name="Direccion" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=1660914453]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 39
+text = "Assets"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=710035603]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Verdo"
+horizontal_alignment = 1
+
+[node name="Assets" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=1328810519]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 39
+text = "Assets"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=1990994878]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
 text = "Gracias a Crafpix por los assets de disparo de fuego y de jabali.
 Miwis de GodotShaders creo la base del filtro visual usado en los niveles
-
-actuacion de voz:
-
-Eva: Arai
-El resto del arte es propio (Verdo)
 "
+horizontal_alignment = 1
+
+[node name="ActuacionDeVoz" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=343398041]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 39
+text = "Actuacion de voz"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=350549399]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Eva: Arai"
+horizontal_alignment = 1
+
+[node name="FondoNegro" type="ColorRect" parent="Control" unique_id=1815754919]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

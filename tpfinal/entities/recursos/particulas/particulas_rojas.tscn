@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://tq6oybli44of"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6puso"]
+load_path = "res://.godot/imported/particula roja.png-1b390b90bfa7d6833ed63898afd37e71.ctex"
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_naj5d"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = -6.69
+initial_velocity_max = 146.69
+gravity = Vector3(0, 98, 0)
+
+[node name="ParticulasRojas" type="GPUParticles2D" unique_id=1096443967]
+texture_filter = 1
+emitting = false
+texture = SubResource("CompressedTexture2D_6puso")
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_naj5d")

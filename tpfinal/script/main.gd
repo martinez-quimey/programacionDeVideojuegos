@@ -5,12 +5,27 @@ extends Node2D
 @onready var game_container: Node2D = $GameContainer
 @onready var hud: CanvasLayer = $HUD
 
+# =========================================================
+# CRÉDITOS
+# =========================================================
+
+@export var escena_creditos: PackedScene
+
+var instancia_creditos: Control = null
 
 # =========================================================
 # NIVEL INICIAL
 # =========================================================
 
 @export var level1: PackedScene
+
+
+# =========================================================
+# TRANSICIÓN DE NIVEL
+# =========================================================
+
+# Asignar TransicionNivel.tscn desde el Inspector.
+@export var escena_transicion: PackedScene
 
 
 # =========================================================
@@ -95,6 +110,7 @@ func _ready() -> void:
 	hud.start_game.connect(new_game)
 	hud.retry_game.connect(retry_game)
 	hud.main_menu.connect(_on_main_menu)
+	hud.mostrar_creditos.connect(mostrar_creditos)
 	hud.continue_game.connect(continue_game)
 
 	ultimo_process_diagnostic = Time.get_ticks_msec()
@@ -105,6 +121,87 @@ func _ready() -> void:
 		Time.get_ticks_msec() - tiempo_inicio,
 		" ms"
 	)
+
+
+# =========================================================
+# CREAR TRANSICIÓN
+# =========================================================
+
+func crear_transicion(ruta_nivel: String) -> Node:
+
+	if escena_transicion == null:
+		push_warning(
+			"MAIN: no se asignó escena_transicion en el Inspector"
+		)
+		return null
+
+	var transicion = escena_transicion.instantiate() as CanvasLayer
+
+	if transicion == null:
+		push_error("MAIN: no se pudo instanciar la transición")
+		return null
+
+	transicion.layer = 100
+	transicion.process_mode = Node.PROCESS_MODE_ALWAYS
+
+	add_child(transicion)
+
+	if not transicion.has_method("iniciar"):
+		push_error(
+			"MAIN: la escena de transición no tiene el método iniciar()"
+		)
+		transicion.queue_free()
+		return null
+
+	# El nombre se obtiene de la ruta del archivo del nivel.
+	# No hace falta instanciar el nivel para mostrarlo.
+	transicion.call("iniciar", ruta_nivel)
+
+	return transicion
+
+
+# =========================================================
+# ESPERAR A QUE LA TRANSICIÓN SE DIBUJE
+# =========================================================
+
+func esperar_transicion_dibujada(transicion: Node) -> void:
+
+	if not is_instance_valid(transicion):
+		return
+
+	# Espera hasta que el renderizador termine de dibujar el frame.
+	# Esto es distinto de process_frame: no continúa simplemente
+	# porque haya terminado el procesamiento del árbol.
+	await RenderingServer.frame_post_draw
+
+
+# =========================================================
+# CANCELAR TRANSICIÓN
+# =========================================================
+
+func cancelar_transicion(transicion: Node) -> void:
+
+	if is_instance_valid(transicion):
+		transicion.queue_free()
+
+
+# =========================================================
+# FINALIZAR TRANSICIÓN
+# =========================================================
+
+func finalizar_transicion(transicion: Node) -> void:
+
+	if not is_instance_valid(transicion):
+		return
+
+	if not transicion.has_method("revelar_nivel"):
+		push_error(
+			"MAIN: la transición no tiene el método revelar_nivel()"
+		)
+		transicion.queue_free()
+		return
+
+	await transicion.call("revelar_nivel")
 
 
 # =========================================================
@@ -219,6 +316,21 @@ func continue_game() -> void:
 		print("Ruta buscada: ", Settings.nivelActual)
 		return
 
+	# =====================================================
+	# CREAR TRANSICIÓN ANTES DE CARGAR EL NIVEL
+	# =====================================================
+
+	var transicion = crear_transicion(Settings.nivelActual)
+
+	# Esperar a que la pantalla negra se haya dibujado realmente.
+	await esperar_transicion_dibujada(transicion)
+
+	print(
+		"MAIN CONTINUE: transición dibujada | ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
 	print(
 		"MAIN CONTINUE: antes de load() | ",
 		Time.get_ticks_msec() - tiempo_inicio,
@@ -235,10 +347,12 @@ func continue_game() -> void:
 
 	if escena_nivel == null:
 		print("ERROR 3: load() devolvió null")
+		cancelar_transicion(transicion)
 		return
 
 	if not escena_nivel is PackedScene:
 		print("ERROR 4: el recurso NO es una PackedScene")
+		cancelar_transicion(transicion)
 		return
 
 	print(
@@ -257,11 +371,13 @@ func continue_game() -> void:
 
 	if nuevo_game == null:
 		print("ERROR 5: instantiate() devolvió null")
+		cancelar_transicion(transicion)
 		return
 
 	if not nuevo_game is Node2D:
 		print("ERROR 6: el nivel no es Node2D")
 		nuevo_game.queue_free()
+		cancelar_transicion(transicion)
 		return
 
 	if game != null:
@@ -350,6 +466,9 @@ func continue_game() -> void:
 		" ms"
 	)
 
+	# La pantalla se retira cuando el nivel ya está preparado.
+	await finalizar_transicion(transicion)
+
 	print("NIVEL CARGADO CORRECTAMENTE")
 
 	print(
@@ -437,8 +556,6 @@ func reiniciar_player() -> void:
 		print("ERROR: no existe Projectiles")
 		return
 
-	# ARREGLO: quitar el tipo EstadoPlayer de las declaraciones.
-	# Así Main no necesita resolver la clase global para analizarlas.
 	var estado_manual = nuevo_player.get_node_or_null("estadoManual")
 	var estado_automatico = nuevo_player.get_node_or_null("estadoAutomatico")
 
@@ -678,18 +795,39 @@ func retry_game() -> void:
 
 	print("Nivel que se va a recargar: ", ruta_nivel)
 
-	print("RETRY: antes de load() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
+	# =====================================================
+	# CREAR TRANSICIÓN ANTES DE CARGAR EL NIVEL
+	# =====================================================
+
+	var transicion = crear_transicion(ruta_nivel)
+
+	# Esperar a que la pantalla negra se haya dibujado realmente.
+	await esperar_transicion_dibujada(transicion)
 
 	var escena_nivel = load(ruta_nivel)
 
-	print("RETRY: después de load() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
-
 	if escena_nivel == null:
 		print("ERROR: no se pudo cargar nuevamente el nivel")
+		cancelar_transicion(transicion)
 		return
 
 	if not escena_nivel is PackedScene:
 		print("ERROR: la escena del nivel no es PackedScene")
+		cancelar_transicion(transicion)
+		return
+
+	# Instanciar el nivel después de mostrar la transición.
+	var nuevo_game = escena_nivel.instantiate()
+
+	if nuevo_game == null:
+		print("ERROR: no se pudo instanciar nuevamente el nivel")
+		cancelar_transicion(transicion)
+		return
+
+	if not nuevo_game is Node2D:
+		print("ERROR: el nivel nuevo no es Node2D")
+		nuevo_game.queue_free()
+		cancelar_transicion(transicion)
 		return
 
 	print("BORRANDO NIVEL COMPLETO")
@@ -697,7 +835,6 @@ func retry_game() -> void:
 	game.queue_free()
 	game = null
 
-	# Restaurar el checkpoint antes de crear el nivel nuevo.
 	Settings.checkpoint = checkpoint_guardado
 
 	print(
@@ -705,66 +842,30 @@ func retry_game() -> void:
 		Settings.checkpoint
 	)
 
-	print(
-		"RETRY: antes de await process_frame después de queue_free | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
-
-	var antes_frame_borrado = Time.get_ticks_msec()
 	await get_tree().process_frame
-	var despues_frame_borrado = Time.get_ticks_msec()
-
-	print(
-		"RETRY: después de await process_frame borrado | ",
-		Time.get_ticks_msec() - tiempo_inicio,
-		" ms"
-	)
-
-	print(
-		"RETRY: solo frame de borrado = ",
-		despues_frame_borrado - antes_frame_borrado,
-		" ms"
-	)
 
 	print("CREANDO NIVEL NUEVO")
 
-	print("RETRY: antes de instantiate() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
-
-	game = escena_nivel.instantiate()
-
-	print("RETRY: después de instantiate() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
-
-	if game == null:
-		print("ERROR: no se pudo instanciar nuevamente el nivel")
-		return
-
-	if not game is Node2D:
-		print("ERROR: el nivel nuevo no es Node2D")
-		game.queue_free()
-		game = null
-		return
-
-	print("RETRY: antes de add_child() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
+	game = nuevo_game
 
 	var antes_add_child = Time.get_ticks_msec()
 	game_container.add_child(game)
-	var despues_add_child = Time.get_ticks_msec()
 
-	print("RETRY: después de add_child() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
-	print("RETRY: SOLO add_child() = ", despues_add_child - antes_add_child, " ms")
+	print(
+		"RETRY: add_child tardó ",
+		Time.get_ticks_msec() - antes_add_child,
+		" ms"
+	)
 
 	ruta_nivel_actual = ruta_nivel
 	Settings.sePuedePausar = true
 
-	print("RETRY: antes de colocar_player_en_checkpoint() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
+	await get_tree().process_frame
 
 	await colocar_player_en_checkpoint()
 
 	if game != null and game.has_method("cargar_spawners_diferidos"):
 		await game.call("cargar_spawners_diferidos")
-
-	print("RETRY: después de colocar_player_en_checkpoint() | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	if game.has_signal("player_died"):
 		if not game.player_died.is_connected(_on_player_died):
@@ -773,6 +874,8 @@ func retry_game() -> void:
 	print("CHECKPOINT FINAL: ", Settings.checkpoint)
 	print("POSICIÓN FINAL PLAYER LOCAL: ", game.get_node("Player").position)
 	print("POSICIÓN FINAL PLAYER GLOBAL: ", game.get_node("Player").global_position)
+
+	await finalizar_transicion(transicion)
 
 	print("REINTENTAR FINALIZADO | ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
@@ -800,7 +903,56 @@ func load_level(level_scene: PackedScene) -> void:
 
 	ruta_nivel_actual = level_scene.resource_path
 
-	# Borrar el nivel anterior, si existe.
+	# =====================================================
+	# CREAR TRANSICIÓN ANTES DE INSTANTIAR EL NIVEL
+	# =====================================================
+
+	var transicion = crear_transicion(level_scene.resource_path)
+
+	# Esperar a que Godot dibuje realmente la pantalla negra.
+	await esperar_transicion_dibujada(transicion)
+
+	print(
+		"LOAD_LEVEL: transición dibujada | ",
+		Time.get_ticks_msec() - tiempo_inicio,
+		" ms"
+	)
+
+	# =====================================================
+	# INSTANTIAR EL NIVEL
+	# =====================================================
+
+	var antes_instantiate := Time.get_ticks_msec()
+
+	print(
+		"LOAD_LEVEL: antes de instantiate | ",
+		antes_instantiate - tiempo_inicio,
+		" ms"
+	)
+
+	var nuevo_game = level_scene.instantiate()
+
+	print(
+		"LOAD_LEVEL: instantiate tardó ",
+		Time.get_ticks_msec() - antes_instantiate,
+		" ms"
+	)
+
+	if nuevo_game == null:
+		push_error("LOAD_LEVEL: no se pudo instanciar el nivel")
+		cancelar_transicion(transicion)
+		return
+
+	if not nuevo_game is Node2D:
+		push_error("LOAD_LEVEL: el nivel no es Node2D")
+		nuevo_game.queue_free()
+		cancelar_transicion(transicion)
+		return
+
+	# =====================================================
+	# ELIMINAR NIVEL ANTERIOR
+	# =====================================================
+
 	if game != null:
 		print(
 			"LOAD_LEVEL: antes de queue_free | ",
@@ -823,26 +975,11 @@ func load_level(level_scene: PackedScene) -> void:
 			" ms"
 		)
 
-	# Instanciar la escena.
-	var antes_instantiate := Time.get_ticks_msec()
+	# =====================================================
+	# AGREGAR EL NIVEL DEBAJO DE LA TRANSICIÓN
+	# =====================================================
 
-	print(
-		"LOAD_LEVEL: antes de instantiate | ",
-		antes_instantiate - tiempo_inicio,
-		" ms"
-	)
-
-	game = level_scene.instantiate()
-
-	print(
-		"LOAD_LEVEL: instantiate tardó ",
-		Time.get_ticks_msec() - antes_instantiate,
-		" ms"
-	)
-
-	if game == null:
-		push_error("LOAD_LEVEL: no se pudo instanciar el nivel")
-		return
+	game = nuevo_game
 
 	print("LOAD_LEVEL: antes de add_child")
 	print("LOAD_LEVEL: hijos directos de la escena = ", game.get_child_count())
@@ -909,6 +1046,9 @@ func load_level(level_scene: PackedScene) -> void:
 		" ms"
 	)
 
+	# Retirar la transición después de preparar el nivel.
+	await finalizar_transicion(transicion)
+
 	print("LOAD_LEVEL: FIN | TOTAL = ", Time.get_ticks_msec() - tiempo_inicio, " ms")
 
 	print("========================================")
@@ -952,8 +1092,8 @@ func _on_game_paused() -> void:
 # VOLVER AL MENÚ
 # =========================================================
 
-
 func _on_main_menu() -> void:
+
 	print("MAIN: VOLVIENDO AL MENÚ")
 
 	get_tree().paused = false
@@ -973,3 +1113,91 @@ func _on_main_menu() -> void:
 	hud.show_main_menu()
 
 	print("MAIN: show_main_menu ejecutado")
+
+
+# =========================================================
+# MOSTRAR CRÉDITOS
+# =========================================================
+
+
+func mostrar_creditos() -> void:
+
+	print("")
+	print("========================================")
+	print("MAIN: MOSTRANDO CRÉDITOS")
+	print("========================================")
+
+	get_tree().paused = false
+	Settings.sePuedePausar = false
+
+	hud.hide()
+
+	if game != null:
+		game.queue_free()
+		game = null
+
+	ruta_nivel_actual = ""
+
+	if escena_creditos == null:
+		push_error("MAIN: no se asignó escena_creditos en el Inspector")
+		hud.show()
+		hud.show_main_menu()
+		return
+
+	instancia_creditos = escena_creditos.instantiate() as Control
+
+	if instancia_creditos == null:
+		push_error("MAIN: no se pudo instanciar la escena de créditos")
+		hud.show()
+		hud.show_main_menu()
+		return
+
+	instancia_creditos.process_mode = Node.PROCESS_MODE_ALWAYS
+
+	# Primero agregamos la escena al árbol.
+	get_tree().root.add_child(instancia_creditos)
+
+	# Después ajustamos su tamaño.
+	instancia_creditos.set_anchors_and_offsets_preset(
+		Control.PRESET_FULL_RECT
+	)
+
+	# También hacemos que el Control interno ocupe toda la pantalla.
+	var control_interno = instancia_creditos.get_node_or_null("Control")
+
+	if control_interno is Control:
+		control_interno.set_anchors_and_offsets_preset(
+			Control.PRESET_FULL_RECT
+		)
+
+		var scroll = control_interno.get_node_or_null("ScrollContainer")
+
+		if scroll is Control:
+			scroll.set_anchors_and_offsets_preset(
+				Control.PRESET_FULL_RECT
+			)
+
+	if instancia_creditos.has_signal("creditos_terminados"):
+		if not instancia_creditos.creditos_terminados.is_connected(_on_creditos_terminados):
+			instancia_creditos.creditos_terminados.connect(_on_creditos_terminados)
+	else:
+		push_error("MAIN: Creditos no tiene la señal creditos_terminados")
+
+
+# =========================================================
+# CRÉDITOS TERMINADOS
+# =========================================================
+func _on_creditos_terminados() -> void:
+
+	print("MAIN: LOS CRÉDITOS TERMINARON")
+
+	if is_instance_valid(instancia_creditos):
+		instancia_creditos.queue_free()
+
+	instancia_creditos = null
+
+	# Volver a mostrar el HUD y el menú principal.
+	hud.show()
+	hud.show_main_menu()
+
+	print("MAIN: menú principal mostrado")

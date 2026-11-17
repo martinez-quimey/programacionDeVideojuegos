@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://dnhtvjtnlqq8e"]
 
 [ext_resource type="Script" uid="uid://bh8cv8kqckg8x" path="res://script/hud.gd" id="1_64ctp"]
+[ext_resource type="FontFile" uid="uid://ch7334of0g8dq" path="res://fonts/Cinzel_Decorative,Press_Start_2P/Press_Start_2P/PressStart2P-Regular.ttf" id="2_cdv6k"]
+[ext_resource type="FontFile" uid="uid://d1wt1cluy8xho" path="res://fonts/Cinzel_Decorative/CinzelDecorative-Black.ttf" id="3_npr4g"]
+[ext_resource type="FontFile" uid="uid://k1qjge3q6bha" path="res://fonts/Cinzel_Decorative,Press_Start_2P/Cinzel_Decorative/CinzelDecorative-Black.ttf" id="4_jqn4v"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nhrkl"]
 content_margin_left = 5.0
@@ -156,14 +159,17 @@ layout_mode = 2
 [node name="Title" type="Label" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=1888398278]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_cdv6k")
 theme_override_font_sizes/font_size = 64
-text = "Eva Two Tales Kitsune"
+text = "Eva
+Two Tales
+Kitsune"
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 2
 
 [node name="StartButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=38431286]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -175,10 +181,10 @@ theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
 
 [node name="ContinueButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=1820123663]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -190,10 +196,10 @@ theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
 
 [node name="SelectorNiveles" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=317658958]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -205,10 +211,10 @@ theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
 
 [node name="Opciones" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=997449116]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -220,10 +226,25 @@ theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
-text = "Startt"
+
+[node name="Creditos" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=768687418]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
 
 [node name="QuitGameButton" type="Button" parent="MainMenu/MarginContainer/CenterContainer/VBoxContainer" unique_id=593025086]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jqn4v")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -269,6 +290,7 @@ layout_mode = 2
 
 [node name="LanguageButton" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=1909700905]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -284,6 +306,7 @@ text = "Startt"
 
 [node name="Sonido" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=1418975951]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -299,6 +322,7 @@ text = "Startt"
 
 [node name="Controles" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=1550948739]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -314,6 +338,7 @@ text = "Startt"
 
 [node name="BackButton" type="Button" parent="Opciones/MarginContainer/CenterContainer/VBoxContainer" unique_id=1254991548]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -359,6 +384,7 @@ layout_mode = 2
 
 [node name="Control" type="Button" parent="Controles/MarginContainer/CenterContainer/VBoxContainer" unique_id=1906040943]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -374,6 +400,7 @@ text = "Startt"
 
 [node name="BotonDeInteract" type="Button" parent="Controles/MarginContainer/CenterContainer/VBoxContainer" unique_id=1810334162]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -389,6 +416,7 @@ text = "Startt"
 
 [node name="BackButton" type="Button" parent="Controles/MarginContainer/CenterContainer/VBoxContainer" unique_id=569062929]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -432,18 +460,21 @@ layout_mode = 2
 
 [node name="LabelSonido" type="Label" parent="Sonido/CenterContainer/VBoxContainer" unique_id=879782236]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="SonidoSlider" type="HSlider" parent="Sonido/CenterContainer/VBoxContainer" unique_id=747968794]
 layout_mode = 2
 
 [node name="LabelMusica" type="Label" parent="Sonido/CenterContainer/VBoxContainer" unique_id=962517015]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="MusicaSlider" type="HSlider" parent="Sonido/CenterContainer/VBoxContainer" unique_id=239391581]
 layout_mode = 2
 
 [node name="LabelVoces" type="Label" parent="Sonido/CenterContainer/VBoxContainer" unique_id=1759323259]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="VocesSlider" type="HSlider" parent="Sonido/CenterContainer/VBoxContainer" unique_id=1807360056]
 layout_mode = 2
@@ -496,10 +527,12 @@ layout_mode = 2
 
 [node name="BackButton" type="Button" parent="SelectorNiveles/CenterContainer/VBoxContainer" unique_id=2112446187]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="Title" type="Label" parent="SelectorNiveles/CenterContainer/VBoxContainer" unique_id=1698980161]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_cdv6k")
 theme_override_font_sizes/font_size = 64
 text = "Eva Two Tales Kitsune"
 horizontal_alignment = 1
@@ -539,14 +572,17 @@ layout_mode = 2
 
 [node name="Message" type="Label" parent="GameOver/CenterContainer/VBoxContainer" unique_id=610805773]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 text = "Has muerto
 "
 
 [node name="RetryButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer" unique_id=1364654888]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="MainMenuButton" type="Button" parent="GameOver/CenterContainer/VBoxContainer" unique_id=1713026728]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="LanguageMenu" type="Control" parent="." unique_id=208200647]
 layout_mode = 3
@@ -571,9 +607,11 @@ layout_mode = 2
 
 [node name="Title" type="Label" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=804674658]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="SpanishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=1422576158]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -589,6 +627,7 @@ text = "Startt"
 
 [node name="EnglishButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=634350840]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -604,6 +643,7 @@ text = "Startt"
 
 [node name="BackButton" type="Button" parent="LanguageMenu/CenterContainer/VBoxContainer" unique_id=285628134]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
@@ -672,10 +712,12 @@ alignment = 1
 
 [node name="Message" type="Label" parent="Pause/CenterContainer/VBoxContainer" unique_id=2024934132]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="Continuar" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=507573745]
 z_index = 2
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
@@ -692,6 +734,7 @@ text = "Start"
 [node name="MainMenuButton" type="Button" parent="Pause/CenterContainer/VBoxContainer" unique_id=1726611479]
 z_index = 2
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
@@ -744,9 +787,11 @@ alignment = 1
 
 [node name="Message" type="Label" parent="Confirmacion/CenterContainer/VBoxContainer" unique_id=59311020]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 
 [node name="YesButton" type="Button" parent="Confirmacion/CenterContainer/VBoxContainer" unique_id=970344171]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
@@ -762,6 +807,7 @@ text = "Start"
 
 [node name="NoButton" type="Button" parent="Confirmacion/CenterContainer/VBoxContainer" unique_id=492037568]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_npr4g")
 theme_override_styles/normal = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_fpuge")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_agiu6")
@@ -784,6 +830,7 @@ text = "Exit"
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles" to="." method="_on_selector_niveles_pressed"]
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/Opciones" to="." method="_on_selector_niveles_pressed"]
+[connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/Creditos" to="." method="_on_creditos_pressed"]
 [connection signal="pressed" from="MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton" to="." method="_on_quit_game_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/LanguageButton" to="." method="_on_language_button_pressed"]
 [connection signal="pressed" from="Opciones/MarginContainer/CenterContainer/VBoxContainer/Sonido" to="." method="_on_sonido_button_pressed"]

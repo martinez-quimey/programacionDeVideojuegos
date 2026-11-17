@@ -5,6 +5,7 @@ signal start_game
 signal retry_game
 signal main_menu
 signal continue_game
+signal mostrar_creditos
 
 var pantallas_visibles_antes_de_advertencia: Array[Control] = []
 
@@ -111,6 +112,13 @@ func _ready() -> void:
 	var quit_button = $MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton
 	if not quit_button.pressed.is_connected(_on_quit_game_button_pressed):
 		quit_button.pressed.connect(_on_quit_game_button_pressed)
+		
+		# Botón de créditos.
+	var creditos_button = _buscar_nodo_por_nombre($MainMenu, "Creditos")
+
+	if creditos_button is Button:
+		if not creditos_button.pressed.is_connected(_on_creditos_pressed):
+			creditos_button.pressed.connect(_on_creditos_pressed)
 
 	var retry_button = $GameOver/CenterContainer/VBoxContainer/RetryButton
 	if not retry_button.pressed.is_connected(_on_retry_button_pressed):
@@ -1221,13 +1229,17 @@ func update_language() -> void:
 	var es: bool = Settings.language == "es"
 
 	# Menú principal.
-	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/Title.text = "Eva Two Tales Kitsune"
+	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/Title.text = "Eva\nTwo Tales\nKitsune"
 	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/StartButton.text = "Nueva partida" if es else "New Game"
 	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/ContinueButton.text = "Continuar" if es else "Continue"
 	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/SelectorNiveles.text = "Selector de niveles" if es else "Level Select"
 	$MainMenu/MarginContainer/CenterContainer/VBoxContainer/QuitGameButton.text = "Cerrar juego" if es else "Quit Game"
 	_actualizar_texto_boton_opciones_menu("Opciones" if es else "Options")
+		# Botón de créditos.
+	var boton_creditos = _buscar_nodo_por_nombre($MainMenu, "Creditos")
 
+	if boton_creditos is Button:
+		boton_creditos.text = "Créditos" if es else "Credits"
 	# Menú de opciones.
 	var opciones = $Opciones/MarginContainer/CenterContainer/VBoxContainer
 	opciones.get_node("LanguageButton").text = "Idioma" if es else "Language"
@@ -1971,3 +1983,11 @@ func _actualizar_estado_flechas(tipo: String) -> void:
 			else Color.WHITE
 		)
 		
+
+func _on_creditos_pressed() -> void:
+
+	print("HUD: mostrando créditos")
+
+	$MainMenu.hide()
+
+	mostrar_creditos.emit()

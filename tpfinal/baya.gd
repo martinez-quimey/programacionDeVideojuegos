@@ -2,6 +2,7 @@
 extends Node2D
 class_name Baya
 
+
 # =========================================================
 # TIPO DE BAYA
 # =========================================================
@@ -15,8 +16,12 @@ enum TipoBaya {
 @export var id_baya: String = ""
 @export var cantidad: int = 1
 
+const PARTICULA_ROJA = preload("res://entities/recursos/particulas/particulas_rojas.tscn")
+const PARTICULA_AMARILLA = preload("res://entities/recursos/particulas/particulas_amarillas.tscn")
+
 # Permite recordar si la baya ya estaba recogida al entrar al árbol.
 var ya_estaba_obtenida: bool = false
+var recogida: bool = false
 
 
 # =========================================================
@@ -26,9 +31,6 @@ var ya_estaba_obtenida: bool = false
 @onready var vida_sprite: Sprite2D = $Vida
 @onready var energia_sprite: Sprite2D = $Energia
 @onready var interaction_area: Area2D = $InteractionArea
-
-@onready var particula_roja: GPUParticles2D = $ParticulaRoja
-@onready var particula_amarilla: GPUParticles2D = $ParticulaAmarilla
 
 
 # =========================================================
@@ -158,7 +160,6 @@ func _ready() -> void:
 		ya_estaba_obtenida
 	)
 
-	# No configurar ni mostrar una baya que ya fue recogida.
 	if ya_estaba_obtenida or ya_fue_obtenida():
 		print(
 			"[BAYA] Se elimina en _ready porque ya estaba recogida: ",
@@ -176,9 +177,6 @@ func _ready() -> void:
 		return
 
 	actualizar_sprite()
-
-	particula_roja.emitting = false
-	particula_amarilla.emitting = false
 
 	if not interaction_area.body_entered.is_connected(_on_body_entered):
 		interaction_area.body_entered.connect(_on_body_entered)
@@ -209,12 +207,14 @@ func actualizar_sprite() -> void:
 	)
 
 
-
 # =========================================================
 # CONTACTO
 # =========================================================
 
 func _on_body_entered(body: Node) -> void:
+	if recogida:
+		return
+
 	print(
 		"[BAYA] body_entered | Cuerpo: ",
 		body.name,
@@ -237,6 +237,9 @@ func _on_body_entered(body: Node) -> void:
 # =========================================================
 
 func recoger_baya(player: Node) -> void:
+	if recogida:
+		return
+
 	print(
 		"\n[BAYA] INICIO DE RECOGIDA | ID: ",
 		id_baya,
@@ -258,6 +261,9 @@ func recoger_baya(player: Node) -> void:
 			id_unico
 		)
 		return
+
+	recogida = true
+	interaction_area.set_deferred("monitoring", false)
 
 	if tipo_baya == TipoBaya.VIDA:
 		aumentar_vidaMax(player)
@@ -289,6 +295,7 @@ func recoger_baya(player: Node) -> void:
 		push_warning(
 			"[BAYA] Recogida cancelada: tipo de baya inválido."
 		)
+		recogida = false
 		return
 
 	print("[BAYA] Intentando guardar partida...")
@@ -311,37 +318,39 @@ func recoger_baya(player: Node) -> void:
 # PARTÍCULAS
 # =========================================================
 
+
+
+# =========================================================
+# PARTÍCULAS
+# =========================================================
+
 func reproducir_particulas() -> void:
-	var particulas: GPUParticles2D
+
+	var posicion := global_position
+
+	var escena_particulas: PackedScene
 
 	if tipo_baya == TipoBaya.VIDA:
-		particulas = particula_roja
+		escena_particulas = PARTICULA_ROJA
 	else:
-		particulas = particula_amarilla
+		escena_particulas = PARTICULA_AMARILLA
 
-	var transformacion_global: Transform2D = particulas.global_transform
+	var particulas = escena_particulas.instantiate()
 
-	remove_child(particulas)
+	get_tree().current_scene.add_child(particulas)
 
-	var nivel: Node = get_tree().current_scene
+	particulas.global_position = posicion
 
-	if nivel == null:
-		push_warning(
-			"[BAYA] No se pudieron reproducir las partículas: current_scene es null."
-		)
-		particulas.queue_free()
-		return
-
-	nivel.add_child(particulas)
-	particulas.global_transform = transformacion_global
+	# Iniciar la emisión de partículas.
 	particulas.restart()
 	particulas.emitting = true
 
+	# Liberar las partículas cuando termine su emisión.
+	particulas.finished.connect(particulas.queue_free)
+
 	print(
 		"[BAYA] Partículas reproducidas | Tipo: ",
-		TipoBaya.keys()[tipo_baya],
-		" | Escena: ",
-		nivel.scene_file_path
+		TipoBaya.keys()[tipo_baya]
 	)
 
 
@@ -454,8 +463,11 @@ static func fue_obtenida(
 
 	return false
 
-# Recalcula si la baya debe existir en el nivel.
-# Puede llamarse desde el nivel después de cargar los datos guardados.
+
+# =========================================================
+# RECALCULAR ESTADO
+# =========================================================
+
 func recalcular_estado() -> void:
 	print("[BAYA][RECALCULAR] Iniciando comprobación.")
 	print("[BAYA][RECALCULAR] Nodo: ", get_path())
@@ -481,23 +493,34 @@ func recalcular_estado() -> void:
 	actualizar_sprite()
 
 
-# Comprueba los datos persistidos según el tipo de baya.
+# =========================================================
+# COMPROBAR SI YA FUE OBTENIDA
+# =========================================================
+
 func ya_fue_obtenida() -> bool:
 	var id_unico: String = obtener_id_unico()
 
 	match tipo_baya:
 		TipoBaya.VIDA:
 			var obtenida: bool = Settings.objetosVidaObtenidos.has(id_unico)
-			print("[BAYA][COMPROBAR] VIDA | ID: ", id_unico,
+
+			print(
+				"[BAYA][COMPROBAR] VIDA | ID: ", id_unico,
 				" | Lista: ", Settings.objetosVidaObtenidos,
-				" | Encontrada: ", obtenida)
+				" | Encontrada: ", obtenida
+			)
+
 			return obtenida
 
 		TipoBaya.ENERGIA:
 			var obtenida: bool = Settings.objetosEnergiaObtenidos.has(id_unico)
-			print("[BAYA][COMPROBAR] ENERGIA | ID: ", id_unico,
+
+			print(
+				"[BAYA][COMPROBAR] ENERGIA | ID: ", id_unico,
 				" | Lista: ", Settings.objetosEnergiaObtenidos,
-				" | Encontrada: ", obtenida)
+				" | Encontrada: ", obtenida
+			)
+
 			return obtenida
 
 	return false

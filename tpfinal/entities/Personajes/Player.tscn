@@ -301,14 +301,16 @@ one_shot = true
 script = ExtResource("2_uqenk")
 DURACION_TURBO = 0.17
 sonido_saltoFuego = ExtResource("3_2oybu")
-JUMP_FIRE_FORCE = -680.0
+JUMP_FIRE_FORCE = -650.0
 projectile_scene = ExtResource("4_nglq2")
 
 [node name="estadoManual" type="Node2D" parent="." unique_id=395898327 groups=["jugador"]]
 script = ExtResource("1_utwpb")
+JUMP_FORCE = -550.0
 
 [node name="estadoAutomatico" type="Node2D" parent="." unique_id=885472935 groups=["jugador"]]
 script = ExtResource("17_jkysx")
+JUMP_FORCE = -550.0
 
 [node name="HitboxTornado" type="Area2D" parent="." unique_id=595204128]
 

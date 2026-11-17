@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" uid="uid://ccwmkj3cunj" path="res://script/main.gd" id="1_36ije"]
 [ext_resource type="PackedScene" uid="uid://dnhtvjtnlqq8e" path="res://entities/hud.tscn" id="2_1v22p"]
+[ext_resource type="PackedScene" uid="uid://bhi7hqr80xnkv" path="res://entities/creditos.tscn" id="2_2runn"]
 [ext_resource type="PackedScene" uid="uid://cuailcqpldjar" path="res://entities/levels/level_1/El bosque espiritual.tscn" id="2_36ije"]
+[ext_resource type="PackedScene" uid="uid://mjnoyg4vcl0y" path="res://entities/transicion_nivel.tscn" id="3_1v22p"]
 
 [node name="Main" type="Node2D" unique_id=495002103]
 script = ExtResource("1_36ije")
+escena_creditos = ExtResource("2_2runn")
 level1 = ExtResource("2_36ije")
+escena_transicion = ExtResource("3_1v22p")
 
 [node name="HUD" parent="." unique_id=1301688024 instance=ExtResource("2_1v22p")]
 

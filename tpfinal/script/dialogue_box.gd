@@ -20,7 +20,7 @@ func _ready() -> void:
 
 
 func show_line(line: DialogueLine) -> void:
-
+	Settings.sePuedePausar = false
 	panel.visible = true
 
 	name_label.text = line.speaker
@@ -39,6 +39,6 @@ func show_line(line: DialogueLine) -> void:
 
 
 func hide_dialogue() -> void:
-
+	Settings.sePuedePausar = true
 	panel.visible = false
 	audio_dialogo.stop()

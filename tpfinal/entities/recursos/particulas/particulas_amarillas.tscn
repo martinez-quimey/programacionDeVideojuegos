@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://365xqsvdosqt"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_fmwq5"]
+load_path = "res://.godot/imported/particula amariilla.png-c7a0a25cbf4899117600e93883362726.ctex"
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5oy7b"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = -6.0
+initial_velocity_max = 146.0
+gravity = Vector3(0, 98, 0)
+
+[node name="ParticulasAmarillas" type="GPUParticles2D" unique_id=873262286]
+texture_filter = 1
+emitting = false
+texture = SubResource("CompressedTexture2D_fmwq5")
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_5oy7b")

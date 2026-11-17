@@ -1,3 +1,4 @@
+
 # Esta baya no aumenta el máximo.
 # Solo aumenta la vida actual.
 extends Node2D
@@ -8,8 +9,9 @@ extends Node2D
 # =========================================================
 
 @export var id_baya: String = ""
-
 @export var valor: int = 1
+
+const PARTICULA_ROJA = preload("res://entities/recursos/particulas/particulas_rojas.tscn")
 
 
 # =========================================================
@@ -17,7 +19,8 @@ extends Node2D
 # =========================================================
 
 @onready var interaction_area: Area2D = $InteractionArea
-@onready var particulas: GPUParticles2D = $Particulas
+
+var recogida: bool = false
 
 
 # =========================================================
@@ -26,10 +29,6 @@ extends Node2D
 
 func _ready() -> void:
 
-	# Las partículas no deben emitirse inicialmente.
-	particulas.emitting = false
-
-	# Conectar el área de interacción.
 	interaction_area.body_entered.connect(_on_body_entered)
 
 
@@ -38,6 +37,9 @@ func _ready() -> void:
 # =========================================================
 
 func _on_body_entered(body: Node) -> void:
+
+	if recogida:
+		return
 
 	if not body.is_in_group("jugador"):
 		return
@@ -53,32 +55,23 @@ func _on_body_entered(body: Node) -> void:
 
 func recoger_baya(player: Node) -> void:
 
+	recogida = true
+
+	var posicion := global_position
+
 	player.aumentar_vida(valor)
 
-	reproducir_particulas()
+	var particulas = PARTICULA_ROJA.instantiate()
 
-	queue_free()
+	get_tree().current_scene.add_child(particulas)
 
+	particulas.global_position = posicion
 
-# =========================================================
-# REPRODUCIR PARTÍCULAS
-# =========================================================
-
-func reproducir_particulas() -> void:
-
-	# Guardar la posición global del efecto.
-	var transformacion_global := particulas.global_transform
-
-	# Separar las partículas de la baya.
-	remove_child(particulas)
-
-	# Agregarlas a la escena actual.
-	var nivel := get_tree().current_scene
-	nivel.add_child(particulas)
-
-	# Mantener la posición original.
-	particulas.global_transform = transformacion_global
-
-	# Reproducir la explosión.
+	# Iniciar la emisión de partículas.
 	particulas.restart()
 	particulas.emitting = true
+
+	# Liberar las partículas cuando termine su emisión.
+	particulas.finished.connect(particulas.queue_free)
+
+	queue_free()

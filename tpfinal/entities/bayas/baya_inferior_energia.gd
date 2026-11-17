@@ -1,3 +1,4 @@
+
 # Esta baya no aumenta el máximo.
 # Solo aumenta la energía actual.
 extends Node2D
@@ -8,8 +9,9 @@ extends Node2D
 # =========================================================
 
 @export var id_baya: String = ""
-
 @export var valor: int = 1
+
+const PARTICULA_AMARILLA = preload("res://entities/recursos/particulas/particulas_amarillas.tscn")
 
 
 # =========================================================
@@ -17,7 +19,8 @@ extends Node2D
 # =========================================================
 
 @onready var interaction_area: Area2D = $InteractionArea
-@onready var particulas: GPUParticles2D = $Particulas
+
+var recogida: bool = false
 
 
 # =========================================================
@@ -25,11 +28,6 @@ extends Node2D
 # =========================================================
 
 func _ready() -> void:
-
-	# Las partículas no deben emitirse inicialmente.
-	particulas.emitting = false
-
-	# Conectar el área de interacción.
 	interaction_area.body_entered.connect(_on_body_entered)
 
 
@@ -38,47 +36,40 @@ func _ready() -> void:
 # =========================================================
 
 func _on_body_entered(body: Node) -> void:
+	if recogida:
+		return
 
 	if not body.is_in_group("jugador"):
 		return
-
-	print("BAYA DE ENERGÍA RECOGIDA: ", id_baya)
 
 	recoger_baya(body)
 
 
 # =========================================================
-# RECOGER BAYA
+# RECOGER BAYa
 # =========================================================
 
 func recoger_baya(player: Node) -> void:
+	if recogida:
+		return
+
+	recogida = true
+
+	var posicion := global_position
 
 	player.aumentar_energia(valor)
 
-	reproducir_particulas()
+	var particulas = PARTICULA_AMARILLA.instantiate()
 
-	queue_free()
+	get_tree().current_scene.add_child(particulas)
 
+	particulas.global_position = posicion
 
-# =========================================================
-# REPRODUCIR PARTÍCULAS
-# =========================================================
-
-func reproducir_particulas() -> void:
-
-	# Guardar la posición global del efecto.
-	var transformacion_global := particulas.global_transform
-
-	# Separar las partículas de la baya.
-	remove_child(particulas)
-
-	# Agregarlas a la escena actual.
-	var nivel := get_tree().current_scene
-	nivel.add_child(particulas)
-
-	# Mantener la posición original.
-	particulas.global_transform = transformacion_global
-
-	# Reproducir la explosión.
+	# Iniciar la emisión de partículas.
 	particulas.restart()
 	particulas.emitting = true
+
+	# Liberar las partículas cuando termine su emisión.
+	particulas.finished.connect(particulas.queue_free)
+
+	queue_free()

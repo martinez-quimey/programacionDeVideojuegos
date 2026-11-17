@@ -69,6 +69,7 @@ func _on_body_entered(body: Node) -> void:
 
 	# Si no hay siguiente nivel, termina la beta.
 	if levelSiguiente == null:
+
 		print("FIN DE LA BETA: no hay siguiente nivel")
 
 		Settings.checkpoint = 0
@@ -77,8 +78,9 @@ func _on_body_entered(body: Node) -> void:
 		Save.partidaFinalizada = true
 		Save.guardar_partida()
 
-		print("IR A NIVEL: volviendo al menú")
-		main._on_main_menu()
+		print("IR A NIVEL: mostrando créditos")
+
+		main.mostrar_creditos()
 		return
 
 	# Cargar el siguiente nivel.

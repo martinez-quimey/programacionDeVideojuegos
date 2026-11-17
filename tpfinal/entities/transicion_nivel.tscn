@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://mjnoyg4vcl0y"]
+
+[ext_resource type="Script" uid="uid://dfwoufdkjuc7j" path="res://transicion_nivel.gd" id="1_r7w71"]
+[ext_resource type="FontFile" uid="uid://yqt43gvqflc6" path="res://fonts/Cinzel_Decorative/CinzelDecorative-Regular.ttf" id="2_a3kgf"]
+
+[sub_resource type="FontVariation" id="FontVariation_3c5qw"]
+base_font = ExtResource("2_a3kgf")
+
+[sub_resource type="FontVariation" id="FontVariation_5p1bl"]
+base_font = SubResource("FontVariation_3c5qw")
+
+[node name="TransicionNivel" type="CanvasLayer" unique_id=208669157]
+layer = 100
+script = ExtResource("1_r7w71")
+
+[node name="Pantalla" type="Control" parent="." unique_id=1138424769]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FondoNegro" type="ColorRect" parent="Pantalla" unique_id=1255402468]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="NombreNivel" type="Label" parent="Pantalla" unique_id=307609163]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = SubResource("FontVariation_5p1bl")
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 2
+vertical_alignment = 1
