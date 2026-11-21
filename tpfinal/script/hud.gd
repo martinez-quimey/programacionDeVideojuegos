@@ -823,30 +823,78 @@ func _cambiar_selector_con_flechas(nodo: Node, direccion: int) -> void:
 		_aplicar_opcion_interaccion_elegida(nueva_opcion)
 
 
+
 func _input(event: InputEvent) -> void:
-	var raiz = get_node_or_null("Controles")
-	if raiz == null or not raiz.visible:
-		return
+
 	if not event is InputEventKey:
 		return
 
 	var tecla := event as InputEventKey
-	if not tecla.pressed or tecla.echo:
-		return
 
-	var enfocado := get_viewport().gui_get_focus_owner()
-	if enfocado != _obtener_selector_control() and enfocado != _obtener_selector_interaccion():
+	if not tecla.pressed:
 		return
 
 	var codigo_fisico := tecla.physical_keycode
 	var codigo_logico := tecla.keycode
-	if codigo_fisico in [KEY_LEFT, KEY_A] or codigo_logico in [KEY_LEFT, KEY_A]:
+
+	var izquierda := (
+		codigo_fisico == KEY_LEFT
+		or codigo_logico == KEY_LEFT
+	)
+
+	var derecha := (
+		codigo_fisico == KEY_RIGHT
+		or codigo_logico == KEY_RIGHT
+	)
+
+	if not izquierda and not derecha:
+		return
+
+	# =====================================================
+	# SELECTORES DE VOLUMEN
+	# =====================================================
+
+	if $Sonido.visible:
+
+		var enfocado := get_viewport().gui_get_focus_owner()
+
+		if enfocado is HSlider:
+
+			var direccion := -1.0 if izquierda else 1.0
+
+			# Pulsación inicial: 1 punto.
+			# Mientras se mantiene presionada: 5 puntos.
+			var incremento := 5.0 if tecla.echo else 1.0
+
+			enfocado.value += direccion * incremento
+
+			get_viewport().set_input_as_handled()
+			return
+
+	# =====================================================
+	# SELECTORES DE CONTROLES
+	# =====================================================
+
+	var raiz = get_node_or_null("Controles")
+
+	if raiz == null or not raiz.visible:
+		return
+
+	if tecla.echo:
+		return
+
+	var enfocado := get_viewport().gui_get_focus_owner()
+
+	if enfocado != _obtener_selector_control() and enfocado != _obtener_selector_interaccion():
+		return
+
+	if izquierda or codigo_fisico == KEY_A or codigo_logico == KEY_A:
 		_cambiar_selector_con_flechas(enfocado, -1)
 		get_viewport().set_input_as_handled()
-	elif codigo_fisico in [KEY_RIGHT, KEY_D] or codigo_logico in [KEY_RIGHT, KEY_D]:
+
+	elif derecha or codigo_fisico == KEY_D or codigo_logico == KEY_D:
 		_cambiar_selector_con_flechas(enfocado, 1)
 		get_viewport().set_input_as_handled()
-
 
 # =========================================================
 # NAVEGACIÓN CON TECLADO
