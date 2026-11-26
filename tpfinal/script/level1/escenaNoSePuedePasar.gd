@@ -127,4 +127,4 @@ func _on_escena_no_puedo_pasar_por_aqui_body_entered(body: Node2D) -> void:
 			DialogueManager.start_dialogue(dialogue)
 
 	# Eliminar el trigger.
-	queue_free()
+	queue_free.call_deferred()

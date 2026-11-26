@@ -29,4 +29,4 @@ func _on_body_entered(body):
 		dialogue.create_dialogue()
 
 		DialogueManager.start_dialogue(dialogue)
-		queue_free()
+		queue_free.call_deferred()

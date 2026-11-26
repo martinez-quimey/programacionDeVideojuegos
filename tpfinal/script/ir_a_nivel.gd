@@ -3,41 +3,20 @@ extends Area2D
 
 @export var levelSiguiente: PackedScene
 
+const UMBRAL_RETRASO_SEGUNDOS: float = 10.0
+
 
 func _ready() -> void:
-	print("")
-	print("========================================")
-	print("IR A NIVEL: empieza _ready()")
-	print("Nodo: ", get_path())
-	print("Escena del nodo: ", scene_file_path)
-	print("Nivel siguiente asignado: ", levelSiguiente != null)
-
-	if levelSiguiente != null:
-		print("Ruta del nivel siguiente: ", levelSiguiente.resource_path)
-
-	body_entered.connect(_on_body_entered)
-
-	print("IR A NIVEL: señal body_entered conectada")
-	print("IR A NIVEL: _ready() terminado")
-	print("========================================")
+	# Evitar conexiones duplicadas.
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
 
 
 func _on_body_entered(body: Node) -> void:
-	print("")
-	print("========================================")
-	print("IR A NIVEL: body_entered")
-	print("Cuerpo detectado: ", body.name)
-	print("Tipo del cuerpo: ", body.get_class())
-	print("Pertenece al grupo jugador: ", body.is_in_group("jugador"))
-
 	if not body.is_in_group("jugador"):
-		print("IR A NIVEL: se ignora el cuerpo porque no es jugador")
 		return
 
-	print("ENTRÓ AL IR A NIVEL")
-
 	set_deferred("monitoring", false)
-	print("IR A NIVEL: monitoring desactivado de forma diferida")
 
 	var main = Settings.getMain()
 
@@ -47,57 +26,75 @@ func _on_body_entered(body: Node) -> void:
 
 	var ruta_nivel_terminado: String = main.obtener_ruta_nivel_actual()
 
-	print("Ruta del nivel terminado: ", ruta_nivel_terminado)
-
 	if ruta_nivel_terminado.is_empty():
 		push_error("IR A NIVEL: no se pudo obtener la ruta del nivel terminado")
 		return
 
-	# Obtener el número/ID del nivel actual.
 	var numero_nivel: int = int(obtener_dato_nivel("numero_nivel"))
-
-	print("Número/ID del nivel terminado: ", numero_nivel)
 
 	if numero_nivel <= 0:
 		push_error("IR A NIVEL: numero_nivel no está configurado correctamente")
 		return
 
-	# Registrar la finalización en Settings.
-	Settings.marcar_nivel_completado(numero_nivel)
-
-	print("Niveles completados: ", Settings.obtener_ids_niveles_completados())
+	# Registrar la finalización.
+	medir_retraso("marcar_nivel_completado", func():
+		Settings.marcar_nivel_completado(numero_nivel)
+	)
 
 	# Si no hay siguiente nivel, termina la beta.
 	if levelSiguiente == null:
-
-		print("FIN DE LA BETA: no hay siguiente nivel")
-
 		Settings.checkpoint = 0
 		Settings.nivelActual = ""
 
 		Save.partidaFinalizada = true
-		Save.guardar_partida()
 
-		print("IR A NIVEL: mostrando créditos")
+		medir_retraso("guardar_partida_finalizada", func():
+			Save.guardar_partida()
+		)
 
-		main.mostrar_creditos()
+		medir_retraso("mostrar_creditos", func():
+			main.mostrar_creditos()
+		)
+
 		return
 
 	# Cargar el siguiente nivel.
-	print("IR A NIVEL: hay un siguiente nivel")
-	print("Ruta siguiente: ", levelSiguiente.resource_path)
-
 	Settings.nivelActual = levelSiguiente.resource_path
 	Settings.checkpoint = 0
 
-	Save.guardar_partida()
-	load_level(levelSiguiente)
+	medir_retraso("guardar_partida", func():
+		Save.guardar_partida()
+	)
+
+	medir_retraso("cargar_siguiente_nivel", func():
+		load_level(levelSiguiente)
+	)
 
 
 # =========================================================
-# COMPLETAR NIVEL
+# DETECCIÓN DE RETRASOS
 # =========================================================
 
+func medir_retraso(nombre_operacion: String, operacion: Callable) -> void:
+	var inicio: int = Time.get_ticks_msec()
+
+	operacion.call()
+
+	var duracion: float = (Time.get_ticks_msec() - inicio) / 1000.0
+
+	if duracion > UMBRAL_RETRASO_SEGUNDOS:
+		print(
+			"[RETRASO] ",
+			nombre_operacion,
+			" tardó ",
+			duracion,
+			" segundos."
+		)
+
+
+# =========================================================
+# OBTENER DATOS DEL NIVEL
+# =========================================================
 
 func obtener_dato_nivel(propiedad: String) -> String:
 	var nodo: Node = self
@@ -117,22 +114,18 @@ func obtener_dato_nivel(propiedad: String) -> String:
 # =========================================================
 
 func load_level(nivel: PackedScene) -> void:
-	print("LOAD_LEVEL DE IR A NIVEL: comienza")
-
 	Settings.checkpoint = 0
-	print("Checkpoint reiniciado a 0")
 
 	if nivel == null:
 		push_error("LOAD_LEVEL DE IR A NIVEL: levelSiguiente está vacío")
 		return
 
 	var main = Settings.getMain()
-	print("LOAD_LEVEL DE IR A NIVEL: Main = ", main)
 
 	if main == null:
 		push_error("LOAD_LEVEL DE IR A NIVEL: no se encontró Main")
 		return
 
-	print("LOAD_LEVEL DE IR A NIVEL: llamando a Main.load_level()")
-	main.load_level(nivel)
-	print("LOAD_LEVEL DE IR A NIVEL: llamada realizada")
+	medir_retraso("Main.load_level", func():
+		main.load_level(nivel)
+	)

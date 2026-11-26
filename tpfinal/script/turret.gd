@@ -78,7 +78,7 @@ func fire():
 func _on_projectile_delete_requested(projectile):
 
 	projectile_container.remove_child(projectile)
-	projectile.queue_free()
+	projectile.queue_free.call_deferred()
 
 
 func animacionHerida():
@@ -96,7 +96,7 @@ func animacionHerida():
 
 func morir():
 
-	queue_free()
+	queue_free.call_deferred()
 
 
 func herir(num: int):

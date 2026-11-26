@@ -2,47 +2,125 @@
 
 [ext_resource type="PackedScene" uid="uid://m2b170sodkps" path="res://entities/abstract/abstract_npc.tscn" id="1_uuypt"]
 [ext_resource type="Script" uid="uid://c23vbt8qm3ycc" path="res://entities/npc/ciervo_1.gd" id="2_s3wjb"]
-[ext_resource type="Texture2D" uid="uid://bldhn2hubvlxo" path="res://sprites/escenario/recursos/cartel.png" id="3_lbbbw"]
-[ext_resource type="PackedScene" uid="uid://365xqsvdosqt" path="res://entities/recursos/particulas/particulas_amarillas.tscn" id="4_uuypt"]
-[ext_resource type="Script" uid="uid://dm2qrhhw6it8h" path="res://entities/recursos/particulas/particulasDeCartel.gd" id="5_s3wjb"]
+[ext_resource type="Texture2D" uid="uid://c2lpr1pv3blv0" path="res://sprites/escenario/recursos/cartel.png" id="3_lbbbw"]
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ilwpg"]
-blend_mode = 1
+[sub_resource type="AtlasTexture" id="AtlasTexture_lbbbw"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(0, 0, 64, 64)
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_s3wjb"]
-particle_flag_disable_z = true
-emission_shape = 3
-emission_box_extents = Vector3(12, 0.1, 1)
-direction = Vector3(0, 9, 0)
-spread = 10.373
-initial_velocity_min = 3.0
-initial_velocity_max = 9.0
-gravity = Vector3(0, 50, 0)
-turbulence_enabled = true
+[sub_resource type="AtlasTexture" id="AtlasTexture_uuypt"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s3wjb"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ilwpg"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2mnll"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wmvmb"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fsdqs"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_48b5c"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j22cq"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wyycu"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(640, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6gmnu"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4617t"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fd7my"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1gpyq"]
+atlas = ExtResource("3_lbbbw")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4jn62"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lbbbw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uuypt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s3wjb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ilwpg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2mnll")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wmvmb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fsdqs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_48b5c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j22cq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wyycu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6gmnu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4617t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fd7my")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1gpyq")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 4.3
+}]
 
 [node name="Cartel" unique_id=1291660537 instance=ExtResource("1_uuypt")]
 scale = Vector2(6, 6)
 script = ExtResource("2_s3wjb")
 dialogue_script = null
 
-[node name="Sprite2D" type="Sprite2D" parent="." index="1" unique_id=1247118749]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="1" unique_id=643669772]
 texture_filter = 1
 position = Vector2(0, -9.536743e-07)
 scale = Vector2(0.4, 0.4)
-texture = ExtResource("3_lbbbw")
-
-[node name="ParticulasAmarillas" parent="." index="2" unique_id=873262286 instance=ExtResource("4_uuypt")]
-material = SubResource("CanvasItemMaterial_ilwpg")
-position = Vector2(0, 2.3)
-emitting = true
-lifetime = 3.0
-one_shot = false
-explosiveness = 0.02
-fixed_fps = 23
-process_material = SubResource("ParticleProcessMaterial_s3wjb")
-script = ExtResource("5_s3wjb")
-
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="ParticulasAmarillas" index="0" unique_id=715003292]
+sprite_frames = SubResource("SpriteFrames_4jn62")
+frame_progress = 0.1757822
 
 [connection signal="body_entered" from="InteractionArea" to="." method="_on_interaction_area_body_entered"]
 [connection signal="body_exited" from="InteractionArea" to="." method="_on_interaction_area_body_exited"]

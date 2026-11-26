@@ -113,6 +113,18 @@ signal died
 # ==========================================
 # PENDIENTES
 # ==========================================
+# Impulso inmediato al empezar a pulsar cuesta abajo.
+@export var IMPULSO_INICIAL_CUESTA_ABAJO: float = 60.0
+
+# Límite máximo de velocidad de caída en pendientes.
+@export var VELOCIDAD_MAXIMA_CAIDA_PENDIENTE: float = 850.0
+
+# Fuerza horizontal del salto desde una pendiente.
+# Un valor mayor produce un empujón lateral más fuerte.
+@export var IMPULSO_LATERAL_SALTO_PENDIENTE: float = 300.0
+
+# Control para aplicar el impulso inicial una sola vez.
+var estaba_pulsando_cuesta_abajo: bool = false
 var ignorar_pendiente_mientras_asciende: bool = false
 var altura_inicio_salto: float = 0.0
 
@@ -131,7 +143,7 @@ const DISTANCIA_SNAP_SUELO: float = 20.0
 @export var VELOCIDAD_DESLIZAMIENTO_PENDIENTE: float = 190.0
 
 # Aceleración mientras se desliza.
-@export var ACELERACION_DESLIZAMIENTO_PENDIENTE: float = 450.0
+@export var ACELERACION_DESLIZAMIENTO_PENDIENTE: float = 650.0
 
 # Rotación visual máxima para evitar inclinaciones absurdas.
 @export var ROTACION_MAXIMA_PENDIENTE: float = 65.0
@@ -146,7 +158,7 @@ var tiempo_sin_contacto_pendiente: float = 0.0
 const TOLERANCIA_CONTACTO_PENDIENTE: float = 0.1
 
 var tiempo_detectando_pendiente: float = 0.0
-const TIEMPO_CONFIRMACION_PENDIENTE: float = 0.08
+const TIEMPO_CONFIRMACION_PENDIENTE: float = 0.1
 
 # ==========================================
 # PARED
@@ -490,7 +502,6 @@ func obtener_normal_pendiente_por_raycast() -> Vector2:
 	return mejor_normal_pendiente
 
 
-
 func actualizar_rotacion_pendiente(delta: float) -> void:
 
 	# ==========================================
@@ -506,18 +517,39 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 
 		if sigue_en_ascenso:
 
-			en_pendiente = false
-			deslizandose_pendiente = false
+			# Comprobar contacto físico con una pendiente
+			# demasiado inclinada.
+			var contacto_pendiente := (
+				obtener_normal_contacto_pendiente_inclinada()
+				!= Vector2.ZERO
+			)
 
-			normal_pendiente = Vector2.ZERO
-			normal_pendiente_suavizada = Vector2.ZERO
+			if contacto_pendiente:
 
-			player.rotation = 0.0
-			player.animated_sprite.rotation = 0.0
+				tiempo_detectando_pendiente += delta
 
-			return
+				# Esperar a que el contacto sea continuo
+				# durante 0.1 segundos.
+				if tiempo_detectando_pendiente < TIEMPO_CONFIRMACION_PENDIENTE:
+					return
 
-		ignorar_pendiente_mientras_asciende = false
+				# Contacto confirmado.
+				ignorar_pendiente_mientras_asciende = false
+				tiempo_detectando_pendiente = 0.0
+
+			else:
+
+				# Si pierde el contacto, reiniciar el contador.
+				tiempo_detectando_pendiente = 0.0
+
+				# Continuar ignorando la pendiente durante el salto.
+				return
+
+		else:
+
+			# Ya terminó el ascenso.
+			ignorar_pendiente_mientras_asciende = false
+			tiempo_detectando_pendiente = 0.0
 
 	# ==========================================
 	# DETECTAR CONTACTO REAL CON PENDIENTE
@@ -686,7 +718,6 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 	normal_pendiente = normal_pendiente_suavizada
 	en_pendiente = true
 
-	# IMPORTANTE:
 	# Solo una colisión física directa con una pendiente
 	# superior a 50 grados activa el deslizamiento.
 	deslizandose_pendiente = (
@@ -719,8 +750,6 @@ func actualizar_rotacion_pendiente(delta: float) -> void:
 
 	if not rotacion_aplicada:
 		return
-
-
 
 func rotar_manteniendo_apoyo(
 	nueva_rotacion: float,
@@ -1549,7 +1578,6 @@ func _physics_process(delta: float) -> void:
 
 
 
-
 func procesar_pendiente_inclinada(delta: float) -> void:
 
 	if normal_pendiente == Vector2.ZERO:
@@ -1566,6 +1594,7 @@ func procesar_pendiente_inclinada(delta: float) -> void:
 	if tangente.y < 0.0:
 		tangente = -tangente
 
+	# Calcular en tiempo real hacia qué lado baja.
 	var direccion_cuesta_abajo := signf(tangente.x)
 
 	# ==========================================
@@ -1584,47 +1613,70 @@ func procesar_pendiente_inclinada(delta: float) -> void:
 	player.velocity.x = 0.0
 
 	# ==========================================
-	# VELOCIDAD DE CAÍDA OBJETIVO
+	# CALCULAR VELOCIDAD SEGÚN LA DIRECCIÓN
 	# ==========================================
 
-	# Al subir, cae lentamente.
-	var velocidad_caida_objetivo := lerpf(
-		10.0,
-		55.0,
-		factor_inclinacion
-	)
-
-	# Al bajar, cae un poco más rápido.
 	if direccion != 0.0:
 
 		if signf(direccion) == direccion_cuesta_abajo:
 
-			velocidad_caida_objetivo += lerpf(
-				15.0,
-				25.0,
+			# ==========================================
+			# CUESTA ABAJO
+			# ==========================================
+
+			# Aplicar un impulso inicial solamente
+			# cuando empieza a pulsar cuesta abajo.
+			if not estaba_pulsando_cuesta_abajo:
+
+				player.velocity.y += IMPULSO_INICIAL_CUESTA_ABAJO
+
+				estaba_pulsando_cuesta_abajo = true
+
+			# Aumentar la velocidad progresivamente.
+			player.velocity.y += (
+				ACELERACION_DESLIZAMIENTO_PENDIENTE
+				* factor_inclinacion
+				* delta
+			)
+
+			# Limitar la velocidad máxima de caída.
+			player.velocity.y = minf(
+				player.velocity.y,
+				VELOCIDAD_MAXIMA_CAIDA_PENDIENTE
+			)
+
+		else:
+
+			# ==========================================
+			# CUESTA ARRIBA
+			# ==========================================
+
+			estaba_pulsando_cuesta_abajo = false
+
+			var velocidad_objetivo := lerpf(
+				10.0,
+				55.0,
 				factor_inclinacion
 			)
 
-	# ==========================================
-	# APLICAR VELOCIDAD
-	# ==========================================
-
-	if direccion != 0.0:
-
-		player.velocity.y = move_toward(
-			player.velocity.y,
-			velocidad_caida_objetivo,
-			7000.0 * delta
-		)
+			player.velocity.y = move_toward(
+				player.velocity.y,
+				velocidad_objetivo,
+				7000.0 * delta
+			)
 
 	else:
 
-		# Si no se pulsa ninguna dirección,
-		# dejar que la gravedad actúe normalmente.
+		# ==========================================
+		# SIN DIRECCIÓN
+		# ==========================================
+
+		estaba_pulsando_cuesta_abajo = false
+
+		# Gravedad natural sobre la pendiente.
 		player.velocity.y += (
 			GRAVITY * factor_inclinacion * delta
 		)
-
 
 
 func saltar() -> void:
@@ -1640,6 +1692,10 @@ func saltar() -> void:
 
 	if ataques.turbo_activo:
 		return
+
+	# ==========================================
+	# SALTO DESDE PARED
+	# ==========================================
 
 	if agarrado_pared:
 
@@ -1662,17 +1718,62 @@ func saltar() -> void:
 		player.restablecer_visual_suelo()
 
 		return
+
+	# ==========================================
+	# SALTO DESDE SUELO O PENDIENTE
+	# ==========================================
+
 	if player.is_on_floor() or en_pendiente or deslizandose_pendiente:
+
+		# Guardar si Eva estaba sobre una pendiente.
+		var salta_desde_pendiente := (
+			en_pendiente or deslizandose_pendiente
+		)
+
+		# Guardar la normal antes de borrar el estado.
+		var normal_salto := normal_pendiente.normalized()
 
 		ignorar_pendiente_mientras_asciende = true
 		altura_inicio_salto = player.global_position.y
-		# Cancelar el deslizamiento.
+
+		# ==========================================
+		# IMPULSO LATERAL DESDE PENDIENTE
+		# ==========================================
+
+		if salta_desde_pendiente and normal_salto != Vector2.ZERO:
+
+			var angulo_pendiente := rad_to_deg(
+				acos(clamp(
+					normal_salto.dot(Vector2.UP),
+					-1.0,
+					1.0
+				))
+			)
+
+			# Aplicar el impulso solamente en pendientes
+			# superiores al ángulo máximo permitido.
+			if angulo_pendiente > ANGULO_MAXIMO_PENDIENTE:
+
+				# La normal indica el lado hacia el que
+				# debe impulsarse Eva para alejarse.
+				var direccion_lateral := signf(normal_salto.x)
+
+				player.velocity.x = (
+					direccion_lateral
+					* IMPULSO_LATERAL_SALTO_PENDIENTE
+				)
+		# ==========================================
+		# CANCELAR DESLIZAMIENTO
+		# ==========================================
+
 		en_pendiente = false
 		deslizandose_pendiente = false
 		normal_pendiente = Vector2.ZERO
 		velocidad_deslizamiento = 0.0
+
 		tiempo_sin_contacto_pendiente = 0.0
 		tiempo_detectando_pendiente = 0.0
+		estaba_pulsando_cuesta_abajo = false
 
 		player.rotation = 0.0
 		player.animated_sprite.rotation = 0.0
@@ -1693,6 +1794,10 @@ func saltar() -> void:
 
 		return
 
+	# ==========================================
+	# DOBLE SALTO
+	# ==========================================
+
 	if not seSalto:
 
 		if player.poseeDobleSalto:
@@ -1702,7 +1807,6 @@ func saltar() -> void:
 			seSalto = true
 
 			player.animacion_salto()
-
 # ==========================================
 # SALTO FUEGO
 # ==========================================

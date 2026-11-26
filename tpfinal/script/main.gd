@@ -12,6 +12,7 @@ extends Node2D
 @export var escena_creditos: PackedScene
 
 var instancia_creditos: Control = null
+var canvas_creditos: CanvasLayer = null
 
 # =========================================================
 # NIVEL INICIAL
@@ -150,7 +151,7 @@ func crear_transicion(ruta_nivel: String) -> Node:
 		push_error(
 			"MAIN: la escena de transición no tiene el método iniciar()"
 		)
-		transicion.queue_free()
+		transicion.queue_free.call_deferred()
 		return null
 
 	# El nombre se obtiene de la ruta del archivo del nivel.
@@ -182,7 +183,7 @@ func esperar_transicion_dibujada(transicion: Node) -> void:
 func cancelar_transicion(transicion: Node) -> void:
 
 	if is_instance_valid(transicion):
-		transicion.queue_free()
+		transicion.queue_free.call_deferred()
 
 
 # =========================================================
@@ -198,7 +199,7 @@ func finalizar_transicion(transicion: Node) -> void:
 		push_error(
 			"MAIN: la transición no tiene el método revelar_nivel()"
 		)
-		transicion.queue_free()
+		transicion.queue_free.call_deferred()
 		return
 
 	await transicion.call("revelar_nivel")
@@ -376,7 +377,7 @@ func continue_game() -> void:
 
 	if not nuevo_game is Node2D:
 		print("ERROR 6: el nivel no es Node2D")
-		nuevo_game.queue_free()
+		nuevo_game.queue_free.call_deferred()
 		cancelar_transicion(transicion)
 		return
 
@@ -387,7 +388,7 @@ func continue_game() -> void:
 			" ms"
 		)
 
-		game.queue_free()
+		game.queue_free.call_deferred()
 		game = null
 
 		print(
@@ -826,13 +827,13 @@ func retry_game() -> void:
 
 	if not nuevo_game is Node2D:
 		print("ERROR: el nivel nuevo no es Node2D")
-		nuevo_game.queue_free()
+		nuevo_game.queue_free.call_deferred()
 		cancelar_transicion(transicion)
 		return
 
 	print("BORRANDO NIVEL COMPLETO")
 
-	game.queue_free()
+	game.queue_free.call_deferred()
 	game = null
 
 	Settings.checkpoint = checkpoint_guardado
@@ -945,7 +946,7 @@ func load_level(level_scene: PackedScene) -> void:
 
 	if not nuevo_game is Node2D:
 		push_error("LOAD_LEVEL: el nivel no es Node2D")
-		nuevo_game.queue_free()
+		nuevo_game.queue_free.call_deferred()
 		cancelar_transicion(transicion)
 		return
 
@@ -960,7 +961,7 @@ func load_level(level_scene: PackedScene) -> void:
 			" ms"
 		)
 
-		game.queue_free()
+		game.queue_free.call_deferred()
 		game = null
 
 		var antes_frame_borrado := Time.get_ticks_msec()
@@ -1102,7 +1103,7 @@ func _on_main_menu() -> void:
 	print("MAIN: game antes de eliminar = ", game)
 
 	if game != null:
-		game.queue_free()
+		game.queue_free.call_deferred()
 		game = null
 
 	ruta_nivel_actual = ""
@@ -1120,12 +1121,13 @@ func _on_main_menu() -> void:
 # =========================================================
 
 
+# =========================================================
+# MOSTRAR CRÉDITOS
+# =========================================================
+
 func mostrar_creditos() -> void:
 
-	print("")
-	print("========================================")
 	print("MAIN: MOSTRANDO CRÉDITOS")
-	print("========================================")
 
 	get_tree().paused = false
 	Settings.sePuedePausar = false
@@ -1133,57 +1135,47 @@ func mostrar_creditos() -> void:
 	hud.hide()
 
 	if game != null:
-		game.queue_free()
+		game.queue_free.call_deferred()
 		game = null
 
 	ruta_nivel_actual = ""
 
 	if escena_creditos == null:
-		push_error("MAIN: no se asignó escena_creditos en el Inspector")
+		push_error("MAIN: no se asignó escena_creditos")
 		hud.show()
 		hud.show_main_menu()
 		return
 
+	# Crear una capa independiente para los créditos.
+	canvas_creditos = CanvasLayer.new()
+	canvas_creditos.name = "CanvasCreditos"
+	canvas_creditos.layer = 50
+	canvas_creditos.process_mode = Node.PROCESS_MODE_ALWAYS
+
+	add_child(canvas_creditos)
+
+	# Instanciar los créditos sin modificar su estructura interna.
 	instancia_creditos = escena_creditos.instantiate() as Control
 
 	if instancia_creditos == null:
-		push_error("MAIN: no se pudo instanciar la escena de créditos")
+		push_error("MAIN: no se pudieron instanciar los créditos")
+		canvas_creditos.queue_free()
+		canvas_creditos = null
 		hud.show()
 		hud.show_main_menu()
 		return
 
 	instancia_creditos.process_mode = Node.PROCESS_MODE_ALWAYS
 
-	# Primero agregamos la escena al árbol.
-	get_tree().root.add_child(instancia_creditos)
+	canvas_creditos.add_child(instancia_creditos)
 
-	# Después ajustamos su tamaño.
-	instancia_creditos.set_anchors_and_offsets_preset(
-		Control.PRESET_FULL_RECT
-	)
-
-	# También hacemos que el Control interno ocupe toda la pantalla.
-	var control_interno = instancia_creditos.get_node_or_null("Control")
-
-	if control_interno is Control:
-		control_interno.set_anchors_and_offsets_preset(
-			Control.PRESET_FULL_RECT
-		)
-
-		var scroll = control_interno.get_node_or_null("ScrollContainer")
-
-		if scroll is Control:
-			scroll.set_anchors_and_offsets_preset(
-				Control.PRESET_FULL_RECT
-			)
-
+	# Conectar señal.
 	if instancia_creditos.has_signal("creditos_terminados"):
-		if not instancia_creditos.creditos_terminados.is_connected(_on_creditos_terminados):
-			instancia_creditos.creditos_terminados.connect(_on_creditos_terminados)
+		instancia_creditos.creditos_terminados.connect(
+			_on_creditos_terminados
+		)
 	else:
 		push_error("MAIN: Creditos no tiene la señal creditos_terminados")
-
-
 # =========================================================
 # CRÉDITOS TERMINADOS
 # =========================================================
@@ -1191,12 +1183,12 @@ func _on_creditos_terminados() -> void:
 
 	print("MAIN: LOS CRÉDITOS TERMINARON")
 
-	if is_instance_valid(instancia_creditos):
-		instancia_creditos.queue_free()
+	if is_instance_valid(canvas_creditos):
+		canvas_creditos.queue_free()
 
+	canvas_creditos = null
 	instancia_creditos = null
 
-	# Volver a mostrar el HUD y el menú principal.
 	hud.show()
 	hud.show_main_menu()
 

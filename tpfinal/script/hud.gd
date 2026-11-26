@@ -21,7 +21,8 @@ var paso_configuracion_inicial: PasoConfiguracionInicial = PasoConfiguracionInic
 var panel_explicacion_controles: PanelContainer
 var etiqueta_explicacion_modo_a: Label
 var etiqueta_explicacion_modo_b: Label
-
+# Indica desde dónde se abrió la pantalla de sonido.
+var origen_sonido: String = "opciones"
 # =========================================================
 # SONIDO DE BOTONES
 # =========================================================
@@ -43,6 +44,9 @@ var sonido_boton_presionado: AudioStream
 # =========================================================
 
 func _ready() -> void:
+	# Conectar la señal de la escena Sonido.
+	if not $Sonido.volver.is_connected(_on_sonido_volver):
+		$Sonido.volver.connect(_on_sonido_volver)
 	# Cargar el sonido genérico de los botones.
 	if ResourceLoader.exists(RUTA_SONIDO_BOTON_PRESIONADO):
 		sonido_boton_presionado = load(RUTA_SONIDO_BOTON_PRESIONADO) as AudioStream
@@ -75,8 +79,6 @@ func _ready() -> void:
 	if pantalla_controles_inicial is Control:
 		pantalla_controles_inicial.hide()
 
-	_configurar_pantalla_sonido()
-	_cargar_volumenes()
 
 	# Recuperar los datos antes de actualizar el estado de los botones.
 	# En modo navegador, los datos están en memoria y no existe RUTA_GUARDADO.
@@ -165,6 +167,11 @@ func _ready() -> void:
 	var continuar_button = $Pause/CenterContainer/VBoxContainer/Continuar
 	if not continuar_button.pressed.is_connected(_on_continuar_button_pressed):
 		continuar_button.pressed.connect(_on_continuar_button_pressed)
+
+	# Botón Sonido de pausa.
+	var pause_sonido_button = $Pause/CenterContainer/VBoxContainer/Sonido
+	if not pause_sonido_button.pressed.is_connected(_on_pause_sonido_pressed):
+		pause_sonido_button.pressed.connect(_on_pause_sonido_pressed)
 
 	var pause_menu_button = $Pause/CenterContainer/VBoxContainer/MainMenuButton
 	if not pause_menu_button.pressed.is_connected(_on_main_menu_button2_pressed):
@@ -851,27 +858,6 @@ func _input(event: InputEvent) -> void:
 		return
 
 	# =====================================================
-	# SELECTORES DE VOLUMEN
-	# =====================================================
-
-	if $Sonido.visible:
-
-		var enfocado := get_viewport().gui_get_focus_owner()
-
-		if enfocado is HSlider:
-
-			var direccion := -1.0 if izquierda else 1.0
-
-			# Pulsación inicial: 1 punto.
-			# Mientras se mantiene presionada: 5 puntos.
-			var incremento := 5.0 if tecla.echo else 1.0
-
-			enfocado.value += direccion * incremento
-
-			get_viewport().set_input_as_handled()
-			return
-
-	# =====================================================
 	# SELECTORES DE CONTROLES
 	# =====================================================
 
@@ -967,7 +953,8 @@ func obtener_botones_visibles() -> Array[Button]:
 		$Pause,
 		$Confirmacion,
 		$SelectorNiveles,
-		$Controles
+		$Controles,
+		$Sonido
 	]
 
 
@@ -1302,12 +1289,8 @@ func update_language() -> void:
 		volver_opciones.text = "Volver" if es else "Back"
 
 	# Menú de sonido.
-	var sonido = $Sonido/CenterContainer/VBoxContainer
-	sonido.get_node("LabelSonido").text = "Efectos de sonido" if es else "Sound Effects"
-	sonido.get_node("LabelMusica").text = "Música" if es else "Music"
-	sonido.get_node("LabelVoces").text = "Voces" if es else "Voices"
-	sonido.get_node("BackButton").text = "Volver" if es else "Back"
-
+	$Sonido.actualizar_idioma()
+	
 	# Menú de idioma.
 	var idioma = $LanguageMenu/CenterContainer/VBoxContainer
 	idioma.get_node("Title").text = "Idioma" if es else "Language"
@@ -1326,7 +1309,7 @@ func update_language() -> void:
 	pausa.get_node("Message").text = "Pausa" if es else "Pause"
 	pausa.get_node("Continuar").text = "Continuar" if es else "Resume"
 	pausa.get_node("MainMenuButton").text = "Volver al menú principal" if es else "Back to Main Menu"
-
+	pausa.get_node("Sonido").text = "Sonido" if es else "Sound"
 	# Selector de niveles.
 	var selector = $SelectorNiveles/CenterContainer/VBoxContainer
 	selector.get_node("Title").text = "Selector de niveles" if es else "Level Select"
@@ -1510,7 +1493,7 @@ func actualizar_selector_niveles() -> void:
 	for hijo in vbox.get_children():
 		if hijo is Button and hijo != boton_volver and hijo != titulo:
 			vbox.remove_child(hijo)
-			hijo.queue_free()
+			hijo.queue_free.call_deferred()
 
 	vbox.move_child(titulo, 0)
 
@@ -1603,216 +1586,42 @@ func _on_selector_niveles_back_pressed() -> void:
 # PANTALLA DE SONIDO
 # =========================================================
 
-const RUTA_OPCIONES_SONIDO := "user://opciones.cfg"
+# =========================================================
+# PANTALLA DE SONIDO
+# =========================================================
 
-
-func _configurar_pantalla_sonido() -> void:
-
-	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
-
-	var sonido_slider: HSlider = vbox_sonido.get_node("SonidoSlider")
-	var musica_slider: HSlider = vbox_sonido.get_node("MusicaSlider")
-	var voces_slider: HSlider = vbox_sonido.get_node("VocesSlider")
-	var back_button: Button = vbox_sonido.get_node("BackButton")
-
-
-	# Los tres deslizadores usan porcentajes de 0 a 100.
-	for slider in [sonido_slider, musica_slider, voces_slider]:
-
-		slider.min_value = 0
-		slider.max_value = 100
-		slider.step = 1
-
-
-	if not sonido_slider.value_changed.is_connected(
-		_on_sonido_slider_changed
-	):
-		sonido_slider.value_changed.connect(
-			_on_sonido_slider_changed
-		)
-
-
-	if not musica_slider.value_changed.is_connected(
-		_on_musica_slider_changed
-	):
-		musica_slider.value_changed.connect(
-			_on_musica_slider_changed
-		)
-
-
-	if not voces_slider.value_changed.is_connected(
-		_on_voces_slider_changed
-	):
-		voces_slider.value_changed.connect(
-			_on_voces_slider_changed
-		)
-
-
-	if not back_button.pressed.is_connected(
-		_on_sonido_back_button_pressed
-	):
-		back_button.pressed.connect(
-			_on_sonido_back_button_pressed
-		)
-
-
-func _on_sonido_button_pressed() -> void:
-
-	print("1. Se presionó Sonido")
+func _abrir_sonido(origen: String) -> void:
+	origen_sonido = origen
 
 	$MainMenu.hide()
 	$GameOver.hide()
 	$LanguageMenu.hide()
 	$Opciones.hide()
-
 	$Pause.hide()
 	$SelectorNiveles.hide()
 	$Confirmacion.hide()
 	$Controles.hide()
 
-	print("2. Voy a mostrar la pantalla")
-
 	$Sonido.show()
-
-	print("3. Pantalla mostrada")
-
 	$Sonido/CenterContainer/VBoxContainer/SonidoSlider.grab_focus()
 
-	print("4. Foco asignado")
+
+func _on_sonido_button_pressed() -> void:
+	_abrir_sonido("opciones")
 
 
-func _on_sonido_back_button_pressed() -> void:
-	show_opciones()
+func _on_pause_sonido_pressed() -> void:
+	_abrir_sonido("pausa")
 
 
-func _on_sonido_slider_changed(valor: float) -> void:
+func _on_sonido_volver() -> void:
+	$Sonido.hide()
 
-	_cambiar_volumen_bus("Sonido", valor)
-	_guardar_volumenes()
-
-
-func _on_musica_slider_changed(valor: float) -> void:
-
-	_cambiar_volumen_bus("Musica", valor)
-	_guardar_volumenes()
-
-
-func _on_voces_slider_changed(valor: float) -> void:
-
-	_cambiar_volumen_bus("Voces", valor)
-	_guardar_volumenes()
-
-
-func _cambiar_volumen_bus(nombre_bus: String, valor: float) -> void:
-
-	var indice_bus := AudioServer.get_bus_index(nombre_bus)
-
-	if indice_bus == -1:
-		push_warning("No se encontró el bus de audio: " + nombre_bus)
-		return
-
-	if valor <= 0.0:
-		AudioServer.set_bus_volume_db(indice_bus, -80.0)
+	if origen_sonido == "pausa":
+		$Pause.show()
+		$Pause/CenterContainer/VBoxContainer/Sonido.grab_focus()
 	else:
-		AudioServer.set_bus_volume_db(
-			indice_bus,
-			linear_to_db(valor / 100.0)
-		)
-
-
-func _guardar_volumenes() -> void:
-	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
-	var efectos: float = float(vbox_sonido.get_node("SonidoSlider").value)
-	var musica: float = float(vbox_sonido.get_node("MusicaSlider").value)
-	var voces: float = float(vbox_sonido.get_node("VocesSlider").value)
-
-	
-	Save.volumenes_memoria = {
-			"efectos": efectos,
-			"musica": musica,
-			"voces": voces
-		}
-		
-
-	var config := ConfigFile.new()
-	config.set_value(
-		"sonido",
-		"efectos",
-		efectos
-	)
-
-	config.set_value(
-		"sonido",
-		"musica",
-		musica
-	)
-
-	config.set_value(
-		"sonido",
-		"voces",
-		voces
-	)
-
-
-	var error := config.save(RUTA_OPCIONES_SONIDO)
-
-	if error != OK:
-
-		push_error(
-			"No se pudieron guardar las opciones de sonido. Error: "
-			+ str(error)
-		)
-
-	else:
-
-		print("VOLUMENES GUARDADOS")
-		print("Efectos: ", config.get_value("sonido", "efectos"))
-		print("Música: ", config.get_value("sonido", "musica"))
-		print("Voces: ", config.get_value("sonido", "voces"))
-		print("Ruta: ", RUTA_OPCIONES_SONIDO)
-
-func _cargar_volumenes() -> void:
-	var vbox_sonido = $Sonido/CenterContainer/VBoxContainer
-
-	var sonido_slider: HSlider = vbox_sonido.get_node("SonidoSlider")
-	var musica_slider: HSlider = vbox_sonido.get_node("MusicaSlider")
-	var voces_slider: HSlider = vbox_sonido.get_node("VocesSlider")
-
-	var config := ConfigFile.new()
-	var error := config.load(RUTA_OPCIONES_SONIDO)
-
-	if error == OK:
-		sonido_slider.set_value_no_signal(
-			float(config.get_value("sonido", "efectos", 50.0))
-		)
-		musica_slider.set_value_no_signal(
-			float(config.get_value("sonido", "musica", 50.0))
-		)
-		voces_slider.set_value_no_signal(
-			float(config.get_value("sonido", "voces", 50.0))
-		)
-
-		print("VOLUMENES CARGADOS")
-	else:
-		sonido_slider.set_value_no_signal(50.0)
-		musica_slider.set_value_no_signal(50.0)
-		voces_slider.set_value_no_signal(50.0)
-
-		print("No se pudo cargar opciones.cfg. Error: ", error)
-		print("Se usarán los valores predeterminados: 50 %.")
-
-		_guardar_volumenes()
-
-	# Aplicar los valores al mezclador.
-	_cambiar_volumen_bus("Sonido", sonido_slider.value)
-	_cambiar_volumen_bus("Musica", musica_slider.value)
-	_cambiar_volumen_bus("Voces", voces_slider.value)
-
-	print("Efectos: ", sonido_slider.value)
-	print("Música: ", musica_slider.value)
-	print("Voces: ", voces_slider.value)
-	print("Archivo: ", RUTA_OPCIONES_SONIDO)
-
+		show_opciones()
 func _on_spanish_button_pressed() -> void:
 	Settings.language = "es"
 

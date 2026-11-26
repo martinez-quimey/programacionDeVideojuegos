@@ -103,4 +103,4 @@ func revelar_nivel() -> void:
 
 	await tween.finished
 
-	queue_free()
+	queue_free.call_deferred()

@@ -1,8 +1,4 @@
 
-
-
-
-
 extends Control
 
 signal creditos_terminados
@@ -21,8 +17,7 @@ func _ready() -> void:
 
 	set_process(false)
 
-	# Evitar que los créditos se vean en su posición original
-	# mientras Godot calcula los tamaños.
+	# Evitar que los créditos se vean mientras Godot calcula los tamaños.
 	visible = false
 
 	actualizar_idioma()
@@ -30,23 +25,26 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	# Calcular la posición vertical necesaria para que
-	# la parte superior de los créditos empiece debajo
-	# del área visible.
-	var altura_area = viewport_creditos.size.y
+	# Obtener los límites del área visible y del contenido.
+	var rect_area = viewport_creditos.get_global_rect()
 	var altura_contenedor = center_container.size.y
 	var altura_creditos = vbox.size.y
 
-	center_container.position.y = (
-		altura_area
-		- (altura_contenedor - altura_creditos) / 2.0
+	# Ajustar exclusivamente la posición vertical.
+	# El VBox comienza justo debajo del área visible.
+	var espacio_centrado = (
+		altura_contenedor - altura_creditos
+	) / 2.0
+
+	center_container.global_position.y = (
+		rect_area.end.y - espacio_centrado
 	)
 
 	print("================================")
 	print("CRÉDITOS: inicio")
 	print("Esquina superior: ", vbox.get_global_rect().position)
 	print("Esquina inferior: ", vbox.get_global_rect().end)
-	print("Altura del área: ", altura_area)
+	print("Área visible: ", rect_area)
 	print("Altura de créditos: ", altura_creditos)
 	print("Velocidad: ", velocidad)
 	print("================================")
@@ -60,24 +58,23 @@ func _process(delta: float) -> void:
 	if creditos_finalizados:
 		return
 
-	# Mover únicamente el contenedor en vertical.
-	# El VBoxContainer conserva su alineación y diseño.
+	# Desplazar los créditos únicamente hacia arriba.
 	center_container.position.y -= velocidad * delta
 
-	# Obtener los límites reales de los créditos.
+	# Consultar los límites actualizados.
 	var rect_creditos = vbox.get_global_rect()
 	var rect_area = viewport_creditos.get_global_rect()
 
 	var esquina_superior = rect_creditos.position
 	var esquina_inferior = rect_creditos.end
 
-	# Detectar cuándo empiezan a aparecer.
-	if not inicio_detectado and esquina_superior.y <= rect_area.position.y:
+	# Detectar cuándo los créditos comienzan a entrar.
+	if not inicio_detectado and esquina_superior.y <= rect_area.end.y:
 
 		inicio_detectado = true
 		print("CRÉDITOS: comenzaron a aparecer")
 
-	# Detectar cuándo terminaron de pasar.
+	# Detectar cuándo todo el contenido salió por arriba.
 	if esquina_inferior.y < rect_area.position.y:
 
 		creditos_finalizados = true

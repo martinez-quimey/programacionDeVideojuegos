@@ -145,7 +145,7 @@ func _enter_tree() -> void:
 			id_baya
 		)
 
-		queue_free()
+		queue_free.call_deferred()
 
 
 # =========================================================
@@ -173,7 +173,7 @@ func _ready() -> void:
 		interaction_area.set_deferred("monitoring", false)
 		interaction_area.set_deferred("monitorable", false)
 
-		queue_free()
+		queue_free.call_deferred()
 		return
 
 	actualizar_sprite()
@@ -311,7 +311,7 @@ func recoger_baya(player: Node) -> void:
 	)
 
 	reproducir_particulas()
-	queue_free()
+	queue_free.call_deferred()
 
 
 # =========================================================
@@ -486,7 +486,7 @@ func recalcular_estado() -> void:
 
 	if obtenida:
 		print("[BAYA][RECALCULAR] La baya ya fue recogida. Eliminando nodo.")
-		queue_free()
+		queue_free.call_deferred()
 		return
 
 	print("[BAYA][RECALCULAR] La baya no figura como recogida. Se mantiene visible.")

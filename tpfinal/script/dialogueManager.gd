@@ -167,7 +167,7 @@ func end_dialogue() -> void:
 		dialogue_box.hide_dialogue()
 
 	if current_dialogue != null:
-		current_dialogue.queue_free()
+		current_dialogue.queue_free.call_deferred()
 		current_dialogue = null
 
 	current_line = 0

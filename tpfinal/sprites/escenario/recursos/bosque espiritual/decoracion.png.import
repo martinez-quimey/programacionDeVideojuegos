@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccg3ooipjcj5i"
-path="res://.godot/imported/pendientemadera.png-dde919ead712bc3dd0c5ce31f4b995af.ctex"
+uid="uid://me13j1mitpvh"
+path="res://.godot/imported/decoracion.png-b13d4fe270d7b0f913ac397e8869b055.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/escenario/pendientemadera.png"
-dest_files=["res://.godot/imported/pendientemadera.png-dde919ead712bc3dd0c5ce31f4b995af.ctex"]
+source_file="res://sprites/escenario/recursos/bosque espiritual/decoracion.png"
+dest_files=["res://.godot/imported/decoracion.png-b13d4fe270d7b0f913ac397e8869b055.ctex"]
 
 [params]
 

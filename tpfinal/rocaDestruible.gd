@@ -31,4 +31,4 @@ func romper_por_tornado() -> void:
 
 	await get_tree().create_timer(0.5).timeout
 	# Eliminar la roca
-	queue_free()
+	queue_free.call_deferred()

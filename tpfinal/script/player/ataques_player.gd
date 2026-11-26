@@ -1115,4 +1115,4 @@ func _on_projectile_delete_requested(
 		projectile
 	)
 
-	projectile.queue_free()
+	projectile.queue_free.call_deferred()

@@ -74,4 +74,4 @@ func recoger_baya(player: Node) -> void:
 	# Liberar las partículas cuando termine su emisión.
 	particulas.finished.connect(particulas.queue_free)
 
-	queue_free()
+	queue_free.call_deferred()

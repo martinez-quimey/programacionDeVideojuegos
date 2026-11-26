@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bscfbohnry7f4"
-path="res://.godot/imported/decoracion.png-d53158fba10fb7748410561589e98570.ctex"
+uid="uid://dn0ip8mlnj10u"
+path="res://.godot/imported/montaña.png-61181fa53445ddc561213a65acfbe416.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/escenario/decoracion.png"
-dest_files=["res://.godot/imported/decoracion.png-d53158fba10fb7748410561589e98570.ctex"]
+source_file="res://sprites/escenario/recursos/bosque espiritual/montaña.png"
+dest_files=["res://.godot/imported/montaña.png-61181fa53445ddc561213a65acfbe416.ctex"]
 
 [params]
 

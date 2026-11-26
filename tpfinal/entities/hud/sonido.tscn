@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://dwv43c0wymevx"]
+
+[ext_resource type="FontFile" uid="uid://d1wt1cluy8xho" path="res://fonts/Cinzel_Decorative/CinzelDecorative-Black.ttf" id="1_174w0"]
+[ext_resource type="Script" uid="uid://dqfjcrriuplex" path="res://entities/hud/sonido.gd" id="1_w6vc8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nhrkl"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.2509804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cdv6k"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.62352943)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mcea6"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0.29803923, 0.6392157, 0.4392157)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_npr4g"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0, 0, 0, 0.2509804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jqn4v"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0.5882353, 0.6392157, 0, 0.4)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4jn62"]
+bg_color = Color(0.6748077, 0.5935568, 0.37265283, 1)
+
+[node name="Sonido" type="Control" unique_id=447680209]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_w6vc8")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=533080846]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 141.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=2007077698]
+layout_mode = 2
+
+[node name="LabelSonido" type="Label" parent="CenterContainer/VBoxContainer" unique_id=582013672]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_174w0")
+
+[node name="SonidoSlider" type="HSlider" parent="CenterContainer/VBoxContainer" unique_id=1818762917]
+layout_mode = 2
+
+[node name="LabelMusica" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1933952569]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_174w0")
+
+[node name="MusicaSlider" type="HSlider" parent="CenterContainer/VBoxContainer" unique_id=194569963]
+layout_mode = 2
+
+[node name="LabelVoces" type="Label" parent="CenterContainer/VBoxContainer" unique_id=58143025]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_174w0")
+
+[node name="VocesSlider" type="HSlider" parent="CenterContainer/VBoxContainer" unique_id=1779792905]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1829438564]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_nhrkl")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_cdv6k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mcea6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_npr4g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqn4v")
+text = "Startt"
+
+[node name="Panel" type="Panel" parent="." unique_id=2056571028]
+z_index = -1
+layout_mode = 0
+offset_left = -353.0
+offset_top = -238.0
+offset_right = 1929.0
+offset_bottom = 1028.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jn62")

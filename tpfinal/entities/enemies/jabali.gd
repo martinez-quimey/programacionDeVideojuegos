@@ -692,11 +692,11 @@ func morir() -> void:
 				await get_tree().create_timer(duracion).timeout
 
 				if is_instance_valid(self):
-					queue_free()
+					queue_free.call_deferred()
 
 				return
 
-	queue_free()
+	queue_free.call_deferred()
 	
 	
 # =========================================================

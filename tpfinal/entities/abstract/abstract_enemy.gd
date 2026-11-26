@@ -184,7 +184,7 @@ func soltar_explosion_nube() -> void:
 # MUERTE PREDETERMINADA
 # Los enemigos con animación de muerte deben sobrescribir esta función.
 func morir() -> void:
-	queue_free()
+	queue_free.call_deferred()
 
 
 # RECIBIR DAÑO

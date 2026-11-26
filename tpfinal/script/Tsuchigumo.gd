@@ -1530,7 +1530,7 @@ func morir() -> void:
 
 	soltar_explosion_nube()
 
-	queue_free()
+	queue_free.call_deferred()
 
 
 # =========================================================

@@ -1,8 +1,17 @@
+
 extends AbstractNPC
 class_name Ciervo1
 
-
 @export var dialogue_script: Script
+
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+
+func _ready() -> void:
+	super._ready()
+
+	if sprite.sprite_frames != null:
+		sprite.play("default")
 
 
 func interact() -> void:

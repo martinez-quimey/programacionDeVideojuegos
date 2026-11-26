@@ -83,7 +83,7 @@ func _crear_colas() -> void:
 		return
 
 	for cola in colas:
-		cola.queue_free()
+		cola.queue_free.call_deferred()
 
 	colas.clear()
 
